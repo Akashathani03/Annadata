@@ -1,0 +1,10 @@
+.ui-back-link {
+  background: none;
+  border: none;
+  color: var(--green-dark);
+  font-weight: 700;
+  font-size: 13.5px;
+  cursor: pointer;
+  padding: 0 0 16px;
+  display: block;
+}

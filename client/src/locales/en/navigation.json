@@ -1,0 +1,29 @@
+{
+  "category": {
+    "crops": "Crops",
+    "animals": "Animals",
+    "shops": "Shops",
+    "schemes": "Government Schemes",
+    "agroAI": "Agro AI"
+  },
+  "categoryDesc": {
+    "crops": "Sell your crops, buy fresh produce, and check today's market prices.",
+    "animals": "Sell and buy livestock directly with nearby farmers.",
+    "shops": "Explore nearby agri shops or manage your own shop.",
+    "schemes": "Explore and apply for schemes for farmers.",
+    "agroAI": "Ask anything about farming and get instant answers."
+  },
+  "crops": {
+    "marketPrices": "Market Prices",
+    "sellCrop": "Sell Crop",
+    "buyCrop": "Buy Crops"
+  },
+  "animals": {
+    "sellAnimal": "Sell Animals",
+    "buyAnimal": "Buy Animals"
+  },
+  "shops": {
+    "nearShop": "Near Shops",
+    "manageShop": "🏪 Shop Owner"
+  }
+}

@@ -1,0 +1,86 @@
+.agroai-empty-state {
+  margin: auto 0; /* vertically centers within ChatArea's flex column, per requirement 6 */
+  padding: 28px 18px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.agroai-empty-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--green-light);
+  color: var(--green-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+
+.agroai-empty-greeting {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.agroai-empty-intro {
+  margin: 0 0 20px;
+  font-size: 13px;
+  color: var(--muted);
+  max-width: 260px;
+  line-height: 1.5;
+}
+
+.agroai-empty-state .quick-actions {
+  margin-bottom: 18px;
+}
+
+.agroai-empty-examples {
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.agroai-empty-examples-label {
+  margin: 0 0 2px 2px;
+  font-size: 11px;
+  color: var(--muted);
+  text-align: left;
+}
+
+.agroai-example-chip {
+  text-align: left;
+  padding: 9px 12px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  font-size: 12.5px;
+  font-family: inherit;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.agroai-example-chip:hover {
+  border-color: var(--green);
+  color: var(--text);
+}
+
+.agroai-example-chip:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(46, 125, 70, 0.2);
+}
+
+.agroai-empty-upload-hint {
+  margin: 0;
+  font-size: 11px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}

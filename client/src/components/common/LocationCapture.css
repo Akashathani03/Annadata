@@ -1,0 +1,135 @@
+.loc-capture-gps-btn {
+  width: 100%;
+  padding: 11px;
+  border: 1.5px solid var(--border);
+  border-radius: 9px;
+  background: #fff;
+  color: var(--green-dark);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+.loc-capture-gps-btn:hover {
+  border-color: var(--green);
+}
+
+.loc-capture-status {
+  font-size: 12px;
+  color: var(--muted);
+  min-height: 16px;
+  margin-bottom: 12px;
+}
+
+.loc-capture-field {
+  margin-bottom: 14px;
+}
+
+.loc-capture-field label {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+
+.loc-capture-field input {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.loc-capture-field input:focus {
+  outline: none;
+  border-color: #2e7d46;
+  box-shadow: 0 0 0 3px rgba(46, 125, 70, 0.1);
+}
+
+.loc-confirm-card {
+  background: var(--green-light);
+  border: 1.5px solid var(--green);
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 14px;
+}
+
+.loc-confirm-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.loc-confirm-address {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 8px;
+  line-height: 1.35;
+}
+
+.loc-confirm-accuracy {
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+.loc-confirm-accuracy.low {
+  color: #b8860b;
+  font-weight: 700;
+}
+
+.loc-confirm-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.loc-confirm-btn-primary {
+  min-height: 44px;
+  border: none;
+  border-radius: 10px;
+  background: var(--green-dark);
+  color: #fff;
+  font-size: 13.5px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.loc-confirm-btn-primary:hover {
+  background: var(--green);
+}
+
+.loc-confirm-btn-secondary {
+  min-height: 40px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--text);
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.loc-confirm-btn-secondary:hover {
+  border-color: var(--green);
+}
+
+.loc-confirm-btn-text {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 4px 0 0;
+}

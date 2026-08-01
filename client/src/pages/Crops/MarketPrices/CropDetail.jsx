@@ -1,0 +1,102 @@
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { getCropPriceDetail } from '../../../services/marketPricesService';
+import { formatDisplayDate } from '../../../utils/formatDate';
+import BackLink from '../../../components/common/BackLink';
+import { PriceGrid, PriceBox } from '../../../components/common/PriceBox';
+import './MarketPrices.css';
+
+export default function CropDetail() {
+  const { apmcId, cropId } = useParams();
+  const navigate = useNavigate();
+  const { t } = useTranslation('marketPrices');
+  const [detail, setDetail] = useState(undefined); // undefined = loading, null = not found
+
+  useEffect(() => {
+    let cancelled = false;
+    getCropPriceDetail(apmcId, cropId).then((result) => {
+      if (!cancelled) setDetail(result);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [apmcId, cropId]);
+
+  if (detail === undefined) {
+    return (
+      <div className="mp-page">
+        <BackLink label={t('backToPrices')} onClick={() => navigate(`/market-prices/${apmcId}`)} />
+        <div className="mp-note">{t('loading')}</div>
+      </div>
+    );
+  }
+
+  if (detail === null) {
+    return (
+      <div className="mp-page">
+        <BackLink label={t('backToPrices')} onClick={() => navigate(`/market-prices/${apmcId}`)} />
+        <div className="mp-note">{t('notFound')}</div>
+      </div>
+    );
+  }
+
+  const { crop, apmc, minPrice, modalPrice, maxPrice, recentHistory } = detail;
+
+  return (
+    <div className="mp-page">
+      <BackLink label={t('backToPrices')} onClick={() => navigate(`/market-prices/${apmcId}`)} />
+
+      <div className="mp-market-bar">
+        <div className="mp-market-left">📍 <b>{apmc.name}</b></div>
+      </div>
+
+      <div className="mp-crop-hero">
+        <div className="mp-crop-icon">{crop.icon}</div>
+        <h2 className="mp-crop-name">{crop.name}</h2>
+      </div>
+
+      <PriceGrid>
+        <PriceBox label={t('minimumPrice')} value={minPrice} unitLabel={t('perKg')} tone="red" />
+        <PriceBox
+          label={t('modalPrice')}
+          value={modalPrice}
+          unitLabel={t('perKg')}
+          tone="green"
+          highlight
+          tag={t('mostCommonPrice')}
+        />
+        <PriceBox label={t('maximumPrice')} value={maxPrice} unitLabel={t('perKg')} tone="orange" />
+      </PriceGrid>
+
+      <div className="mp-recent-head">📊 {t('recentPrices')}</div>
+      <table className="mp-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>{t('table.min')}</th>
+            <th>{t('table.modal')}</th>
+            <th>{t('table.max')}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {recentHistory.map((row) => (
+            <tr key={row.date}>
+              <td>{formatDisplayDate(row.date)}</td>
+              <td className="mp-red">{row.minPrice}</td>
+              <td className="mp-green">{row.modalPrice}</td>
+              <td className="mp-orange">{row.maxPrice}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <div className="mp-detail-actions">
+        <button className="mp-secondary-btn" disabled>{t('compareNearby')}</button>
+        <button className="mp-primary-btn" onClick={() => navigate('/sell')}>
+          🛒 {t('sellThisCrop')}
+        </button>
+      </div>
+    </div>
+  );
+}

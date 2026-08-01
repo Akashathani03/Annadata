@@ -1,0 +1,150 @@
+.home {
+  max-width: 480px;
+  margin: 0 auto;
+  padding-bottom: 16px;
+}
+
+/* ---- Header (matches prototype's header/.logo/.bell/.hamburger exactly) ---- */
+.home-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.home-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.home-logo-badge {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--green-light);
+  border: 2px solid var(--green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 19px;
+  flex-shrink: 0;
+}
+
+.home-logo h1 {
+  font-size: 17px;
+  margin: 0;
+  color: var(--green-dark);
+}
+
+.home-logo p {
+  margin: 2px 0 0;
+  font-size: 9px;
+  letter-spacing: 0.4px;
+  color: var(--muted);
+}
+
+.home-header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.home-auth-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--cream);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  cursor: pointer;
+  color: var(--text);
+}
+
+.home-bell {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--cream);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.home-hamburger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--text);
+  cursor: pointer;
+  padding: 0;
+}
+
+/* ---- Weather card sits here, styled by WeatherCard.css ---- */
+.home > .weather-card {
+  margin: 14px 16px 0;
+}
+
+/* ---- Category cards (restyled from home-tile to match .feature-card) ---- */
+.home-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  padding: 18px 16px 0;
+}
+
+.home-card {
+  text-align: center;
+  padding: 18px 10px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.home-card:hover,
+.home-card:active {
+  background: var(--green-light);
+  transform: translateY(-2px);
+}
+
+.home-card-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  margin: 0 auto 12px;
+}
+
+.home-card h3 {
+  font-size: 14px;
+  margin: 0 0 6px;
+  color: var(--text);
+}
+
+.home-card p {
+  font-size: 11.5px;
+  color: var(--muted);
+  line-height: 1.4;
+  margin: 0;
+}

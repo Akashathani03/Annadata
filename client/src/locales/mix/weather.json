@@ -1,0 +1,14 @@
+{
+  "humidity": "ತೇವಾಂಶ",
+  "rainChance": "ಮಳೆ ಸಾಧ್ಯತೆ",
+  "loading": "ಹವಾಮಾನ ನೋಡುತ್ತಿದ್ದೇವೆ...",
+  "unavailable": "ಹವಾಮಾನ ಮಾಹಿತಿ ಸಿಗಲಿಲ್ಲ",
+  "conditions": {
+    "sunny": "ಬಿಸಿಲು",
+    "partlyCloudy": "ಸ್ವಲ್ಪ Cloudy",
+    "cloudy": "Cloudy ವಾತಾವರಣ",
+    "foggy": "ಮಂಜು",
+    "rainy": "ಮಳೆ",
+    "stormy": "ಗುಡುಗು ಮಳೆ"
+  }
+}

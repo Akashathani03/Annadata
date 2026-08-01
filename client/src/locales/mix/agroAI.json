@@ -1,0 +1,74 @@
+{
+  "input": {
+    "placeholder": "ಏನಾದರೂ ಕೇಳಿ...",
+    "cameraAriaLabel": "Photo ಸೇರಿಸಿ",
+    "sendAriaLabel": "Message Send ಮಾಡಿ"
+  },
+  "emptyState": {
+    "greetingMorning": "ಶುಭೋದಯ",
+    "greetingAfternoon": "ನಮಸ್ಕಾರ",
+    "greetingEvening": "ಶುಭ ಸಂಜೆ",
+    "introduction": "ಕೀಟ, ಬೆಲೆ, ಹವಾಮಾನ ಮತ್ತು ಇನ್ನಷ್ಟು ವಿಷಯಗಳಲ್ಲಿ ನಾನು ಸಹಾಯ ಮಾಡಬಲ್ಲೆ.",
+    "tryAsking": "ಹೀಗೆ ಕೇಳಿ ನೋಡಿ",
+    "uploadHint": "ನಿಮ್ಮ ಬೆಳೆಯ Photoವನ್ನೂ ಕಳುಹಿಸಬಹುದು."
+  },
+  "quickActions": {
+    "disease": "ರೋಗ",
+    "fertilizer": "Fertilizer",
+    "weather": "ಹವಾಮಾನ",
+    "marketPrice": "Market Price"
+  },
+  "examplePrompts": {
+    "diseaseExample": "ನನ್ನ ಟೊಮ್ಯಾಟೊ ಎಲೆಗಳಲ್ಲಿ ಹಳದಿ ಚುಕ್ಕೆಗಳಿವೆ",
+    "priceExample": "ಇಂದಿನ ಈರುಳ್ಳಿ ಬೆಲೆ ಎಷ್ಟು?",
+    "weatherExample": "ಇಂದು ಮಳೆ ಬರುತ್ತಾ?"
+  },
+  "diagnosisCard": {
+    "possibleProblem": "ಸಂಭವನೀಯ ಸಮಸ್ಯೆ",
+    "severity": "ತೀವ್ರತೆ",
+    "suggestedAction": "ಸಲಹೆ ಮಾಡಿದ ಕ್ರಮ",
+    "moreDetails": "More Details",
+    "howSureAmI": "ನನಗೆ ಎಷ್ಟು ಖಚಿತ?",
+    "likelyCause": "ಸಂಭವನೀಯ ಕಾರಣ",
+    "prevention": "ತಡೆಗಟ್ಟುವಿಕೆ"
+  },
+  "weatherCard": {
+    "rain": "ಮಳೆ",
+    "humidity": "ಆರ್ದ್ರತೆ",
+    "wind": "ಗಾಳಿ"
+  },
+  "marketPriceCard": {
+    "min": "ಕನಿಷ್ಠ",
+    "max": "ಗರಿಷ್ಠ",
+    "trendUp": "ಏರಿಕೆ",
+    "trendDown": "ಇಳಿಕೆ",
+    "trendStable": "ಸ್ಥಿರ",
+    "viewMoreMarkets": "ಇನ್ನಷ್ಟು Market ನೋಡಿ",
+    "updatedLabel": "Update ಆಗಿದೆ"
+  },
+  "fertilizerCard": {
+    "crop": "ಬೆಳೆ",
+    "growthStage": "ಬೆಳವಣಿಗೆ ಹಂತ",
+    "recommendedFertilizer": "ಸಲಹೆ ಮಾಡಿದ Fertilizer",
+    "quantity": "ಪ್ರಮಾಣ",
+    "applicationMethod": "ಹಾಕುವ ವಿಧಾನ",
+    "bestTimeToApply": "ಸೂಕ್ತ ಸಮಯ",
+    "precautions": "ಎಚ್ಚರಿಕೆಗಳು",
+    "alternativeFertilizer": "ಪರ್ಯಾಯ Fertilizer"
+  },
+  "imageUpload": {
+    "camera": "Camera",
+    "gallery": "Gallery",
+    "captionPlaceholder": "ಇನ್ನಷ್ಟು ವಿವರ ಸೇರಿಸಿ (Optional)",
+    "cancelAriaLabel": "Cancel ಮಾಡಿ",
+    "retake": "Retake ಮಾಡಿ",
+    "send": "Send ಮಾಡಿ",
+    "previewAlt": "ಆಯ್ಕೆ ಮಾಡಿದ ಬೆಳೆ Photo"
+  },
+  "message": {
+    "retry": "Retry ಮಾಡಿ"
+  },
+  "typingIndicator": {
+    "ariaLabel": "Agro AI ಉತ್ತರಿಸುತ್ತಿದೆ"
+  }
+}

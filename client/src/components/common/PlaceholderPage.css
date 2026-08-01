@@ -1,0 +1,39 @@
+.placeholder-page {
+  min-height: 60vh;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.placeholder-back {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  color: var(--green-dark);
+  font-weight: 700;
+  font-size: 13.5px;
+  cursor: pointer;
+  padding: 0 0 40px;
+}
+
+.placeholder-icon {
+  font-size: 44px;
+  margin-bottom: 14px;
+}
+
+.placeholder-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 8px;
+}
+
+.placeholder-note {
+  font-size: 13.5px;
+  color: var(--muted);
+  margin: 0;
+}

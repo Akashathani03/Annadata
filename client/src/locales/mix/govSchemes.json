@@ -1,0 +1,49 @@
+{
+  "title": "ಸರ್ಕಾರಿ ಯೋಜನೆಗಳು",
+  "subtitle": "ರೈತರಿಗೆ ಸಹಾಯ ಮಾಡುವ ಸರ್ಕಾರಿ ಯೋಜನೆಗಳನ್ನು ಹುಡುಕಿ ಮತ್ತು Apply ಮಾಡಿ.",
+  "bannerTitle": "ನಿಮಗೆ ಸಿಗಬೇಕಾದ ಸಹಾಯ ಪಡೆಯಿರಿ",
+  "bannerBody": "ನಿಮ್ಮ ಬೆಳೆ, ಜಮೀನಿನ ಗಾತ್ರ ಮತ್ತು Location ಆಧಾರದ ಮೇಲೆ ಯೋಜನೆ ಸೂಚಿಸುತ್ತೇವೆ.",
+  "filterType": {
+    "all": "ಎಲ್ಲಾ ಯೋಜನೆಗಳು",
+    "central": "ಕೇಂದ್ರ ಮಾತ್ರ",
+    "state": "ರಾಜ್ಯ ಮಾತ್ರ"
+  },
+  "filterState": {
+    "karnataka": "📍 ಕರ್ನಾಟಕ",
+    "all": "ಎಲ್ಲಾ ರಾಜ್ಯಗಳು"
+  },
+  "sortByDeadline": "Sort ಮಾಡಿ: Deadline",
+  "filtersButton": "Filter",
+  "filtersComingSoon": "Filter ಶೀಘ್ರದಲ್ಲೇ ಬರುತ್ತಿದೆ.",
+  "searchPlaceholder": "ಯೋಜನೆ Search ಮಾಡಿ...",
+  "statusOpen": "ತೆರೆದಿದೆ",
+  "statusClosing": "ಬೇಗ ಮುಗಿಯುತ್ತದೆ",
+  "appliedSuffix": "Apply ಮಾಡಿದ್ದಾರೆ",
+  "deadlineLabel": "Deadline",
+  "applyNow": "Apply ಮಾಡಿ",
+  "viewDetails": "ವಿವರ ನೋಡಿ",
+  "loadMore": "ಇನ್ನಷ್ಟು ನೋಡಿ ⌄",
+  "loadMoreComingSoon": "ಇನ್ನಷ್ಟು ಯೋಜನೆಗಳು ಶೀಘ್ರದಲ್ಲೇ ಬರುತ್ತಿದೆ.",
+  "openingOfficialSite": "{{title}} ನ Official Site ತೆರೆಯುತ್ತಿದ್ದೇವೆ…",
+  "detail": {
+    "eligibility": "ಅರ್ಹತೆ",
+    "applyOnOfficialSite": "Official Site ನಲ್ಲಿ Apply ಮಾಡಿ ↗",
+    "note": "ನಿಜವಾದ ಸರ್ಕಾರಿ ಸೈಟ್ ಹೊಸ Tab ನಲ್ಲಿ ತೆರೆಯುತ್ತದೆ. Annadata ನೇರವಾಗಿ ಅರ್ಜಿ ಪ್ರಕ್ರಿಯೆ ಮಾಡುವುದಿಲ್ಲ."
+  },
+  "myApplications": {
+    "title": "My Applications",
+    "empty": "ನೀವು ಇನ್ನೂ ಯಾವುದೇ ಯೋಜನೆಗೆ Apply ಮಾಡಿಲ್ಲ."
+  },
+  "eligibility": {
+    "title": "ನಾನು ಅರ್ಹನೇ?",
+    "item1": "🌾 ಸ್ವಂತ ಅಥವಾ ಗುತ್ತಿಗೆ ಜಮೀನು ಇರಬೇಕು",
+    "item2": "🪪 ಸರಿಯಾದ ಆಧಾರ್ ಮತ್ತು Bank Account",
+    "item3": "📍 Annadata ನಲ್ಲಿ ರೈತರಾಗಿ ನೋಂದಣಿಯಾಗಿರಬೇಕು"
+  },
+  "helpdesk": {
+    "title": "Apply ಮಾಡಲು ಸಹಾಯ ಬೇಕೇ?",
+    "body": "ದಾಖಲೆ ಮತ್ತು ಅರ್ಹತೆ ಬಗ್ಗೆ ನಮ್ಮ Helpdesk ಮಾರ್ಗದರ್ಶನ ನೀಡುತ್ತದೆ.",
+    "button": "Helpdesk ಜೊತೆ ಮಾತಾಡಿ",
+    "comingSoon": "ಇದು Demo — ಪೂರ್ಣ Version ನಲ್ಲಿ Helpdesk Chat ಕೆಲಸ ಮಾಡುತ್ತದೆ."
+  }
+}

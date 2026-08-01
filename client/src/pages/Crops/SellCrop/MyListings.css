@@ -1,0 +1,38 @@
+.my-listings-list {
+  display: grid;
+  gap: 12px;
+}
+
+.my-listings-empty {
+  text-align: center;
+  border: 1px dashed #c9ddce;
+  background: #fbfefa;
+  border-radius: 22px;
+  padding: 28px 16px;
+  color: var(--muted);
+}
+
+.my-listings-empty .icon {
+  font-size: 34px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.my-listings-empty b {
+  display: block;
+  color: var(--text);
+  font-size: 15px;
+  margin-bottom: 5px;
+}
+
+.my-listings-empty span {
+  font-size: 12.5px;
+  line-height: 1.45;
+  display: block;
+}
+
+.my-listings-empty .sticky-bar-primary {
+  margin-top: 14px;
+  display: inline-flex;
+  padding: 0 20px;
+}

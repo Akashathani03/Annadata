@@ -1,0 +1,14 @@
+{
+  "humidity": "Humidity",
+  "rainChance": "Rain chance",
+  "loading": "Checking weather...",
+  "unavailable": "Weather unavailable",
+  "conditions": {
+    "sunny": "Sunny",
+    "partlyCloudy": "Partly cloudy",
+    "cloudy": "Cloudy",
+    "foggy": "Foggy",
+    "rainy": "Rainy",
+    "stormy": "Stormy"
+  }
+}

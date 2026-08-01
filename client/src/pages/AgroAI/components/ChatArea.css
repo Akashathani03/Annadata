@@ -1,0 +1,13 @@
+.agroai-chat-area {
+  flex: 1;
+  min-height: 0; /* required for a flex child to actually scroll instead of overflowing its parent */
+  overflow-y: auto;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.agroai-chat-area .message-bubble-row.is-assistant > article {
+  max-width: 88%; /* matches the locked design's card proportions - applied here at the wrapper level so no previously-approved card component needs its own CSS touched */
+}

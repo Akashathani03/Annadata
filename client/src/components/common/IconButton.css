@@ -1,0 +1,33 @@
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text);
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.icon-btn-default {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.icon-btn-small {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+}
+
+.icon-btn.active {
+  background: var(--green-light);
+  border-color: var(--green-dark);
+  color: var(--green-dark);
+}
+
+.icon-btn:active {
+  transform: scale(0.94);
+}

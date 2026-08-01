@@ -1,0 +1,28 @@
+{
+  "title": "Market Prices",
+  "subtitle": "Pick a nearby APMC to see today's crop prices.",
+  "nearest": "Nearest",
+  "sourceNote": "Prices are based on Government of India AGMARKNET data and updated daily.",
+  "searchPlaceholder": "Search crop...",
+  "table": {
+    "crop": "Crop",
+    "min": "Min (₹)",
+    "modal": "Modal (₹)",
+    "max": "Max (₹)"
+  },
+  "tapHint": "Tap on any crop to view detailed prices.",
+  "backToMarkets": "Back to markets",
+  "backToPrices": "Back to prices",
+  "minimumPrice": "Minimum price",
+  "modalPrice": "Modal price",
+  "maximumPrice": "Maximum price",
+  "mostCommonPrice": "Most common price",
+  "recentPrices": "Recent prices",
+  "compareNearby": "Compare nearby APMCs",
+  "sellThisCrop": "Sell this crop",
+  "perKg": "/kg",
+  "notFound": "Price not available for this crop.",
+  "backToHome": "Back to home",
+  "loading": "Loading...",
+  "marketNotFound": "This market could not be found."
+}

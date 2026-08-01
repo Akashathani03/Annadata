@@ -1,0 +1,39 @@
+.expandable-section {
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+  margin-top: 10px;
+}
+
+.expandable-section-toggle {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--green-dark);
+  cursor: pointer;
+}
+
+.expandable-section-toggle:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(46, 125, 70, 0.2);
+  border-radius: 4px;
+}
+
+.expandable-section-chevron {
+  transition: none; /* no unnecessary animations, per design rule */
+}
+
+.expandable-section-chevron.is-expanded {
+  transform: rotate(180deg);
+}
+
+.expandable-section-content {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

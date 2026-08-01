@@ -1,0 +1,39 @@
+.option-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 4px 0 16px;
+}
+
+.option-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 48px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 0 14px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  background: #fff;
+}
+
+.option-list-item.active {
+  border-color: #2e7d46;
+  background: #f2fbf4;
+  color: var(--green-dark);
+}
+
+.option-list-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  flex-shrink: 0;
+}
+
+.option-list-item.active .option-list-dot {
+  border-color: #2e7d46;
+  background: #2e7d46;
+}

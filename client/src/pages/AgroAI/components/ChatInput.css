@@ -1,0 +1,85 @@
+.chat-input {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 8px 10px;
+}
+
+.chat-input-camera-btn,
+.chat-input-send-btn {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--muted);
+}
+
+.chat-input-camera-btn:hover:not(:disabled) {
+  background: var(--cream);
+}
+
+.chat-input-send-btn {
+  color: var(--muted);
+}
+
+.chat-input-send-btn:not(:disabled) {
+  color: var(--green-dark);
+}
+
+.chat-input-send-btn:not(:disabled):hover {
+  background: var(--green-light);
+}
+
+.chat-input-camera-btn:disabled,
+.chat-input-send-btn:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.chat-input-camera-btn:focus-visible,
+.chat-input-send-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(46, 125, 70, 0.2);
+}
+
+.chat-input-textarea {
+  flex: 1;
+  min-width: 0;
+  resize: none;
+  border: none;
+  outline: none;
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.4;
+  padding: 8px 2px;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.chat-input-textarea::placeholder {
+  color: var(--muted);
+}
+
+.chat-input-textarea:focus-visible {
+  outline: none;
+}
+
+.chat-input-textarea:disabled {
+  opacity: 0.6;
+}
+
+/* Visible focus state for the whole bar when the textarea is focused -
+   satisfies the accessibility requirement without adding a border to
+   every child individually. */
+.chat-input:focus-within {
+  box-shadow: 0 0 0 2px rgba(46, 125, 70, 0.15);
+  border-radius: 12px;
+}

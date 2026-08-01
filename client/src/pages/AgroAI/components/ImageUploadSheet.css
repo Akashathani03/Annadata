@@ -1,0 +1,127 @@
+.image-upload-chooser {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 4px 4px 8px;
+}
+
+.image-upload-choice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 8px;
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 12.5px;
+  font-family: inherit;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.image-upload-choice:hover {
+  border-color: var(--green);
+}
+
+.image-upload-choice:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(46, 125, 70, 0.2);
+}
+
+.image-upload-preview {
+  position: relative;
+  padding: 4px 4px 8px;
+}
+
+.image-upload-cancel-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--cream);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--muted);
+}
+
+.image-upload-cancel-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(46, 125, 70, 0.2);
+}
+
+.image-upload-preview-frame {
+  width: 100%;
+  height: 180px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--cream);
+  margin-bottom: 10px;
+}
+
+.image-upload-preview-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-upload-caption {
+  width: 100%;
+  resize: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 11px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+
+.image-upload-caption:focus-visible {
+  outline: none;
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(46, 125, 70, 0.1);
+}
+
+.image-upload-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.image-upload-retake-btn,
+.image-upload-send-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px;
+  border-radius: var(--radius, 8px);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.image-upload-retake-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.image-upload-send-btn {
+  background: var(--green-dark);
+  border: none;
+  color: #fff;
+}
+
+.image-upload-retake-btn:focus-visible,
+.image-upload-send-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(46, 125, 70, 0.2);
+}

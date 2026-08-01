@@ -1,0 +1,6 @@
+.agroai-input-area {
+  flex-shrink: 0;
+  min-height: 56px;
+  border-top: 1px solid var(--border);
+  background: #fff;
+}

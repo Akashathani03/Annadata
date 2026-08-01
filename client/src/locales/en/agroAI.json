@@ -1,0 +1,74 @@
+{
+  "input": {
+    "placeholder": "Ask anything...",
+    "cameraAriaLabel": "Add a photo",
+    "sendAriaLabel": "Send message"
+  },
+  "emptyState": {
+    "greetingMorning": "Good morning",
+    "greetingAfternoon": "Good afternoon",
+    "greetingEvening": "Good evening",
+    "introduction": "I can help with pests, prices, weather and more.",
+    "tryAsking": "Try asking",
+    "uploadHint": "You can also upload a photo of your crop."
+  },
+  "quickActions": {
+    "disease": "Disease",
+    "fertilizer": "Fertilizer",
+    "weather": "Weather",
+    "marketPrice": "Market price"
+  },
+  "examplePrompts": {
+    "diseaseExample": "My tomato leaves have yellow spots",
+    "priceExample": "Today's onion price?",
+    "weatherExample": "Will it rain today?"
+  },
+  "diagnosisCard": {
+    "possibleProblem": "Possible Problem",
+    "severity": "Severity",
+    "suggestedAction": "Suggested Action",
+    "moreDetails": "More details",
+    "howSureAmI": "How sure am I?",
+    "likelyCause": "Likely Cause",
+    "prevention": "Prevention"
+  },
+  "weatherCard": {
+    "rain": "Rain",
+    "humidity": "Humidity",
+    "wind": "Wind"
+  },
+  "marketPriceCard": {
+    "min": "Min",
+    "max": "Max",
+    "trendUp": "Up",
+    "trendDown": "Down",
+    "trendStable": "Stable",
+    "viewMoreMarkets": "View More Markets",
+    "updatedLabel": "Updated"
+  },
+  "fertilizerCard": {
+    "crop": "Crop",
+    "growthStage": "Growth Stage",
+    "recommendedFertilizer": "Recommended Fertilizer",
+    "quantity": "Quantity",
+    "applicationMethod": "Application Method",
+    "bestTimeToApply": "Best Time to Apply",
+    "precautions": "Precautions",
+    "alternativeFertilizer": "Alternative Fertilizer"
+  },
+  "imageUpload": {
+    "camera": "Camera",
+    "gallery": "Gallery",
+    "captionPlaceholder": "Add details (optional)",
+    "cancelAriaLabel": "Cancel",
+    "retake": "Retake",
+    "send": "Send",
+    "previewAlt": "Selected crop photo preview"
+  },
+  "message": {
+    "retry": "Retry"
+  },
+  "typingIndicator": {
+    "ariaLabel": "Agro AI is responding"
+  }
+}

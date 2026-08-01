@@ -1,0 +1,39 @@
+.contact-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  grid-column: 1 / -1;
+}
+
+.contact-buttons .btn-call,
+.contact-buttons .btn-whatsapp {
+  min-height: 40px;
+  border-radius: 10px;
+  font-size: 11.5px;
+  padding: 0 6px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.contact-buttons .btn-call {
+  background: var(--green-light);
+  color: var(--green-dark);
+}
+
+.contact-buttons .btn-whatsapp {
+  background: #25d366;
+  color: #fff;
+}
+
+.contact-buttons-large .btn-call,
+.contact-buttons-large .btn-whatsapp {
+  min-height: 52px;
+  border-radius: 16px;
+  font-size: 14.5px;
+  font-weight: 800;
+}

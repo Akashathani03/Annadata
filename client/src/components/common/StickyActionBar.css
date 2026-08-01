@@ -1,0 +1,59 @@
+.sticky-bar-primary,
+.sticky-bar-secondary,
+.sticky-bar-danger {
+  min-height: 52px;
+  border-radius: 17px;
+  border: none;
+  font-family: inherit;
+  font-size: 14.5px;
+  font-weight: 900;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.sticky-bar-primary {
+  background: var(--green-dark);
+  color: #fff;
+  box-shadow: 0 12px 22px rgba(30, 91, 50, 0.2);
+}
+
+.sticky-bar-primary:active,
+.sticky-bar-secondary:active {
+  transform: scale(0.985);
+}
+
+.sticky-bar-primary:disabled {
+  pointer-events: none;
+  opacity: 0.84;
+}
+
+.sticky-bar-primary:disabled::before {
+  content: '';
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-top-color: #fff;
+  animation: stickyBarSpin 0.7s linear infinite;
+}
+
+@keyframes stickyBarSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.sticky-bar-secondary {
+  background: #fff;
+  color: var(--green-dark);
+  border: 1px solid #cfe4d4;
+}
+
+.sticky-bar-danger {
+  background: #fff5f4;
+  color: #bc3327;
+  border: 1px solid #f0c4bd;
+}

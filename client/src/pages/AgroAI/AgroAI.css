@@ -1,0 +1,26 @@
+/*
+ * This page needs a genuinely different layout model than the rest of
+ * the app: a fixed-height chat shell (only ChatArea scrolls; InputArea
+ * always stays visible) instead of AppShell's normal whole-page-scroll
+ * model. Rather than modifying the shared AppShell.css (used by ~15
+ * other screens built around natural document scroll), this file
+ * compensates entirely on its own side using two known, documented
+ * AppShell values:
+ *
+ *   - AppShell's sticky header (.app-shell-bar) renders at ~65px
+ *   - AppShell's own root (.app-shell) has an unconditional
+ *     padding-bottom: 78px, reserved for screens using its bottom
+ *     nav - which Agro AI does not use, so that space must be
+ *     reclaimed here or it shows up as dead space / extra scroll.
+ *
+ * If either of those two AppShell values ever changes, this file's
+ * two magic numbers below need to be updated to match. A cleaner
+ * long-term fix would be an optional fixed-height flex mode built
+ * into AppShell itself - flagged for a future decision, not done here.
+ */
+.agroai-page {
+  display: flex;
+  flex-direction: column;
+  height: calc(100dvh - 65px); /* 65px = AppShell header height */
+  margin: -14px -14px -92px; /* cancels app-shell-content's 14px padding + app-shell's unused 78px bottom-nav padding (14 + 78 = 92) */
+}

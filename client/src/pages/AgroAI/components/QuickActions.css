@@ -1,0 +1,37 @@
+.quick-actions {
+  width: 100%;
+  max-width: 320px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.quick-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+}
+
+.quick-action-btn:hover {
+  border-color: var(--green);
+  background: var(--green-light);
+}
+
+.quick-action-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(46, 125, 70, 0.2);
+}
+
+.quick-action-btn svg {
+  color: var(--muted);
+  flex-shrink: 0;
+}

@@ -1,0 +1,49 @@
+{
+  "title": "Government Schemes",
+  "subtitle": "Explore and apply for government schemes designed to support farmers.",
+  "bannerTitle": "Get the support you're entitled to",
+  "bannerBody": "We match you with schemes based on your crop, land size and location.",
+  "filterType": {
+    "all": "All Schemes",
+    "central": "Central Only",
+    "state": "State Only"
+  },
+  "filterState": {
+    "karnataka": "📍 Karnataka",
+    "all": "All States"
+  },
+  "sortByDeadline": "Sort by: Deadline",
+  "filtersButton": "Filters",
+  "filtersComingSoon": "Filters coming soon.",
+  "searchPlaceholder": "Search schemes...",
+  "statusOpen": "Open",
+  "statusClosing": "Closing Soon",
+  "appliedSuffix": "applied",
+  "deadlineLabel": "Deadline",
+  "applyNow": "Apply Now",
+  "viewDetails": "View Details",
+  "loadMore": "Load More ⌄",
+  "loadMoreComingSoon": "More schemes coming soon.",
+  "openingOfficialSite": "Opening official site for {{title}}…",
+  "detail": {
+    "eligibility": "Eligibility",
+    "applyOnOfficialSite": "Apply on Official Site ↗",
+    "note": "Opens the real government site in a new tab. Annadata doesn't process applications directly."
+  },
+  "myApplications": {
+    "title": "My Applications",
+    "empty": "You haven't applied to any scheme yet."
+  },
+  "eligibility": {
+    "title": "Am I Eligible?",
+    "item1": "🌾 Own or lease cultivable land",
+    "item2": "🪪 Valid Aadhaar & bank account",
+    "item3": "📍 Registered as a farmer on Annadata"
+  },
+  "helpdesk": {
+    "title": "Need help applying?",
+    "body": "Our helpdesk can guide you through documents and eligibility.",
+    "button": "Talk to Helpdesk",
+    "comingSoon": "This is a demo — helpdesk chat will work in the full version."
+  }
+}

@@ -1,0 +1,230 @@
+.mp-page {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.mp-header {
+  margin-bottom: 16px;
+}
+
+.mp-title {
+  font-size: 20px;
+  margin: 0 0 4px;
+  color: var(--text);
+}
+
+.mp-subtitle {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 0;
+}
+
+.mp-apmc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.mp-apmc-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.mp-apmc-card.mp-apmc-nearest {
+  border-color: var(--green-dark);
+  background: var(--green-light);
+}
+
+.mp-apmc-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mp-pin {
+  font-size: 18px;
+}
+
+.mp-apmc-left b {
+  display: block;
+  font-size: 14.5px;
+}
+
+.mp-dist {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.mp-apmc-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mp-nearest-pill,
+.mp-tag-pill {
+  background: var(--green-dark);
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 10px;
+}
+
+.mp-chev {
+  color: var(--muted);
+  font-size: 18px;
+}
+
+.mp-note {
+  background: #eef6fb;
+  border: 1px solid #d7e9f5;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 8px;
+}
+
+.mp-market-bar {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 14px;
+  font-size: 13.5px;
+}
+
+.mp-market-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mp-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  font-size: 13px;
+}
+
+.mp-table th {
+  text-align: left;
+  background: var(--green-light);
+  color: var(--green-dark);
+  font-size: 11px;
+  padding: 9px 12px;
+}
+
+.mp-table td {
+  padding: 11px 12px;
+  border-top: 1px solid var(--border);
+}
+
+.mp-table tbody tr {
+  cursor: pointer;
+}
+
+.mp-table tbody tr:hover {
+  background: var(--green-light);
+}
+
+.mp-crop-icon-sm {
+  margin-right: 4px;
+}
+
+.mp-red {
+  color: #d1453b;
+  font-weight: 700;
+}
+
+.mp-green {
+  color: var(--green-dark);
+  font-weight: 700;
+}
+
+.mp-orange {
+  color: #c98a1c;
+  font-weight: 700;
+}
+
+.mp-crop-hero {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.mp-crop-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 14px;
+  background: var(--green-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+}
+
+.mp-crop-name {
+  margin: 0;
+  font-size: 19px;
+}
+
+.mp-recent-head {
+  font-weight: 700;
+  font-size: 14px;
+  margin: 0 0 10px;
+}
+
+.mp-detail-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.mp-primary-btn,
+.mp-secondary-btn {
+  flex: 1;
+  padding: 13px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+}
+
+.mp-primary-btn {
+  background: var(--green-dark);
+  color: #fff;
+}
+
+.mp-primary-btn:hover {
+  background: var(--green);
+}
+
+.mp-secondary-btn {
+  background: #fff;
+  border: 1.5px solid var(--border);
+  color: var(--text);
+}
+
+@media (max-width: 480px) {
+  .mp-table {
+    font-size: 11.5px;
+  }
+}

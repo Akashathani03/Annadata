@@ -1,0 +1,294 @@
+.schemes-page {
+  padding-bottom: 8px;
+}
+
+.scheme-page-sub {
+  margin: -4px 0 14px;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+
+.scheme-banner {
+  background: linear-gradient(120deg, #ede8fb, #e4ecfa);
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.scheme-banner .txt b {
+  font-size: 15.5px;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.scheme-banner .txt div {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.scheme-banner .art {
+  font-size: 34px;
+  flex-shrink: 0;
+}
+
+.scheme-filter {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 12px 0 16px;
+}
+
+.scheme-filter select,
+.scheme-filter button {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 12px;
+  background: #fff;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.scheme-filter select:disabled {
+  color: var(--muted);
+  cursor: default;
+}
+
+.scheme-filter-icon-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.scheme-helpdesk-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.scheme-card {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 12px;
+  background: #fff;
+}
+
+.scheme-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.scheme-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.scheme-title {
+  flex: 1;
+  min-width: 0;
+}
+
+.scheme-title b {
+  font-size: 14.5px;
+  display: block;
+  line-height: 1.3;
+}
+
+.scheme-title .dept {
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.scheme-status {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 10px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.status-open {
+  background: #e5f5ea;
+  color: #1e8f4f;
+}
+
+.status-closing {
+  background: #fff3d6;
+  color: #a67a00;
+}
+
+.scheme-desc {
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 10px 0 12px;
+}
+
+.scheme-meta {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-bottom: 14px;
+}
+
+.scheme-meta b {
+  color: var(--text);
+}
+
+.scheme-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-apply {
+  background: var(--green-dark);
+  color: #fff;
+  border: none;
+  padding: 9px 16px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-details {
+  background: #fff;
+  border: 1px solid var(--border);
+  padding: 9px 16px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.scheme-loadmore-btn {
+  width: 100%;
+  background: #fff;
+  border: 1px solid var(--border);
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 13.5px;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.track-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12.5px;
+  margin-bottom: 12px;
+}
+
+.track-row b {
+  display: block;
+  font-size: 13px;
+}
+
+.track-row span {
+  color: var(--muted);
+}
+
+.track-status {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 8px;
+  white-space: nowrap;
+  height: fit-content;
+}
+
+.st-review {
+  background: #fff3d6;
+  color: #a67a00;
+}
+
+.st-approved {
+  background: #e5f5ea;
+  color: #1e8f4f;
+}
+
+.scheme-track-empty {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.elig-item {
+  display: flex;
+  gap: 8px;
+  font-size: 12.5px;
+  margin-bottom: 10px;
+  color: var(--muted);
+}
+
+.helpdesk-box {
+  background: var(--green-light);
+  text-align: center;
+}
+
+.helpdesk-box b {
+  font-size: 13.5px;
+}
+
+.helpdesk-box p {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin: 6px 0 12px;
+}
+
+.helpdesk-box button {
+  background: var(--green-dark);
+  color: #fff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.scheme-detail-desc {
+  font-size: 13.5px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.scheme-detail-elig-label {
+  font-weight: 700;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.scheme-detail-elig-list {
+  margin: 0 0 18px;
+  padding-left: 18px;
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.scheme-detail-apply-btn {
+  width: 100%;
+  padding: 12px;
+  font-size: 13.5px;
+}

@@ -1,0 +1,16 @@
+:root {
+  --green-dark: #1e5b32;
+  --green: #2e7d46;
+  --green-light: #e8f5ec;
+  --green-mid: #3f9159;
+  --cream: #fbfaf6;
+  --text: #1f2b23;
+  --muted: #5b6b60;
+  --border: #e1e8e2;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}

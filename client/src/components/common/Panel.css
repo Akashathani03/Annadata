@@ -1,0 +1,12 @@
+.panel {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 18px;
+}
+
+.panel h4 {
+  margin: 0 0 14px;
+  font-size: 14.5px;
+}

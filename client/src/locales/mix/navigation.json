@@ -1,0 +1,29 @@
+{
+  "category": {
+    "crops": "ಬೆಳೆಗಳು",
+    "animals": "ಪ್ರಾಣಿಗಳು",
+    "shops": "ಅಂಗಡಿಗಳು",
+    "schemes": "ಸರ್ಕಾರಿ ಯೋಜನೆಗಳು",
+    "agroAI": "Agro AI"
+  },
+  "categoryDesc": {
+    "crops": "ಬೆಳೆ Sell ಮಾಡಿ, Buy ಮಾಡಿ ಮತ್ತು ಇಂದಿನ Market Price ನೋಡಿ.",
+    "animals": "ಹತ್ತಿರದ ರೈತರೊಂದಿಗೆ ಪ್ರಾಣಿ Sell ಮತ್ತು Buy ಮಾಡಿ.",
+    "shops": "ಹತ್ತಿರದ ಕೃಷಿ ಅಂಗಡಿ ಹುಡುಕಿ ಅಥವಾ ನಿಮ್ಮ Shop ನಿರ್ವಹಿಸಿ.",
+    "schemes": "ಸರ್ಕಾರಿ ಯೋಜನೆಗಳನ್ನು ಹುಡುಕಿ ಮತ್ತು Apply ಮಾಡಿ.",
+    "agroAI": "ಕೃಷಿ ಬಗ್ಗೆ ಏನಾದರೂ ಕೇಳಿ, ತಕ್ಷಣ ಉತ್ತರ ಪಡೆಯಿರಿ."
+  },
+  "crops": {
+    "marketPrices": "ಇಂದಿನ Market Prices",
+    "sellCrop": "ಬೆಳೆ ಮಾರಾಟ",
+    "buyCrop": "ಬೆಳೆ ಖರೀದಿ"
+  },
+  "animals": {
+    "sellAnimal": "ಪ್ರಾಣಿ ಮಾರಾಟ",
+    "buyAnimal": "ಪ್ರಾಣಿ ಖರೀದಿ"
+  },
+  "shops": {
+    "nearShop": "ಹತ್ತಿರದ ಅಂಗಡಿಗಳು",
+    "manageShop": "🏪 Shop Owner"
+  }
+}
