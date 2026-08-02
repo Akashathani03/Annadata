@@ -12,6 +12,9 @@ export default function ApmcList() {
   const { t } = useTranslation('marketPrices');
   const { user } = useAuth();
   const [apmcs, setApmcs] = useState([]);
+  const [showAll, setShowAll] = useState(false);
+
+  const VISIBLE_COUNT = 5;
 
   useEffect(() => {
     let cancelled = false;
@@ -25,6 +28,11 @@ export default function ApmcList() {
     };
   }, [user]);
 
+  // getApmcMarkets already returns markets sorted nearest-first (per
+  // the backend service), so the first 5 are genuinely the closest,
+  // not an arbitrary slice.
+  const visibleApmcs = showAll ? apmcs : apmcs.slice(0, VISIBLE_COUNT);
+
   return (
     <div className="mp-page">
       <BackLink label={t('backToHome')} onClick={() => navigate('/')} />
@@ -34,7 +42,7 @@ export default function ApmcList() {
       </div>
 
       <div className="mp-apmc-list">
-        {apmcs.map((apmc) => (
+        {visibleApmcs.map((apmc) => (
           <button
             key={apmc.id}
             className={`mp-apmc-card${apmc.isNearest ? ' mp-apmc-nearest' : ''}`}
@@ -54,6 +62,12 @@ export default function ApmcList() {
           </button>
         ))}
       </div>
+
+      {!showAll && apmcs.length > VISIBLE_COUNT && (
+        <button className="mp-show-more-btn" onClick={() => setShowAll(true)}>
+          {t('showMore')}
+        </button>
+      )}
 
       <div className="mp-note">ℹ️ {t('sourceNote')}</div>
     </div>

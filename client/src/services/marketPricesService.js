@@ -1,60 +1,33 @@
-import { apmcMarkets, nearestApmcId } from '../data/apmcMarkets';
-import { cropCatalog, getCropById } from '../data/cropCatalog';
-import { marketPrices, buildRecentHistory } from '../data/marketPrices';
-import { distanceKm } from '../utils/geo';
+import { apiRequest } from './apiClient';
 
-// This module's async function signatures are written to match the
-// planned GET /api/apmc-markets and GET /api/market-prices?apmc=&crop=
-// endpoints. When the backend exists, each function body becomes a
-// fetch() call - callers (the screens) do not change.
+// Step 7: internals now call the real Market Prices domain service
+// (backend). Every exported function name and signature below is
+// unchanged from before - this file's own original comment already
+// anticipated this exact swap ("each function body becomes a fetch()
+// call - callers do not change"), and that's exactly what happened.
+// This is shared, load-bearing infrastructure beyond just the 3
+// Market Prices screens - Sell Crop's CreateListing/MyListings/
+// ListingDetail and Buy Crops' Detail all import from this same file,
+// and now transparently receive real backend data too, per the
+// approved plan.
 
-// Pass { lat, lng } to get APMCs sorted by real distance from that
-// point (each one's distanceKm is computed live, and the closest one
-// is marked isNearest). Without coordinates, falls back to the static
-// seed order and the fixed nearestApmcId flag.
 export async function getApmcMarkets({ lat, lng } = {}) {
-  if (lat != null && lng != null) {
-    const withDistance = apmcMarkets.map((apmc) => ({
-      ...apmc,
-      distanceKm: apmc.location ? distanceKm(lat, lng, apmc.location.lat, apmc.location.lng) : apmc.distanceKm,
-    }));
-    withDistance.sort((a, b) => (a.distanceKm ?? Infinity) - (b.distanceKm ?? Infinity));
-    return withDistance.map((apmc, index) => ({ ...apmc, isNearest: index === 0 }));
-  }
-
-  return apmcMarkets.map((apmc) => ({
-    ...apmc,
-    isNearest: apmc.id === nearestApmcId,
-  }));
+  const query = lat != null && lng != null ? `?lat=${lat}&lng=${lng}` : '';
+  const { markets } = await apiRequest(`/market-prices/apmc-markets${query}`);
+  return markets;
 }
 
 export async function getCropPricesForApmc(apmcId) {
-  return marketPrices
-    .filter((entry) => entry.apmcId === apmcId)
-    .map((entry) => ({
-      ...entry,
-      crop: getCropById(entry.cropId),
-    }))
-    .filter((entry) => entry.crop);
+  const { prices } = await apiRequest(`/market-prices/apmc-markets/${apmcId}/prices`);
+  return prices;
 }
 
 export async function getCropPriceDetail(apmcId, cropId) {
-  const entry = marketPrices.find((p) => p.apmcId === apmcId && p.cropId === cropId);
-  if (!entry) return null;
-  const crop = getCropById(cropId);
-  if (!crop) return null;
-
-  return {
-    crop,
-    apmc: apmcMarkets.find((a) => a.id === apmcId),
-    minPrice: entry.minPrice,
-    modalPrice: entry.modalPrice,
-    maxPrice: entry.maxPrice,
-    priceDate: entry.priceDate,
-    recentHistory: buildRecentHistory(entry),
-  };
+  const { detail } = await apiRequest(`/market-prices/apmc-markets/${apmcId}/prices/${cropId}`);
+  return detail;
 }
 
 export async function getCropCatalog() {
-  return cropCatalog;
+  const { crops } = await apiRequest('/market-prices/crops');
+  return crops;
 }

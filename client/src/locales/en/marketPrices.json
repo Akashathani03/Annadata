@@ -24,5 +24,6 @@
   "notFound": "Price not available for this crop.",
   "backToHome": "Back to home",
   "loading": "Loading...",
-  "marketNotFound": "This market could not be found."
+  "marketNotFound": "This market could not be found.",
+  "showMore": "Show more markets"
 }
