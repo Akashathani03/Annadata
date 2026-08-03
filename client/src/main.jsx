@@ -5,6 +5,7 @@ import './i18n';
 import './styles/tokens.css';
 import { ToastProvider } from './context/ToastContext';
 import { AuthProvider } from './context/AuthContext';
+import { LocationProvider } from './context/LocationContext';
 import App from './App';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
@@ -12,7 +13,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <BrowserRouter>
       <ToastProvider>
         <AuthProvider>
-          <App />
+          <LocationProvider>
+            <App />
+          </LocationProvider>
         </AuthProvider>
       </ToastProvider>
     </BrowserRouter>

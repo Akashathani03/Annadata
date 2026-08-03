@@ -35,6 +35,6 @@
   "languageMix": "ಕನ್ನಡ + English",
   "languageKn": "ಕನ್ನಡ",
   "languageEn": "English",
-  "language": "Language",
-  "greeting": "Good morning, {{name}}"
+  "greeting": "Good morning, {{name}}",
+  "currentLocationLabel": "Your current location"
 }

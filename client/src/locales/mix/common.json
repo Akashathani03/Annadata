@@ -31,10 +31,10 @@
   "taluk": "ತಾಲೂಕು",
   "district": "ಜಿಲ್ಲೆ",
   "state": "ರಾಜ್ಯ",
-  "language": "Language",
+  "language": "ಭಾಷೆ",
   "languageMix": "ಕನ್ನಡ + English",
   "languageKn": "ಕನ್ನಡ",
   "languageEn": "English",
-  "language": "ಭಾಷೆ",
-  "greeting": "ನಮಸ್ಕಾರ, {{name}}"
+  "greeting": "ನಮಸ್ಕಾರ, {{name}}",
+  "currentLocationLabel": "ನಿಮ್ಮ Current Location"
 }

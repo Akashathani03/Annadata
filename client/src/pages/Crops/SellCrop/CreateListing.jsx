@@ -6,7 +6,7 @@ import { createListing, getListingById, updateListing } from '../../../services/
 import { distanceKm, findNearest } from '../../../utils/geo';
 import { getListingFieldConfig, unitMeta } from '../../../config/listingFieldConfig';
 import { useAuth } from '../../../context/AuthContext';
-import { DEFAULT_LOCATION } from '../../../config/constants';
+import { useUserLocation } from '../../../context/LocationContext';
 import { useToast } from '../../../context/ToastContext';
 import StepCard from '../../../components/common/StepCard';
 import PhotoUpload from '../../../components/common/PhotoUpload';
@@ -25,6 +25,7 @@ export default function CreateListing() {
   const { t } = useTranslation(['listings', 'marketPrices', 'common']);
   const { showToast } = useToast();
   const { user } = useAuth();
+  const { lat: currentLat, lng: currentLng } = useUserLocation();
   const config = getListingFieldConfig(CATEGORY);
 
   const [catalog, setCatalog] = useState([]);
@@ -51,7 +52,7 @@ export default function CreateListing() {
     let cancelled = false;
     Promise.all([
       getCropCatalog(),
-      getApmcMarkets({ lat: user?.lat ?? DEFAULT_LOCATION.lat, lng: user?.lng ?? DEFAULT_LOCATION.lng }),
+      getApmcMarkets({ lat: currentLat, lng: currentLng }),
       editId ? getListingById(editId) : Promise.resolve(null),
     ]).then(([cropList, apmcList, existingListing]) => {
       if (cancelled) return;

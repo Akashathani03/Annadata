@@ -45,5 +45,6 @@
     "body": "Our helpdesk can guide you through documents and eligibility.",
     "button": "Talk to Helpdesk",
     "comingSoon": "This is a demo — helpdesk chat will work in the full version."
-  }
+  },
+  "loadFailed": "Something went wrong. Please try again."
 }

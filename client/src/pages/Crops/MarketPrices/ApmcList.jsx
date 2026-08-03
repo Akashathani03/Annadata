@@ -2,15 +2,14 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getApmcMarkets } from '../../../services/marketPricesService';
-import { DEFAULT_LOCATION } from '../../../config/constants';
-import { useAuth } from '../../../context/AuthContext';
+import { useUserLocation } from '../../../context/LocationContext';
 import BackLink from '../../../components/common/BackLink';
 import './MarketPrices.css';
 
 export default function ApmcList() {
   const navigate = useNavigate();
   const { t } = useTranslation('marketPrices');
-  const { user } = useAuth();
+  const { lat, lng } = useUserLocation();
   const [apmcs, setApmcs] = useState([]);
   const [showAll, setShowAll] = useState(false);
 
@@ -18,15 +17,13 @@ export default function ApmcList() {
 
   useEffect(() => {
     let cancelled = false;
-    const lat = user?.lat ?? DEFAULT_LOCATION.lat;
-    const lng = user?.lng ?? DEFAULT_LOCATION.lng;
     getApmcMarkets({ lat, lng }).then((result) => {
       if (!cancelled) setApmcs(result);
     });
     return () => {
       cancelled = true;
     };
-  }, [user]);
+  }, [lat, lng]);
 
   // getApmcMarkets already returns markets sorted nearest-first (per
   // the backend service), so the first 5 are genuinely the closest,

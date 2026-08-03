@@ -2,8 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getApmcMarkets, getCropPricesForApmc } from '../../../services/marketPricesService';
-import { DEFAULT_LOCATION } from '../../../config/constants';
-import { useAuth } from '../../../context/AuthContext';
+import { useUserLocation } from '../../../context/LocationContext';
 import BackLink from '../../../components/common/BackLink';
 import SearchInput from '../../../components/common/SearchInput';
 import './MarketPrices.css';
@@ -12,15 +11,13 @@ export default function CropList() {
   const { apmcId } = useParams();
   const navigate = useNavigate();
   const { t } = useTranslation('marketPrices');
-  const { user } = useAuth();
+  const { lat, lng } = useUserLocation();
   const [apmc, setApmc] = useState(undefined); // undefined = loading, null = not found
   const [rows, setRows] = useState([]);
   const [query, setQuery] = useState('');
 
   useEffect(() => {
     let cancelled = false;
-    const lat = user?.lat ?? DEFAULT_LOCATION.lat;
-    const lng = user?.lng ?? DEFAULT_LOCATION.lng;
     Promise.all([getApmcMarkets({ lat, lng }), getCropPricesForApmc(apmcId)]).then(([apmcs, prices]) => {
       if (cancelled) return;
       setApmc(apmcs.find((a) => a.id === apmcId) ?? null);
@@ -29,7 +26,7 @@ export default function CropList() {
     return () => {
       cancelled = true;
     };
-  }, [apmcId, user]);
+  }, [apmcId, lat, lng]);
 
   const filteredRows = useMemo(() => {
     const q = query.trim().toLowerCase();

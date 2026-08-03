@@ -45,5 +45,6 @@
     "body": "ದಾಖಲೆ ಮತ್ತು ಅರ್ಹತೆ ಬಗ್ಗೆ ನಮ್ಮ Helpdesk ಮಾರ್ಗದರ್ಶನ ನೀಡುತ್ತದೆ.",
     "button": "Helpdesk ಜೊತೆ ಮಾತಾಡಿ",
     "comingSoon": "ಇದು Demo — ಪೂರ್ಣ Version ನಲ್ಲಿ Helpdesk Chat ಕೆಲಸ ಮಾಡುತ್ತದೆ."
-  }
+  },
+  "loadFailed": "ಏನೋ ತಪ್ಪಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ Try ಮಾಡಿ."
 }

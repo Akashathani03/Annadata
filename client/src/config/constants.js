@@ -9,3 +9,9 @@ export const DEFAULT_LOCATION = {
   lng: 76.8958,
   label: 'Mandya, Karnataka',
 };
+
+// How long a captured live-GPS location is trusted before Home
+// silently re-checks it. Configurable in one place - a farmer who's
+// traveled since their location was last captured gets a fresh fix
+// without ever being prompted again or needing a manual refresh.
+export const GPS_STALE_THRESHOLD_MS = 30 * 60 * 1000; // 30 minutes

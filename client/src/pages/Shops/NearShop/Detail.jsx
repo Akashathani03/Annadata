@@ -5,6 +5,7 @@ import { getShopDetail } from '../../../services/nearShopService';
 import { getBuyerLocation } from '../../../services/buyerLocationService';
 import { shopProductCategories } from '../../../config/shopProductCatalog';
 import { useAuth } from '../../../context/AuthContext';
+import { useUserLocation } from '../../../context/LocationContext';
 import AppShell from '../../../components/common/AppShell';
 import ChipScroller from '../../../components/common/ChipScroller';
 import ContactButtons from '../../../components/common/ContactButtons';
@@ -15,12 +16,13 @@ export default function Detail() {
   const navigate = useNavigate();
   const { t } = useTranslation(['shops', 'common']);
   const { user } = useAuth();
+  const { liveLocation } = useUserLocation();
   const [shop, setShop] = useState(undefined);
   const [activeCategory, setActiveCategory] = useState('seeds');
 
   useEffect(() => {
     let cancelled = false;
-    getBuyerLocation({ authenticatedUser: user }).then((loc) =>
+    getBuyerLocation({ authenticatedUser: user, liveLocation }).then((loc) =>
       getShopDetail(id, { buyerLat: loc.lat, buyerLng: loc.lng }).then((result) => {
         if (!cancelled) setShop(result);
       })
@@ -28,7 +30,7 @@ export default function Detail() {
     return () => {
       cancelled = true;
     };
-  }, [id, user]);
+  }, [id, user, liveLocation]);
 
   if (shop === undefined) {
     return (

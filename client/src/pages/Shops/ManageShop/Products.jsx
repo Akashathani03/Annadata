@@ -89,21 +89,33 @@ export default function Products() {
       price: Number(priceDrafts[item.id]) || 0,
       availability: 'In Stock',
     }));
-    await addProducts(shop.id, items);
-    await reload(shop.id);
-    showToast(t('shops:manage.productsSaved'));
-    setSubView('myproducts');
+    try {
+      await addProducts(shop.id, items);
+      await reload(shop.id);
+      showToast(t('shops:manage.productsSaved'));
+      setSubView('myproducts');
+    } catch {
+      showToast(t('shops:manage.saveFailed'));
+    }
   }
 
   async function handleToggleAvailability(id) {
-    await toggleAvailability(id);
-    reload(shop.id);
+    try {
+      await toggleAvailability(id);
+      reload(shop.id);
+    } catch {
+      showToast(t('shops:manage.saveFailed'));
+    }
   }
 
   async function handleDelete(id) {
     if (!window.confirm(t('shops:manage.deleteConfirm'))) return;
-    await deleteProduct(id);
-    reload(shop.id);
+    try {
+      await deleteProduct(id);
+      reload(shop.id);
+    } catch {
+      showToast(t('shops:manage.saveFailed'));
+    }
   }
 
   function openPriceSheet(product) {

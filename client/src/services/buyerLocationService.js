@@ -2,14 +2,24 @@ import * as buyerLocationRepository from '../repositories/buyerLocationRepositor
 import { DEFAULT_LOCATION } from '../config/constants';
 
 // If the buyer/farmer has explicitly set a location via the Change
-// Location sheet, that always wins (explicit choice). Otherwise, a
-// logged-in user's own onboarded GPS location (captured during Login)
-// is reused here instead of falling straight to the anonymous default -
-// that location was captured and confirmed for exactly this purpose.
-export async function getBuyerLocation({ authenticatedUser } = {}) {
+// Location sheet, that always wins (explicit choice) - even over live
+// GPS. Otherwise, live GPS captured this session (if granted) is used
+// next, then a logged-in user's own onboarded location (captured
+// during Login), then the anonymous default. liveLocation is optional
+// and additive - existing callers passing only authenticatedUser
+// behave exactly as before.
+export async function getBuyerLocation({ authenticatedUser, liveLocation } = {}) {
   const loc = await buyerLocationRepository.find();
   if (loc.lat != null && loc.lng != null) {
     return { ...loc, label: loc.label || DEFAULT_LOCATION.label };
+  }
+  if (liveLocation?.lat != null && liveLocation?.lng != null) {
+    return {
+      ...loc,
+      lat: liveLocation.lat,
+      lng: liveLocation.lng,
+      label: loc.label || DEFAULT_LOCATION.label,
+    };
   }
   if (authenticatedUser?.lat != null && authenticatedUser?.lng != null) {
     return {

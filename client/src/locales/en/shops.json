@@ -89,6 +89,7 @@
     "noEnquiriesBody": "New enquiries from farmers will show up here.",
     "step1": "Category",
     "step2": "Products",
-    "step3": "Price"
+    "step3": "Price",
+    "saveFailed": "Something went wrong. Please try again."
   }
 }

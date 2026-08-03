@@ -35,6 +35,6 @@
   "languageMix": "ಕನ್ನಡ + English",
   "languageKn": "ಕನ್ನಡ",
   "languageEn": "English",
-  "language": "ಭಾಷೆ",
-  "greeting": "ನಮಸ್ಕಾರ, {{name}}"
+  "greeting": "ನಮಸ್ಕಾರ, {{name}}",
+  "currentLocationLabel": "ನಿಮ್ಮ ಪ್ರಸ್ತುತ ಸ್ಥಳ"
 }

@@ -63,8 +63,12 @@ export default function MyShop() {
   }
 
   async function handleSave() {
-    await saveShop(user.id, form);
-    showToast(t('shops:manage.shopSaved'));
+    try {
+      await saveShop(user.id, form);
+      showToast(t('shops:manage.shopSaved'));
+    } catch {
+      showToast(t('shops:manage.saveFailed'));
+    }
   }
 
   if (!loaded) return null;

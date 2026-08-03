@@ -89,6 +89,7 @@
     "noEnquiriesBody": "ರೈತರ ಹೊಸ Enquiries ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತವೆ.",
     "step1": "Category",
     "step2": "Products",
-    "step3": "ಬೆಲೆ"
+    "step3": "ಬೆಲೆ",
+    "saveFailed": "ಏನೋ ತಪ್ಪಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ Try ಮಾಡಿ."
   }
 }

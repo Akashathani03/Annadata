@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { getNearbyShops, getShopPricesForItem, getShopCountForItem } from '../../../services/nearShopService';
 import { getBuyerLocation } from '../../../services/buyerLocationService';
 import { useAuth } from '../../../context/AuthContext';
+import { useUserLocation } from '../../../context/LocationContext';
 import { useToast } from '../../../context/ToastContext';
 import { shopProductCategories, getShopCatalogByCategory } from '../../../config/shopProductCatalog';
 import AppShell from '../../../components/common/AppShell';
@@ -16,6 +17,7 @@ export default function Browse() {
   const { t } = useTranslation(['shops']);
   const { showToast } = useToast();
   const { user } = useAuth();
+  const { liveLocation } = useUserLocation();
 
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('seeds');
@@ -38,7 +40,7 @@ export default function Browse() {
 
   useEffect(() => {
     let cancelled = false;
-    getBuyerLocation({ authenticatedUser: user }).then((loc) =>
+    getBuyerLocation({ authenticatedUser: user, liveLocation }).then((loc) =>
       getNearbyShops({ query, buyerLat: loc.lat, buyerLng: loc.lng }).then((result) => {
         if (cancelled) return;
         setShops(result);
@@ -48,7 +50,7 @@ export default function Browse() {
     return () => {
       cancelled = true;
     };
-  }, [query, user]);
+  }, [query, user, liveLocation]);
 
   useEffect(() => {
     let cancelled = false;

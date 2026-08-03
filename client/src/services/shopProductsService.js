@@ -1,37 +1,45 @@
-import * as shopProductsRepository from '../repositories/shopProductsRepository';
+import { apiRequest } from './apiClient';
 import { getShopCatalogItem } from '../config/shopProductCatalog';
 
+// Step 9: internals now call the real Shops domain service (backend).
+// Function names/signatures unchanged. resolveCatalogIcon below is
+// untouched on purpose - it's a pure, synchronous, local lookup
+// against static config with zero network dependency, not something
+// that should become an async backend call.
+
+function normalizeProduct(product) {
+  if (!product) return null;
+  const { _id, __v, ...rest } = product;
+  return { id: _id, ...rest };
+}
+
 export async function getMyProducts(shopId) {
-  return shopProductsRepository.findByShopId(shopId);
+  const { products } = await apiRequest(`/shops/${shopId}/products`);
+  return products.map(normalizeProduct);
 }
 
 // items: [{ itemId, name, category, price, availability }]
 export async function addProducts(shopId, items) {
-  return shopProductsRepository.insertMany(
-    items.map((item) => ({
-      shopId,
-      itemId: item.itemId ?? null,
-      category: item.category,
-      name: item.name,
-      price: item.price,
-      availability: item.availability ?? 'In Stock',
-    }))
-  );
+  const { products } = await apiRequest(`/shops/${shopId}/products`, {
+    method: 'POST',
+    body: { items },
+  });
+  return products.map(normalizeProduct);
 }
 
 export async function updateProduct(id, patch) {
-  return shopProductsRepository.update(id, patch);
+  const { product } = await apiRequest(`/shops/products/${id}`, { method: 'PATCH', body: patch });
+  return normalizeProduct(product);
 }
 
 export async function toggleAvailability(id) {
-  const product = await shopProductsRepository.findById(id);
-  if (!product) return null;
-  const next = product.availability === 'In Stock' ? 'Out of Stock' : 'In Stock';
-  return shopProductsRepository.update(id, { availability: next });
+  const { product } = await apiRequest(`/shops/products/${id}/toggle-availability`, { method: 'PATCH' });
+  return normalizeProduct(product);
 }
 
 export async function deleteProduct(id) {
-  return shopProductsRepository.remove(id);
+  const { deleted } = await apiRequest(`/shops/products/${id}`, { method: 'DELETE' });
+  return deleted;
 }
 
 export function resolveCatalogIcon(itemId) {

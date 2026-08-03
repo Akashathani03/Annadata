@@ -23,12 +23,16 @@ export default function Schemes() {
   const [detailScheme, setDetailScheme] = useState(null);
 
   async function reload() {
-    const [schemeList, appList] = await Promise.all([
-      getSchemes({ type, stateFilter }),
-      getMyApplications(),
-    ]);
-    setSchemes(schemeList);
-    setApplications(appList);
+    try {
+      const [schemeList, appList] = await Promise.all([
+        getSchemes({ type, stateFilter }),
+        getMyApplications(),
+      ]);
+      setSchemes(schemeList);
+      setApplications(appList);
+    } catch {
+      showToast(t('govSchemes:loadFailed'));
+    }
   }
 
   useEffect(() => {
@@ -44,9 +48,13 @@ export default function Schemes() {
   async function handleApply(scheme) {
     showToast(t('govSchemes:openingOfficialSite', { title: scheme.title }));
     window.open(scheme.officialUrl, '_blank', 'noopener,noreferrer');
-    await applyToScheme(scheme.id);
-    setDetailScheme(null);
-    reload();
+    try {
+      await applyToScheme(scheme.id);
+      setDetailScheme(null);
+      reload();
+    } catch {
+      showToast(t('govSchemes:loadFailed'));
+    }
   }
 
   return (
