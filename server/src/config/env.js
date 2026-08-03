@@ -5,7 +5,7 @@ dotenv.config();
 // Fails fast and loudly at boot if required config is missing, rather
 // than surfacing as a confusing runtime error on first DB query or
 // request. Per the roadmap's "minimize risk" principle for Step 1.
-const REQUIRED_VARS = ['MONGODB_URI', 'JWT_SECRET'];
+const REQUIRED_VARS = ['MONGODB_URI', 'JWT_SECRET', 'GEMINI_API_KEY'];
 
 function validateEnv() {
   const missing = REQUIRED_VARS.filter((key) => !process.env[key]);
@@ -30,4 +30,5 @@ export const env = {
   corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:5173',
   jwtSecret: process.env.JWT_SECRET,
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
+  geminiApiKey: process.env.GEMINI_API_KEY,
 };

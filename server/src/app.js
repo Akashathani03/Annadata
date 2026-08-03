@@ -10,6 +10,9 @@ import authRoutes from './routes/auth.routes.js';
 import userRoutes from './routes/user.routes.js';
 import marketPricesRoutes from './routes/marketPrices.routes.js';
 import weatherRoutes from './routes/weather.routes.js';
+import shopsRoutes from './routes/shops.routes.js';
+import nearShopsRoutes from './routes/nearShops.routes.js';
+import governmentSchemesRoutes from './routes/governmentSchemes.routes.js';
 import agroAIMessageRoutes from './routes/agroAI/message.routes.js';
 
 const app = express();
@@ -45,6 +48,9 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/market-prices', marketPricesRoutes);
 app.use('/api/v1/weather', weatherRoutes);
+app.use('/api/v1/shops', shopsRoutes);
+app.use('/api/v1/near-shops', nearShopsRoutes);
+app.use('/api/v1/schemes', governmentSchemesRoutes);
 app.use('/api/v1/agro-ai', agroAIMessageRoutes);
 
 // Must be mounted after every route: an unmatched path falls through
