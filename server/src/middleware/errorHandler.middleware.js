@@ -32,6 +32,16 @@ export function errorHandler(err, req, res, next) {
     return sendError(res, 400, 'INVALID_FILE_UPLOAD', err.message);
   }
 
+  if (err.type === 'entity.too.large' || err.status === 413) {
+    // Thrown by body-parser (via express.json/express.urlencoded) when
+    // a request exceeds the explicit size limit set in app.js (Step
+    // 20) - same treatment as MulterError above, so this correctly
+    // returns 413 with a clear message instead of falling through to
+    // a generic, misleading 500.
+    logger.warn({ code: 'PAYLOAD_TOO_LARGE' }, 'Request body too large');
+    return sendError(res, 413, 'PAYLOAD_TOO_LARGE', 'Request is too large. Please shorten your message and try again.');
+  }
+
   // Unexpected error (a bug, a thrown library error) - log the real
   // detail server-side for debugging, but never return it to the
   // client. This is the actual mechanism behind the PDS's "never

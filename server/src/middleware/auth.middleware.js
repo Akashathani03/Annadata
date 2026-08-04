@@ -23,7 +23,7 @@ export function requireAuth(req, res, next) {
   const token = header.slice('Bearer '.length).trim();
 
   try {
-    const decoded = jwt.verify(token, env.jwtSecret);
+    const decoded = jwt.verify(token, env.jwtSecret, { algorithms: ['HS256'] });
     req.user = { id: decoded.sub, ...decoded };
     next();
   } catch (err) {

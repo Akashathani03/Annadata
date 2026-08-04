@@ -13,9 +13,23 @@ import mongoose from 'mongoose';
 // Intent Router avoid re-asking a question it could already answer
 // from recent turns, never to be a source of factual truth - real
 // facts only ever come from real domain service calls, regardless of
-// whether this object is accurate. Nothing writes to it yet; the
-// schema exists now because the Session model owning it was part of
-// the locked architecture, not because Step 3 implements the writer.
+// whether this object is accurate.
+//
+// STATUS (Step 18 decision): this field's entire original purpose -
+// short-term conversation memory for follow-up resolution - was fully
+// achieved by Step 16's conversation-context work, via a different
+// mechanism (re-deriving a compact summary from recent Message
+// documents on each reply, rather than incrementally persisting one
+// here). Compared directly against this field's own design goal, the
+// Step 16 approach covers every case this field could and more (any
+// message type, not just crop/diagnosis), and is the one actually
+// proven in a live multi-turn conversation. Nothing writes to this
+// field, and nothing should - reviving it would mean two parallel
+// short-term-memory mechanisms to keep consistent for zero additional
+// capability. Left in place deliberately (not deleted), same as other
+// superseded-but-harmless code elsewhere in this project, in case a
+// genuinely distinct future need for it is ever identified - but it
+// should not be treated as a pending obligation.
 const sessionSchema = new mongoose.Schema(
   {
     userId: {

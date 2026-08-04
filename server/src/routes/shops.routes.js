@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import multer from 'multer';
 import { requireAuth } from '../middleware/auth.middleware.js';
+import { rateLimit } from '../middleware/rateLimit.middleware.js';
 import { getMyShop, saveShop } from '../controllers/shops.controller.js';
 import {
   getMyProducts,
@@ -21,7 +22,7 @@ const router = Router();
 // Owner-facing shop management - all authenticated, per the
 // "shop owner must be logged in to manage their own shop" requirement.
 router.get('/me', requireAuth, getMyShop);
-router.put('/me', requireAuth, upload.single('photo'), saveShop);
+router.put('/me', requireAuth, rateLimit('IMAGE_UPLOAD'), upload.single('photo'), saveShop);
 
 router.get('/:shopId/products', requireAuth, getMyProducts);
 router.post('/:shopId/products', requireAuth, addProducts);

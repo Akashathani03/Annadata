@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import multer from 'multer';
 import { requireAuth } from '../../middleware/auth.middleware.js';
+import { rateLimit } from '../../middleware/rateLimit.middleware.js';
 import { postMessage, getMessages, retryMessage, postReply } from '../../controllers/agroAI/message.controller.js';
 import { MAX_IMAGE_SIZE_BYTES } from '../../services/agroAI/conversation/conversation.service.js';
 
@@ -21,9 +22,9 @@ const upload = multer({
 
 const router = Router();
 
-router.post('/messages', requireAuth, upload.single('image'), postMessage);
+router.post('/messages', requireAuth, rateLimit('IMAGE_UPLOAD'), upload.single('image'), postMessage);
 router.get('/messages', requireAuth, getMessages);
 router.post('/messages/:id/retry', requireAuth, retryMessage);
-router.post('/messages/:id/reply', requireAuth, postReply);
+router.post('/messages/:id/reply', requireAuth, rateLimit('AI_REPLY'), postReply);
 
 export default router;

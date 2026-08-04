@@ -1,9 +1,11 @@
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
 import pinoHttp from 'pino-http';
 import { env } from './config/env.js';
 import { logger } from './config/logger.js';
 import { notFoundHandler, errorHandler } from './middleware/errorHandler.middleware.js';
+import { rateLimit } from './middleware/rateLimit.middleware.js';
 import healthRoutes from './routes/health.routes.js';
 import whoamiRoutes from './routes/whoami.routes.js';
 import authRoutes from './routes/auth.routes.js';
@@ -17,13 +19,46 @@ import agroAIMessageRoutes from './routes/agroAI/message.routes.js';
 
 const app = express();
 
+// Step 20 hardening. contentSecurityPolicy and hsts are explicitly
+// disabled - both are ON by default in helmet()'s own defaults, and
+// both were explicitly excluded from this step (CSP could affect the
+// frontend in ways not fully audited here; HSTS shouldn't be sent
+// until production runs entirely over HTTPS). crossOriginResourcePolicy
+// is set to 'cross-origin' (not helmet's own default of 'same-origin')
+// specifically because the frontend loads uploaded photos directly
+// from this backend's /uploads path across origins
+// (localhost:5173 -> localhost:8123) - helmet's default would silently
+// have started blocking every crop/shop photo already working in the
+// app. Every other helmet default (X-Content-Type-Options, X-Frame-
+// Options, etc.) is left as-is - safe for a JSON+static-image API with
+// no HTML views to protect.
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    hsts: false,
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+  })
+);
+
+// Explicit, standard hardening beyond what helmet's own hidePoweredBy
+// middleware already does - redundant with it, but cheap and makes the
+// intent clear without depending on reading helmet's own defaults.
+app.disable('x-powered-by');
+
 // Restricted to the configured frontend origin rather than a wide-open
 // cors() with no options - the latter would allow any site to call
 // this API. env.corsOrigin is one value for now (single frontend
 // origin per environment); a multi-origin comma-separated list is a
 // trivial extension later if ever needed, not a redesign.
 app.use(cors({ origin: env.corsOrigin }));
-app.use(express.json());
+
+// Explicit, deliberate limits (Step 20) rather than relying on
+// Express's implicit 100kb default - generous enough for any real text
+// message, profile update, or form field this app sends, nowhere near
+// image-sized (those go through multer's own separate, already-
+// existing 8MB limit, never through these parsers at all).
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ limit: '1mb', extended: true }));
 
 // Serves whatever localFilesystemStorage.js writes to ./uploads, at
 // the same /uploads prefix its saveFile() already returns as part of
@@ -44,6 +79,14 @@ app.use(pinoHttp({ logger }));
 // under this same /api/v1 prefix.
 app.use('/api/v1', healthRoutes);
 app.use('/api/v1', whoamiRoutes);
+
+// Backstop for every route mounted below this point - routes with
+// their own tighter, cost/risk-specific policy (AI_REPLY,
+// AUTHENTICATION, IMAGE_UPLOAD, PROFILE_UPDATE) apply that within
+// their own route file, on top of this one. health/whoami above are
+// deliberately exempt (diagnostic routes, not farmer-facing).
+app.use('/api/v1', rateLimit('GENERAL_API'));
+
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/market-prices', marketPricesRoutes);
