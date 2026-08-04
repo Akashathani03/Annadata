@@ -43,6 +43,18 @@ const messageSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.Mixed,
       default: null,
     },
+    // Step 17, Design B: independent of cardType by design - cardType
+    // stays purely "what content to show," action is purely "what the
+    // frontend should do." A message can carry either, both, or
+    // neither. destination is a stable backend identifier (e.g.
+    // 'SELL_CROP'), never a frontend route string - the frontend owns
+    // its own separate identifier->route mapping. Optional and
+    // additive: null by default, so every existing message and every
+    // reply builder that doesn't set it is completely unaffected.
+    action: {
+      type: mongoose.Schema.Types.Mixed,
+      default: null,
+    },
     status: {
       type: String,
       enum: ['sending', 'sent', 'failed'],

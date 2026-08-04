@@ -17,6 +17,10 @@ const EXTENSION_BY_MIME_TYPE = {
   'image/webp': 'webp',
 };
 
+const MIME_TYPE_BY_EXTENSION = Object.fromEntries(
+  Object.entries(EXTENSION_BY_MIME_TYPE).map(([mime, ext]) => [ext, mime])
+);
+
 async function ensureUploadDir() {
   await fs.mkdir(UPLOAD_DIR, { recursive: true });
 }
@@ -34,4 +38,19 @@ export async function saveFile(buffer, { mimeType }) {
   // dev/staging/prod without baking in one environment's origin. app.js
   // serves this directory statically at the same /uploads prefix.
   return { url: `/uploads/${filename}` };
+}
+
+// Reads a previously saved file back into memory - needed when a
+// stored photo (e.g. a crop photo attached to a farmer's message)
+// needs to be sent to Gemini for diagnosis. The Message model only
+// stores the URL, never the mime type, so it's inferred from the file
+// extension - the same mapping saveFile used to choose that extension
+// in the first place, just applied in reverse.
+export async function readFile(url) {
+  const filename = path.basename(url);
+  const filePath = path.join(UPLOAD_DIR, filename);
+  const buffer = await fs.readFile(filePath);
+  const extension = path.extname(filename).slice(1);
+  const mimeType = MIME_TYPE_BY_EXTENSION[extension] || 'application/octet-stream';
+  return { buffer, mimeType };
 }

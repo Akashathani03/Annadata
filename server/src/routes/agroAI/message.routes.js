@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import multer from 'multer';
 import { requireAuth } from '../../middleware/auth.middleware.js';
-import { postMessage, getMessages, retryMessage } from '../../controllers/agroAI/message.controller.js';
+import { postMessage, getMessages, retryMessage, postReply } from '../../controllers/agroAI/message.controller.js';
 import { MAX_IMAGE_SIZE_BYTES } from '../../services/agroAI/conversation/conversation.service.js';
 
 // memoryStorage - the file arrives as a Buffer on req.file, handed to
@@ -24,5 +24,6 @@ const router = Router();
 router.post('/messages', requireAuth, upload.single('image'), postMessage);
 router.get('/messages', requireAuth, getMessages);
 router.post('/messages/:id/retry', requireAuth, retryMessage);
+router.post('/messages/:id/reply', requireAuth, postReply);
 
 export default router;

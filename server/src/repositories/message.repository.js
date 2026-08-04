@@ -18,6 +18,15 @@ export async function findMessagesBySession(sessionId) {
   return Message.find({ sessionId }).sort({ createdAt: 1 });
 }
 
+// Step 16: bounded fetch for short-term conversation context - sorts
+// newest-first with a real MongoDB limit (not fetch-everything-then-
+// slice-in-JS), then reverses back to chronological order to match
+// findMessagesBySession's existing convention above.
+export async function findRecentMessagesBySession(sessionId, limit) {
+  const messages = await Message.find({ sessionId }).sort({ createdAt: -1 }).limit(limit);
+  return messages.reverse();
+}
+
 export async function updateMessageStatus(id, status) {
   return Message.findByIdAndUpdate(id, { $set: { status } }, { new: true });
 }

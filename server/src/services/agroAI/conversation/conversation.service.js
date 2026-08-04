@@ -1,6 +1,27 @@
 import mongoose from 'mongoose';
 import { ApiError } from '../../../utils/ApiError.js';
 import { storageProvider } from '../../../storage/index.js';
+import { routeMessage } from '../intentRouter/index.js';
+import { generateStructuredCompletion } from '../../../ai/gateway/index.js';
+import {
+  DIAGNOSIS_RESPONSE_SCHEMA,
+  validateDiagnosisResponse,
+  buildDiagnosisFallback,
+  buildDiagnosisCardData,
+} from '../../../ai/gateway/schemas/diagnosisSchema.js';
+import {
+  GENERAL_GUIDANCE_RESPONSE_SCHEMA,
+  validateGeneralGuidanceResponse,
+  buildGeneralGuidanceFallback,
+} from '../../../ai/gateway/schemas/generalGuidanceSchema.js';
+import {
+  buildLookupReply,
+  buildDiagnosisReply,
+  buildGeneralGuidanceReply,
+  buildNavigateReply,
+  buildOutOfScopeReply,
+} from './replyBuilder.js';
+import { CONTEXT_WINDOW_MESSAGES, buildConversationSummary } from './conversationContext.js';
 import {
   createSession,
   findSessionById,
@@ -10,6 +31,7 @@ import {
   createMessage,
   findMessageById,
   findMessagesBySession,
+  findRecentMessagesBySession,
   updateMessageStatus,
 } from '../../../repositories/message.repository.js';
 
@@ -132,4 +154,100 @@ export async function retryMessage({ userId, messageId }) {
   // successfully delivered. A later step (once Gemini/AI Gateway
   // exist) is what gives this a real failure mode to actually retry.
   return updateMessageStatus(messageId, 'sent');
+}
+
+// Step 15: the second call of the two-call architecture ("persist
+// user message" / "generate assistant reply", planned since the
+// original Backend Architecture session, deferred at every step
+// since). Reuses the exact same ownership pattern as retryMessage
+// above (message -> its session -> that session's owner), the Intent
+// Router (Step 14) for the routing decision, the Gateway's structured
+// completion (Step 12) for the two generate sub-types, and the
+// reply builder to shape the result into what the existing frontend
+// already renders. No new decision-making logic lives here - this
+// function only orchestrates already-approved pieces and persists the
+// result.
+export async function generateReply({ userId, messageId, lat, lng }) {
+  assertValidObjectId(messageId, 'messageId');
+
+  const userMessage = await findMessageById(messageId);
+  if (!userMessage) {
+    throw new ApiError(404, 'MESSAGE_NOT_FOUND', 'Message not found.');
+  }
+  const session = await getOwnedSessionOrThrow(userMessage.sessionId, userId);
+
+  let imageBase64;
+  let imageMimeType;
+  if (userMessage.photoUrl) {
+    const file = await storageProvider.readFile(userMessage.photoUrl);
+    imageBase64 = file.buffer.toString('base64');
+    imageMimeType = file.mimeType;
+  }
+
+  // Step 16: short-term context - the current session's recent
+  // messages only, excluding this same message (which hasn't been
+  // replied to yet and would just duplicate userMessage.text).
+  // Bounded by CONTEXT_WINDOW_MESSAGES, reduced to a compact text
+  // summary (never raw documents or card JSON) before it ever reaches
+  // a prompt.
+  const recentMessages = await findRecentMessagesBySession(session._id, CONTEXT_WINDOW_MESSAGES);
+  const priorMessages = recentMessages.filter((m) => m._id.toString() !== userMessage._id.toString());
+  const conversationSummary = buildConversationSummary(priorMessages);
+
+  const decision = await routeMessage({
+    userPrompt: userMessage.text || '(see attached photo)',
+    imageBase64,
+    imageMimeType,
+    context: { lat, lng },
+    conversationSummary,
+  });
+
+  let reply;
+  if (decision.intent === 'lookup') {
+    reply = buildLookupReply(decision.targetTool, decision.toolResult);
+  } else if (decision.intent === 'generate' && decision.generationType === 'diagnosis') {
+    const result = await generateStructuredCompletion({
+      taskType: 'generation',
+      systemPrompt:
+        `You are an agriculture assistant diagnosing a crop problem for an Indian farmer, based on their message and/or an attached photo.${conversationSummary ? `\n\n${conversationSummary}` : ''}`,
+      userPrompt: userMessage.text || 'Please diagnose the issue shown in the attached photo.',
+      imageBase64,
+      imageMimeType,
+      responseSchema: DIAGNOSIS_RESPONSE_SCHEMA,
+      validate: validateDiagnosisResponse,
+      buildFallback: buildDiagnosisFallback,
+    });
+    reply = buildDiagnosisReply(buildDiagnosisCardData(result.data));
+  } else if (decision.intent === 'generate' && decision.generationType === 'general_guidance') {
+    const result = await generateStructuredCompletion({
+      taskType: 'generation',
+      systemPrompt:
+        `You are an agriculture assistant giving general farming guidance to an Indian farmer.${conversationSummary ? `\n\n${conversationSummary}\n\nIf the farmer's message is a follow-up request referring to the conversation above (e.g. "summarize", "explain simply", "give it in Kannada", "continue"), respond to that request using what was actually discussed above - do not treat it as an unrelated new question.` : ''}`,
+      userPrompt: userMessage.text || '',
+      responseSchema: GENERAL_GUIDANCE_RESPONSE_SCHEMA,
+      validate: validateGeneralGuidanceResponse,
+      buildFallback: buildGeneralGuidanceFallback,
+    });
+    reply = buildGeneralGuidanceReply(result.data);
+  } else if (decision.intent === 'navigate') {
+    reply = buildNavigateReply(decision.destination);
+  } else {
+    reply = buildOutOfScopeReply();
+  }
+
+  const assistantMessage = await createMessage({
+    sessionId: session._id,
+    sender: 'assistant',
+    type: reply.type,
+    text: reply.text || '',
+    photoUrl: null,
+    cardType: reply.cardType,
+    cardData: reply.cardData,
+    action: reply.action || null,
+    status: 'sent',
+  });
+
+  await touchSessionActivity(session._id);
+
+  return assistantMessage;
 }

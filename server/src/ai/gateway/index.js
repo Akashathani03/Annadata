@@ -1,5 +1,13 @@
 import { getModelForTask } from './modelRouter.js';
-import { callGemini } from './geminiClient.js';
+import { callGemini, callGeminiWithTools } from './geminiClient.js';
+
+// Resilience fallback (added without touching modelRouter.js's own
+// permanent mapping): which task type's model to fall back to, for a
+// single request only, after the primary model's retries are
+// exhausted on a transient error. Configurable in one place, not
+// scattered inline across every exported function below - change this
+// one constant to fall back to a different tier if ever needed.
+const FALLBACK_TASK_TYPE = 'generation';
 
 // The Gateway's entire external interface, per the locked design:
 // "{task type} in -> generated content out", provider-agnostic by
@@ -20,7 +28,8 @@ import { callGemini } from './geminiClient.js';
 // to whatever calls this later, not to the Gateway itself.
 export async function generateCompletion({ taskType, systemPrompt, userPrompt, imageBase64, imageMimeType }) {
   const modelName = getModelForTask(taskType);
-  const text = await callGemini({ modelName, systemPrompt, userPrompt, imageBase64, imageMimeType });
+  const fallbackModelName = getModelForTask(FALLBACK_TASK_TYPE);
+  const text = await callGemini({ modelName, systemPrompt, userPrompt, imageBase64, imageMimeType, fallbackModelName });
   return { text, model: modelName };
 }
 
@@ -55,6 +64,7 @@ export async function generateStructuredCompletion({
   buildFallback,
 }) {
   const modelName = getModelForTask(taskType);
+  const fallbackModelName = getModelForTask(FALLBACK_TASK_TYPE);
   const rawText = await callGemini({
     modelName,
     systemPrompt,
@@ -62,6 +72,7 @@ export async function generateStructuredCompletion({
     imageBase64,
     imageMimeType,
     responseSchema,
+    fallbackModelName,
   });
 
   let parsed;
@@ -77,4 +88,36 @@ export async function generateStructuredCompletion({
   }
 
   return { valid: true, data: parsed, model: modelName, errors: [] };
+}
+
+// Step 13: tool selection - a distinct function alongside the two
+// above, neither of which is touched. Uses the 'classification' tier
+// by default (the ModelRouter's cheap/fast tier exists exactly for
+// this kind of decision, not full generation), though a caller can
+// still pass a different taskType if ever needed.
+//
+// toolDefinitions comes from the Tool Registry's getToolDefinitions()
+// - this function has no idea what a "market price" or "weather" tool
+// even is, only that it was handed some tool metadata to bind to the
+// call. Returns the same generic { toolCall, text } shape
+// geminiClient.js already produces - this function's only real job is
+// resolving the model name, everything else passes through.
+//
+// Never executes the chosen tool - that's the Tool Registry's job,
+// called separately by whatever orchestrates this later (Step 14's
+// Intent Router). Keeping "decide" and "execute" as two distinct
+// steps, never fused into one function, is what lets a future
+// multi-provider setup swap only this decision step without touching
+// how tools actually get run.
+export async function classifyToolCall({ taskType = 'classification', systemPrompt, userPrompt, toolDefinitions }) {
+  const modelName = getModelForTask(taskType);
+  const fallbackModelName = getModelForTask(FALLBACK_TASK_TYPE);
+  const { functionCall, text } = await callGeminiWithTools({
+    modelName,
+    systemPrompt,
+    userPrompt,
+    toolDefinitions,
+    fallbackModelName,
+  });
+  return { toolCall: functionCall, text, model: modelName };
 }

@@ -39,3 +39,17 @@ export async function retryMessage(req, res, next) {
     next(err);
   }
 }
+
+export async function postReply(req, res, next) {
+  try {
+    const message = await conversationService.generateReply({
+      userId: req.user.id,
+      messageId: req.params.id,
+      lat: req.body.lat != null ? Number(req.body.lat) : undefined,
+      lng: req.body.lng != null ? Number(req.body.lng) : undefined,
+    });
+    sendSuccess(res, { message }, 201);
+  } catch (err) {
+    next(err);
+  }
+}
