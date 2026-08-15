@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import { ApiError } from '../../../utils/ApiError.js';
 import { storageProvider } from '../../../storage/index.js';
 import { routeMessage } from '../intentRouter/index.js';
-import { generateStructuredCompletion } from '../../../ai/gateway/index.js';
+import { generateCompletion, generateStructuredCompletion } from '../../../ai/gateway/index.js';
 import {
   DIAGNOSIS_RESPONSE_SCHEMA,
   validateDiagnosisResponse,
@@ -10,14 +10,9 @@ import {
   buildDiagnosisCardData,
 } from '../../../ai/gateway/schemas/diagnosisSchema.js';
 import {
-  GENERAL_GUIDANCE_RESPONSE_SCHEMA,
-  validateGeneralGuidanceResponse,
-  buildGeneralGuidanceFallback,
-} from '../../../ai/gateway/schemas/generalGuidanceSchema.js';
-import {
   buildLookupReply,
   buildDiagnosisReply,
-  buildGeneralGuidanceReply,
+  buildTextReply,
   buildNavigateReply,
   buildOutOfScopeReply,
 } from './replyBuilder.js';
@@ -205,11 +200,11 @@ export async function generateReply({ userId, messageId, lat, lng }) {
   let reply;
   if (decision.intent === 'lookup') {
     reply = buildLookupReply(decision.targetTool, decision.toolResult);
-  } else if (decision.intent === 'generate' && decision.generationType === 'diagnosis') {
+  } else if (decision.intent === 'diagnosis') {
     const result = await generateStructuredCompletion({
       taskType: 'generation',
       systemPrompt:
-        `You are an agriculture assistant diagnosing a crop problem for an Indian farmer, based on their message and/or an attached photo.${conversationSummary ? `\n\n${conversationSummary}` : ''}`,
+        `You are an agriculture assistant diagnosing a crop problem for an Indian farmer, based on their message and/or an attached photo. Only produce a real diagnosis when there is an actual symptom described or an image to analyze - if neither is present, ask plainly for a photo or a description rather than fabricating a diagnosis.${conversationSummary ? `\n\n${conversationSummary}` : ''}`,
       userPrompt: userMessage.text || 'Please diagnose the issue shown in the attached photo.',
       imageBase64,
       imageMimeType,
@@ -218,17 +213,14 @@ export async function generateReply({ userId, messageId, lat, lng }) {
       buildFallback: buildDiagnosisFallback,
     });
     reply = buildDiagnosisReply(buildDiagnosisCardData(result.data));
-  } else if (decision.intent === 'generate' && decision.generationType === 'general_guidance') {
-    const result = await generateStructuredCompletion({
+  } else if (decision.intent === 'conversation') {
+    const result = await generateCompletion({
       taskType: 'generation',
       systemPrompt:
-        `You are an agriculture assistant giving general farming guidance to an Indian farmer.${conversationSummary ? `\n\n${conversationSummary}\n\nIf the farmer's message is a follow-up request referring to the conversation above (e.g. "summarize", "explain simply", "give it in Kannada", "continue"), respond to that request using what was actually discussed above - do not treat it as an unrelated new question.` : ''}`,
+        `You are Agro AI, a friendly agricultural assistant helping farmers. Continue the conversation naturally using the recent conversation context. Speak simply, warmly, and clearly. If the farmer asks to explain, summarize, translate, or continue a previous answer, do so naturally. Do not generate diagnosis cards or structured lookup responses from this conversational prompt.${conversationSummary ? `\n\n${conversationSummary}` : ''}`,
       userPrompt: userMessage.text || '',
-      responseSchema: GENERAL_GUIDANCE_RESPONSE_SCHEMA,
-      validate: validateGeneralGuidanceResponse,
-      buildFallback: buildGeneralGuidanceFallback,
     });
-    reply = buildGeneralGuidanceReply(result.data);
+    reply = buildTextReply(result.text);
   } else if (decision.intent === 'navigate') {
     reply = buildNavigateReply(decision.destination);
   } else {

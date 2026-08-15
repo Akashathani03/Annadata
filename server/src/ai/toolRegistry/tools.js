@@ -2,6 +2,18 @@ import * as marketPricesService from '../../services/domain/marketPrices/marketP
 import * as weatherService from '../../services/domain/weather/weather.service.js';
 import * as nearShopsService from '../../services/domain/shops/nearShops.service.js';
 import * as governmentSchemesService from '../../services/domain/schemes/governmentSchemes.service.js';
+import * as listingsService from '../../services/domain/listings/listings.service.js';
+import * as cropRepository from '../../repositories/crop.repository.js';
+import { distanceKm } from '../../utils/geo.js';
+
+// RESOLVED (was the "FUTURE CAPABILITY" note through the Equipment
+// phases): search_marketplace_listings below is that deferred
+// listing_lookup tool, now built now that the Marketplace has
+// stabilized across crop/animal/equipment. Same tool pattern as the 4
+// tools that follow it - execute(args, context), args only ever what
+// Gemini extracted from text, context carrying the farmer's trusted
+// location the same way it already does for weather_lookup and
+// nearby_shops_lookup.
 
 // Each tool's `parameters` is plain, standard (lowercase) JSON Schema -
 // genuinely provider-neutral, not Gemini's uppercase Type enum. The
@@ -87,6 +99,106 @@ async function executeGovernmentSchemeLookup(args) {
   return { found: schemes.length > 0, schemes: schemes.slice(0, 5) };
 }
 
+const MARKETPLACE_CATEGORIES = ['crop', 'animal', 'equipment'];
+
+// A reasonable "nearby" radius for this app's semi-rural/rural
+// context - large enough that equipment (which farmers may
+// reasonably travel further for than a bag of seed) isn't
+// under-matched, small enough to stay meaningfully "near your
+// location" rather than the whole district. No existing app-wide
+// radius constant to match (nearby_shops_lookup uses nearest-5, not a
+// radius cutoff at all) - chosen explicitly here, not inherited.
+const DEFAULT_MARKETPLACE_RADIUS_KM = 25;
+
+// Resolves a farmer's free-text item phrase ("tractor", "tractors")
+// to a real catalog itemId, scoped to the given category - generic
+// across crop/animal/equipment via the new
+// cropRepository.searchByNameAndCategory, not three separate
+// category-specific lookups. Only a trailing-'s' strip for simple
+// plural handling, deliberately not a general stemmer or synonym
+// system (per the approved scope) - "tractors" -> "tractor" is
+// covered; more elaborate phrasing is the LLM's job to normalize into
+// a clean itemQuery before this ever runs, not this function's.
+async function resolveItemId(itemQuery, category) {
+  const normalized = itemQuery?.trim();
+  if (!normalized) return null;
+
+  const candidates = [normalized];
+  if (normalized.endsWith('s') && normalized.length > 3) {
+    candidates.push(normalized.slice(0, -1));
+  }
+
+  for (const candidate of candidates) {
+    const matches = await cropRepository.searchByNameAndCategory(candidate, category);
+    if (matches.length > 0) return matches[0]._id;
+  }
+  return null;
+}
+
+async function executeMarketplaceSearch(args, context) {
+  if (!MARKETPLACE_CATEGORIES.includes(args.category)) {
+    return { found: false, reason: 'invalid_category' };
+  }
+
+  // Marketplace search is inherently "near me" in intent - every
+  // example query in the approved spec implies proximity, so an
+  // unbounded, distance-blind search would risk showing a listing
+  // hundreds of km away as if it were nearby. Ask for location
+  // plainly rather than guess or silently drop the distance filter
+  // (the earlier Phase 1/2 behavior, now superseded by this explicit
+  // Phase 3 requirement).
+  if (context.lat == null || context.lng == null) {
+    return { found: false, reason: 'location_unavailable' };
+  }
+
+  let itemId;
+  if (args.itemQuery?.trim()) {
+    itemId = await resolveItemId(args.itemQuery, args.category);
+    if (!itemId) {
+      // The farmer named something the catalog doesn't recognize -
+      // never guess a nearby/unrelated item instead, per the approved
+      // "safe not-found over invented match" rule.
+      return { found: false, reason: 'item_not_recognized' };
+    }
+  }
+
+  const searchParams = { category: args.category, page: 1, limit: 10 };
+  if (itemId) searchParams.itemId = itemId;
+  if (args.priceMax != null) searchParams.priceMax = args.priceMax;
+  // Equipment-only, per the approved scope - a condition value
+  // extracted for a crop/animal question is silently dropped rather
+  // than forwarded (getListings would just filter those categories to
+  // zero anyway, since their listings always have condition:null, but
+  // dropping it here avoids a misleading "nothing found" for what was
+  // really just an inapplicable filter).
+  if (args.condition && args.category === 'equipment') searchParams.condition = args.condition;
+  if (context.lat != null && context.lng != null) {
+    searchParams.lat = context.lat;
+    searchParams.lng = context.lng;
+    searchParams.radiusKm = DEFAULT_MARKETPLACE_RADIUS_KM;
+  }
+
+  let result;
+  try {
+    result = await listingsService.getListings(searchParams);
+  } catch (err) {
+    // Defensive only - resolveItemId already guarantees itemId
+    // belongs to category, so getListings' own validation shouldn't
+    // normally reject this. A genuine validation failure degrades to
+    // "not found," never a raw error or an invented result reaching
+    // the farmer.
+    return { found: false, reason: 'search_error' };
+  }
+
+  return {
+    found: result.listings.length > 0,
+    listings: result.listings.slice(0, 5).map((l) => ({
+      ...l,
+      distanceKm: context.lat != null && context.lng != null ? distanceKm(context.lat, context.lng, l.lat, l.lng) : null,
+    })),
+  };
+}
+
 export const tools = [
   {
     name: 'market_price_lookup',
@@ -132,5 +244,21 @@ export const tools = [
       },
     },
     execute: executeGovernmentSchemeLookup,
+  },
+  {
+    name: 'search_marketplace_listings',
+    description:
+      "Search REAL, currently published Annadata marketplace listings - crops, animals, or equipment for sale by other farmers. Use this for questions like \"any tractor near me\", \"is anyone selling tomatoes nearby\", \"used tractor under 5 lakh\", \"cows for sale near my village\". Never invent or guess a listing - only describe what this tool actually returns. If nothing is found, say so plainly rather than suggesting something similar exists.",
+    parameters: {
+      type: 'object',
+      properties: {
+        category: { type: 'string', enum: ['crop', 'animal', 'equipment'], description: 'Which marketplace category the farmer is asking about.' },
+        itemQuery: { type: 'string', description: 'The specific item the farmer named, in their own words, e.g. "tractor", "tomato", "cow". Omit if they asked about a category generally.' },
+        priceMax: { type: 'number', description: 'Maximum price in rupees, if the farmer gave one, e.g. "under 5 lakh" -> 500000, "below 500000" -> 500000.' },
+        condition: { type: 'string', enum: ['new', 'used-good', 'used-fair'], description: 'Only for equipment, only if the farmer specified a condition, e.g. "used tractor" -> used-good.' },
+      },
+      required: ['category'],
+    },
+    execute: executeMarketplaceSearch,
   },
 ];

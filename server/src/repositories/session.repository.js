@@ -13,10 +13,6 @@ export async function findSessionById(id) {
   return Session.findById(id);
 }
 
-export async function findSessionsByUser(userId) {
-  return Session.find({ userId }).sort({ createdAt: -1 });
-}
-
 // Partial/incremental update by design (per the Database session's
 // "incrementally-updated" framing) - only the fields actually passed
 // in contextPatch are touched, so updating recentCropName alone never

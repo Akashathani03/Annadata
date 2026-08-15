@@ -3,7 +3,7 @@
 // already renders. Scoped to its own file so future fields
 // (citations, disease identifiers, multilingual content, confidence
 // explanations - explicitly not built now) are additive here without
-// touching generalGuidanceSchema.js or anything in ai/gateway/index.js.
+// touching anything in ai/gateway/index.js.
 
 // Gemini's own structured-output constraint (config.responseSchema) -
 // an OpenAPI-subset schema, uppercase types. This is the FIRST line of

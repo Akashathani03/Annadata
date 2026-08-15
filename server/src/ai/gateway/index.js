@@ -1,5 +1,5 @@
 import { getModelForTask } from './modelRouter.js';
-import { callGemini, callGeminiWithTools } from './geminiClient.js';
+import { callGemini } from './geminiClient.js';
 
 // Resilience fallback (added without touching modelRouter.js's own
 // permanent mapping): which task type's model to fall back to, for a
@@ -88,36 +88,4 @@ export async function generateStructuredCompletion({
   }
 
   return { valid: true, data: parsed, model: modelName, errors: [] };
-}
-
-// Step 13: tool selection - a distinct function alongside the two
-// above, neither of which is touched. Uses the 'classification' tier
-// by default (the ModelRouter's cheap/fast tier exists exactly for
-// this kind of decision, not full generation), though a caller can
-// still pass a different taskType if ever needed.
-//
-// toolDefinitions comes from the Tool Registry's getToolDefinitions()
-// - this function has no idea what a "market price" or "weather" tool
-// even is, only that it was handed some tool metadata to bind to the
-// call. Returns the same generic { toolCall, text } shape
-// geminiClient.js already produces - this function's only real job is
-// resolving the model name, everything else passes through.
-//
-// Never executes the chosen tool - that's the Tool Registry's job,
-// called separately by whatever orchestrates this later (Step 14's
-// Intent Router). Keeping "decide" and "execute" as two distinct
-// steps, never fused into one function, is what lets a future
-// multi-provider setup swap only this decision step without touching
-// how tools actually get run.
-export async function classifyToolCall({ taskType = 'classification', systemPrompt, userPrompt, toolDefinitions }) {
-  const modelName = getModelForTask(taskType);
-  const fallbackModelName = getModelForTask(FALLBACK_TASK_TYPE);
-  const { functionCall, text } = await callGeminiWithTools({
-    modelName,
-    systemPrompt,
-    userPrompt,
-    toolDefinitions,
-    fallbackModelName,
-  });
-  return { toolCall: functionCall, text, model: modelName };
 }

@@ -24,20 +24,40 @@ export async function getUserById(id) {
   return usersRepository.findById(id);
 }
 
-export async function updateUserProfile(id, { name, whatsapp, village, taluk, district, state, language }) {
+export async function updateUserProfile(id, { name, whatsapp, village, taluk, district, state, language, lat, lng }) {
   const { user } = await apiRequest('/users/me', {
     method: 'PATCH',
-    body: { name, village, taluk, district, state, language },
+    body: { name, village, taluk, district, state, language, lat, lng },
+  });
+  return normalizeUser(user);
+}
+
+export async function updateProfilePhoto(id, file) {
+  const formData = new FormData();
+  formData.append('photo', file);
+  const { user } = await apiRequest('/users/me', {
+    method: 'PATCH',
+    body: formData,
+    isFormData: true,
   });
   return normalizeUser(user);
 }
 
 export async function saveOnboardingLocation(id, { village, taluk, district, state, lat, lng }) {
-  const { user } = await apiRequest('/users/me', {
-    method: 'PATCH',
-    body: { village, taluk, district, state, lat, lng },
-  });
-  return normalizeUser(user);
+  try {
+    const { user } = await apiRequest('/users/me', {
+      method: 'PATCH',
+      body: { village, taluk, district, state, lat, lng },
+    });
+    return { success: true, user: normalizeUser(user) };
+  } catch {
+    // Matches authService.js's sendOtp/verifyOtp shape exactly - never
+    // throws, so a network/API failure here can't leave the farmer
+    // stuck mid-onboarding with an uncaught exception and no way
+    // forward. The caller shows a clear error and the Continue button
+    // remains usable for a retry.
+    return { success: false };
+  }
 }
 
 export async function skipOnboardingLocation(id) {

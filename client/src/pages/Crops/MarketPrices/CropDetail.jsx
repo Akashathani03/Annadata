@@ -11,13 +11,27 @@ export default function CropDetail() {
   const { apmcId, cropId } = useParams();
   const navigate = useNavigate();
   const { t } = useTranslation('marketPrices');
-  const [detail, setDetail] = useState(undefined); // undefined = loading, null = not found
+
+  const [detail, setDetail] = useState(undefined);
+  // undefined = loading
+  // null = not found / failed
 
   useEffect(() => {
     let cancelled = false;
-    getCropPriceDetail(apmcId, cropId).then((result) => {
-      if (!cancelled) setDetail(result);
-    });
+
+    getCropPriceDetail(apmcId, cropId)
+      .then((result) => {
+        if (cancelled) return;
+        setDetail(result);
+      })
+      .catch(() => {
+        if (cancelled) return;
+
+        // Treat a failed request as unavailable data rather than
+        // leaving the page stuck on the loading state.
+        setDetail(null);
+      });
+
     return () => {
       cancelled = true;
     };
@@ -26,8 +40,16 @@ export default function CropDetail() {
   if (detail === undefined) {
     return (
       <div className="mp-page">
-        <BackLink label={t('backToPrices')} onClick={() => navigate(`/market-prices/${apmcId}`)} />
-        <div className="mp-note">{t('loading')}</div>
+        <BackLink
+          label={t('backToPrices')}
+          onClick={() =>
+            navigate(`/market-prices/${apmcId}`)
+          }
+        />
+
+        <div className="mp-note">
+          {t('loading')}
+        </div>
       </div>
     );
   }
@@ -35,29 +57,62 @@ export default function CropDetail() {
   if (detail === null) {
     return (
       <div className="mp-page">
-        <BackLink label={t('backToPrices')} onClick={() => navigate(`/market-prices/${apmcId}`)} />
-        <div className="mp-note">{t('notFound')}</div>
+        <BackLink
+          label={t('backToPrices')}
+          onClick={() =>
+            navigate(`/market-prices/${apmcId}`)
+          }
+        />
+
+        <div className="mp-note">
+          {t('notFound')}
+        </div>
       </div>
     );
   }
 
-  const { crop, apmc, minPrice, modalPrice, maxPrice, recentHistory } = detail;
+  const {
+    crop,
+    apmc,
+    minPrice,
+    modalPrice,
+    maxPrice,
+    recentHistory,
+  } = detail;
 
   return (
     <div className="mp-page">
-      <BackLink label={t('backToPrices')} onClick={() => navigate(`/market-prices/${apmcId}`)} />
+      <BackLink
+        label={t('backToPrices')}
+        onClick={() =>
+          navigate(`/market-prices/${apmcId}`)
+        }
+      />
 
       <div className="mp-market-bar">
-        <div className="mp-market-left">📍 <b>{apmc.name}</b></div>
+        <div className="mp-market-left">
+          📍 <b>{apmc.name}</b>
+        </div>
       </div>
 
       <div className="mp-crop-hero">
-        <div className="mp-crop-icon">{crop.icon}</div>
-        <h2 className="mp-crop-name">{crop.name}</h2>
+        <div className="mp-crop-icon">
+          {crop.icon}
+        </div>
+
+        <h2 className="mp-crop-name">
+          {crop.name}
+        </h2>
       </div>
 
       <PriceGrid>
-        <PriceBox label={t('minimumPrice')} value={minPrice} unitLabel={t('perKg')} tone="red" />
+        <PriceBox
+          label={t('minimumPrice')}
+          value={minPrice}
+          unitLabel={t('perKg')}
+          tone="red"
+        />
+
         <PriceBox
           label={t('modalPrice')}
           value={modalPrice}
@@ -66,10 +121,19 @@ export default function CropDetail() {
           highlight
           tag={t('mostCommonPrice')}
         />
-        <PriceBox label={t('maximumPrice')} value={maxPrice} unitLabel={t('perKg')} tone="orange" />
+
+        <PriceBox
+          label={t('maximumPrice')}
+          value={maxPrice}
+          unitLabel={t('perKg')}
+          tone="orange"
+        />
       </PriceGrid>
 
-      <div className="mp-recent-head">📊 {t('recentPrices')}</div>
+      <div className="mp-recent-head">
+        📊 {t('recentPrices')}
+      </div>
+
       <table className="mp-table">
         <thead>
           <tr>
@@ -79,21 +143,39 @@ export default function CropDetail() {
             <th>{t('table.max')}</th>
           </tr>
         </thead>
+
         <tbody>
           {recentHistory.map((row) => (
             <tr key={row.date}>
               <td>{formatDisplayDate(row.date)}</td>
-              <td className="mp-red">{row.minPrice}</td>
-              <td className="mp-green">{row.modalPrice}</td>
-              <td className="mp-orange">{row.maxPrice}</td>
+              <td className="mp-red">
+                {row.minPrice}
+              </td>
+              <td className="mp-green">
+                {row.modalPrice}
+              </td>
+              <td className="mp-orange">
+                {row.maxPrice}
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
 
       <div className="mp-detail-actions">
-        <button className="mp-secondary-btn" disabled>{t('compareNearby')}</button>
-        <button className="mp-primary-btn" onClick={() => navigate('/sell')}>
+        <button
+          type="button"
+          className="mp-secondary-btn"
+          disabled
+        >
+          {t('compareNearby')}
+        </button>
+
+        <button
+          type="button"
+          className="mp-primary-btn"
+          onClick={() => navigate('/sell')}
+        >
           🛒 {t('sellThisCrop')}
         </button>
       </div>

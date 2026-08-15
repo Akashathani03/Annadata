@@ -1,0 +1,91 @@
+{
+  "buyBrowse": {
+    "browseTitle": "ಉಪಕರಣ ಖರೀದಿ",
+    "detailTitle": "ಉಪಕರಣ Details",
+    "searchPlaceholder": "ಉಪಕರಣ ಹುಡುಕಿ...",
+    "equipmentNearYou": "ಹತ್ತಿರದ Equipment",
+    "emptyTitle": "ಯಾವುದೇ ಉಪಕರಣ ಸಿಗಲಿಲ್ಲ",
+    "emptyBody": "Filter ಅಥವಾ search ಬದಲಾಯಿಸಿ ನೋಡಿ."
+  },
+  "detail": {
+    "equipmentType": "ಉಪಕರಣದ ವಿಧ",
+    "condition": "ಸ್ಥಿತಿ",
+    "active": "Active",
+    "location": "ಸ್ಥಳ",
+    "phone": "Phone",
+    "lastUpdated": "ಕೊನೆಯ Update",
+    "description": "ವಿವರಣೆ",
+    "editPrice": "Total Price ಬದಲಿಸಿ",
+    "markSold": "Sold ಎಂದು ಗುರುತಿಸಿ",
+    "sold": "Sold",
+    "delete": "Delete ಮಾಡಿ",
+    "deleteConfirm": "ಈ listing delete ಮಾಡುವುದೇ? ಇದನ್ನು ರದ್ದುಗೊಳಿಸಲಾಗುವುದಿಲ್ಲ.",
+    "deleted": "Listing delete ಆಗಿದೆ.",
+    "newPrice": "ಹೊಸ Total Price",
+    "save": "Save ಮಾಡಿ",
+    "cancel": "Cancel ಮಾಡಿ",
+    "priceUpdated": "Price update ಆಗಿದೆ.",
+    "markSoldTitle": "Sold ಎಂದು ಗುರುತಿಸಿ",
+    "finalPrice": "Final Total Price",
+    "buyerName": "Buyer ಹೆಸರು (Optional)",
+    "confirmSold": "Sold Confirm ಮಾಡಿ",
+    "markedSold": "Listing sold ಎಂದು ಗುರುತಿಸಲಾಗಿದೆ!"
+  },
+  "condition": {
+    "new": "ಹೊಸದು",
+    "used-good": "Used - ಉತ್ತಮ",
+    "used-fair": "Used - ಸಾಧಾರಣ"
+  },
+  "nav": {
+    "myListings": "My Listings"
+  },
+  "dashboard": {
+    "greetingMorning": "ಶುಭೋದಯ, {{name}}",
+    "greetingAfternoon": "ಶುಭ ಮಧ್ಯಾಹ್ನ, {{name}}",
+    "greetingEvening": "ಶುಭ ಸಂಜೆ, {{name}}",
+    "myListingsCard": "ನನ್ನ Equipment Listings",
+    "activeListings": "Active Listings",
+    "soldListings": "Sold Listings"
+  },
+  "create": {
+    "subtitle": "ನಿಮ್ಮ Equipment ಅನ್ನು ಹತ್ತಿರದ ಖರೀದಿದಾರರಿಗೆ ಪಟ್ಟಿ ಮಾಡಿ.",
+    "step1Title": "ಉಪಕರಣದ ವಿವರ",
+    "equipmentType": "ಉಪಕರಣದ ವಿಧ",
+    "titleLabel": "Title",
+    "titlePlaceholder": "ಉದಾ: Mahindra 575 Tractor, 2019",
+    "conditionLabel": "ಸ್ಥಿತಿ",
+    "priceLabel": "ಒಟ್ಟು Price (₹)",
+    "description": "ವಿವರಣೆ",
+    "descriptionPlaceholder": "ಇನ್ನಷ್ಟು ವಿವರ ಸೇರಿಸಿ (Optional)",
+    "uploadImage": "Photo",
+    "uploadLabel": "Photo ಸೇರಿಸಿ",
+    "uploadHint": "ಸ್ಪಷ್ಟ Photo ಖರೀದಿದಾರರ ನಂಬಿಕೆ ಹೆಚ್ಚಿಸುತ್ತದೆ.",
+    "step2Title": "ಸ್ಥಳ",
+    "saveDraft": "Draft ಆಗಿ Save ಮಾಡಿ",
+    "publishListing": "ಪಟ್ಟಿ Publish ಮಾಡಿ",
+    "draftSaved": "Draft ಆಗಿ ಉಳಿಸಲಾಗಿದೆ.",
+    "successTitle": "🎉 Listing Published!",
+    "successBody": "ನಿಮ್ಮ Equipment listing ಈಗ live ಆಗಿದೆ.",
+    "addAnother": "ಇನ್ನೊಂದು ಸೇರಿಸಿ",
+    "viewListing": "Listing ನೋಡಿ",
+    "validationCategory": "ದಯವಿಟ್ಟು equipment type ಆಯ್ಕೆಮಾಡಿ.",
+    "validationCondition": "ದಯವಿಟ್ಟು condition ಆಯ್ಕೆಮಾಡಿ.",
+    "validationPhoto": "ದಯವಿಟ್ಟು photo ಸೇರಿಸಿ.",
+    "validationTitle": "ದಯವಿಟ್ಟು title ನಮೂದಿಸಿ.",
+    "validationPrice": "ಸರಿಯಾದ ಒಟ್ಟು price ನಮೂದಿಸಿ."
+  },
+  "myListings": {
+    "active": "Active",
+    "sold": "Sold",
+    "emptyActiveTitle": "ಯಾವುದೇ Active listings ಇಲ್ಲ",
+    "emptyActiveBody": "ನಿಮ್ಮ published equipment ಮತ್ತು drafts ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತವೆ.",
+    "emptySoldTitle": "ಯಾವುದೇ Sold listings ಇಲ್ಲ",
+    "emptySoldBody": "ನೀವು sold ಎಂದು ಗುರುತಿಸಿದ listings ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತವೆ.",
+    "createListing": "Equipment ಮಾರಾಟ",
+    "details": "Details",
+    "edit": "Edit ಮಾಡಿ"
+  },
+  "units": {
+    "unit": "Unit"
+  }
+}

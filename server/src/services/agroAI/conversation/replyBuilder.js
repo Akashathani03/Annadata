@@ -32,17 +32,7 @@ function buildMarketPriceReply(toolResult) {
     };
   }
 
-  const { crop, apmc, minPrice, modalPrice, maxPrice, priceDate, recentHistory } = toolResult;
-
-  // Trend from the two most recent days already returned by the tool
-  // (recentHistory is ordered newest-first) - no extra data needed.
-  let trend;
-  if (Array.isArray(recentHistory) && recentHistory.length >= 2) {
-    const [today, yesterday] = recentHistory;
-    if (today.modalPrice > yesterday.modalPrice) trend = 'up';
-    else if (today.modalPrice < yesterday.modalPrice) trend = 'down';
-    else trend = 'stable';
-  }
+  const { crop, apmc, minPrice, modalPrice, maxPrice, priceDate } = toolResult;
 
   return {
     type: 'card',
@@ -56,7 +46,12 @@ function buildMarketPriceReply(toolResult) {
       minPrice,
       maxPrice,
       lastUpdated: priceDate,
-      trend,
+      // trend intentionally omitted - no genuine multi-day price
+      // history exists to derive a real directional trend from.
+      // toolResult.recentHistory is synthetic 3-day drift (see
+      // marketPrices.service.js's buildRecentHistory), not real
+      // data, so it must never be used to compute an "up"/"down"
+      // signal shown to a farmer as if it were real.
     },
     text: '',
   };
@@ -160,11 +155,66 @@ function buildSchemesReply(toolResult) {
   };
 }
 
+// Card-producing now that Phase 3 builds the visual result card -
+// cardType 'marketplaceListing' (added to the Message model's enum
+// this phase). Not-found/unrecognized/no-location cases stay
+// text-only, matching every other tool's "nothing to show" pattern.
+// cardData deliberately carries only the same safe fields the earlier
+// text-only version referenced - phone and ownerId are present on the
+// underlying listing objects but never included here.
+function buildMarketplaceSearchReply(toolResult) {
+  if (toolResult?.reason === 'location_unavailable') {
+    return {
+      type: 'text',
+      cardType: null,
+      cardData: null,
+      text: 'I need your location to search nearby listings. Please enable location and try again.',
+    };
+  }
+
+  if (toolResult?.reason === 'item_not_recognized') {
+    return {
+      type: 'text',
+      cardType: null,
+      cardData: null,
+      text: "I couldn't recognize that item in our marketplace catalog. Please try a different or more specific name.",
+    };
+  }
+
+  if (!toolResult?.found || !toolResult.listings?.length) {
+    return {
+      type: 'text',
+      cardType: null,
+      cardData: null,
+      text: 'No matching listings were found near your location right now.',
+    };
+  }
+
+  return {
+    type: 'card',
+    cardType: 'marketplaceListing',
+    cardData: {
+      listings: toolResult.listings.slice(0, 5).map((l) => ({
+        id: l.id,
+        category: l.category,
+        itemName: l.itemName,
+        price: l.price,
+        condition: l.condition,
+        distanceKm: l.distanceKm,
+        location: l.location,
+        photoUrl: l.photoUrl,
+      })),
+    },
+    text: '',
+  };
+}
+
 const LOOKUP_REPLY_BUILDERS = {
   market_price_lookup: buildMarketPriceReply,
   weather_lookup: buildWeatherReply,
   nearby_shops_lookup: buildShopsReply,
   government_scheme_lookup: buildSchemesReply,
+  search_marketplace_listings: buildMarketplaceSearchReply,
 };
 
 export function buildLookupReply(targetTool, toolResult) {
@@ -189,8 +239,13 @@ export function buildDiagnosisReply(cardData) {
   return { type: 'card', cardType: 'diagnosis', cardData, text: '' };
 }
 
-export function buildGeneralGuidanceReply(validated) {
-  return { type: 'text', cardType: null, cardData: null, text: validated.responseText };
+// Generic, presentation-only - deliberately has no knowledge of which
+// intent produced this text (conversation, or anything else that's
+// ever just plain text). The Reply Builder's job is only "how to
+// present a response," never "why this response exists" - that
+// separation is why this isn't named after any router intent.
+export function buildTextReply(text) {
+  return { type: 'text', cardType: null, cardData: null, text };
 }
 
 // Design B (Step 17): navigate produces a message with both a short
@@ -210,12 +265,9 @@ export function buildNavigateReply(destination) {
 }
 
 export function buildOutOfScopeReply() {
-  return {
-    type: 'text',
-    cardType: null,
-    cardData: null,
-    text: "I'm here to help with farming questions - crop prices, weather, nearby shops, government schemes, or crop problems. Could you ask something related to that?",
-  };
+  return buildTextReply(
+    "I'm here to help with farming questions - crop prices, weather, nearby shops, government schemes, or crop problems. Could you ask something related to that?"
+  );
 }
 
 // Step 16: converts one persisted message into a single compact,
@@ -245,6 +297,12 @@ export function summarizeForContext(message) {
 
   if (cardType === 'diagnosis' && cardData) {
     return `${speaker}: [Diagnosis shown] ${cardData.problem || 'a crop issue'}${cardData.severity ? ` (${cardData.severity} severity)` : ''}`;
+  }
+
+  if (cardType === 'marketplaceListing' && cardData) {
+    const count = cardData.listings?.length ?? 0;
+    const names = (cardData.listings ?? []).slice(0, 3).map((l) => l.itemName).join(', ');
+    return `${speaker}: [Marketplace listings shown] ${count} result(s)${names ? `: ${names}` : ''}`;
   }
 
   if (text) {

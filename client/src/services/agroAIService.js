@@ -77,6 +77,23 @@ export async function updateMessageStatus(id, status) {
   return normalizeMessage(message);
 }
 
+// Step 15: real reply from the backend's Intent Router pipeline,
+// replacing the naive "photo -> always diagnosis, text -> always
+// generic reply" assumption useAgroAIChat used to make on its own.
+// The backend now genuinely decides what kind of response fits -
+// this function just asks for it and returns whatever comes back,
+// whether that's a card or plain text.
+export async function getAssistantReply(userMessageId, { lat, lng } = {}) {
+  const body = {};
+  if (lat != null) body.lat = lat;
+  if (lng != null) body.lng = lng;
+  const { message } = await apiRequest(`/agro-ai/messages/${userMessageId}/reply`, {
+    method: 'POST',
+    body,
+  });
+  return normalizeMessage(message);
+}
+
 // UNCHANGED from before this step - still pure local mock content,
 // inserted into the local mock repository, not sent to or read from
 // the real backend at all. There is no backend endpoint for creating

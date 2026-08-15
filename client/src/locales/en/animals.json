@@ -1,7 +1,6 @@
 {
   "nav": {
-    "myListings": "My Listings",
-    "enquiries": "Enquiries"
+    "myListings": "My Listings"
   },
   "dashboard": {
     "greetingMorning": "Good morning, {{name}}",
@@ -11,12 +10,9 @@
     "myListingsCard": "My Animal Listings",
     "activeListings": "Active Listings",
     "soldListings": "Sold Listings",
-    "buyerInterest": "Buyer Interest",
-    "totalEnquiries": "Total Enquiries",
     "listingViews": "Listing Views",
-    "recentEnquiries": "Recent Enquiries",
-    "noEnquiriesTitle": "No enquiries yet",
-    "noEnquiriesBody": "Buyer enquiries will appear here once you publish a listing."
+    "sellAnimalSubtitle": "Create a new animal listing",
+    "myListingsSubtitle": "Manage your animal listings"
   },
   "myListings": {
     "active": "Active",
@@ -69,7 +65,6 @@
     "lastUpdated": "Last Updated",
     "description": "Description",
     "views": "Views",
-    "enquiries": "Enquiries",
     "editPrice": "Edit Total Price",
     "editQty": "Edit Qty",
     "markSold": "Mark Sold",
@@ -89,19 +84,6 @@
     "buyerName": "Buyer Name (optional)",
     "confirmSold": "Confirm Sold",
     "markedSold": "Listing marked as sold!"
-  },
-  "enquiriesScreen": {
-    "title": "Buyer Enquiries",
-    "subtitle": "Calls and WhatsApp leads from interested buyers.",
-    "all": "All",
-    "completed": "Completed",
-    "open": "Open",
-    "call": "Call",
-    "whatsapp": "WhatsApp",
-    "done": "Done",
-    "emptyTitle": "No enquiries",
-    "emptyBody": "Buyer messages will appear here after you publish a listing.",
-    "markedCompleted": "Enquiry marked as completed."
   },
   "units": {
     "head": "Head"

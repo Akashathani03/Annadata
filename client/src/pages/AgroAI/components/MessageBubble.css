@@ -111,3 +111,29 @@
   font-size: 10.5px;
   color: var(--muted);
 }
+
+.message-bubble-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 8px;
+  padding: 6px 12px;
+  background: var(--green-light);
+  border: 1px solid var(--green);
+  border-radius: 14px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--green-dark);
+  cursor: pointer;
+}
+
+.message-bubble-action-btn:hover {
+  background: var(--green);
+  color: #fff;
+}
+
+.message-bubble-action-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(46, 125, 70, 0.2);
+}

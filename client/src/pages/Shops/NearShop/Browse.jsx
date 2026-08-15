@@ -2,10 +2,10 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getNearbyShops, getShopPricesForItem, getShopCountForItem } from '../../../services/nearShopService';
+import { resolveImageUrl } from '../../../utils/resolveImageUrl';
 import { getBuyerLocation } from '../../../services/buyerLocationService';
 import { useAuth } from '../../../context/AuthContext';
 import { useUserLocation } from '../../../context/LocationContext';
-import { useToast } from '../../../context/ToastContext';
 import { shopProductCategories, getShopCatalogByCategory } from '../../../config/shopProductCatalog';
 import AppShell from '../../../components/common/AppShell';
 import SearchInput from '../../../components/common/SearchInput';
@@ -15,7 +15,6 @@ import './Shops.css';
 export default function Browse() {
   const navigate = useNavigate();
   const { t } = useTranslation(['shops']);
-  const { showToast } = useToast();
   const { user } = useAuth();
   const { liveLocation } = useUserLocation();
 
@@ -81,7 +80,6 @@ export default function Browse() {
 
       <div className="shop-sec-head">
         <h4>{t('shops:nearShop.popular')} {t(`shops:categories.${category}`)}</h4>
-        <span className="shop-lnk" onClick={() => showToast('Full catalog coming soon.')}>{t('shops:nearShop.viewAll')}</span>
       </div>
 
       <div className="shop-item-row">
@@ -99,7 +97,6 @@ export default function Browse() {
 
       <div className="shop-nearby-head">
         <h4>{t('shops:nearShop.nearbyShops')}</h4>
-        <button className="shop-filter-btn" onClick={() => showToast('Filters coming soon.')}>{t('shops:nearShop.filter')}</button>
       </div>
 
       {selectedItem && (
@@ -123,7 +120,7 @@ export default function Browse() {
           {shops.map((shop) => (
             <div className="shop-card" key={shop.id}>
               <div className="shop-card-thumb">
-                {shop.photoUrl ? <img src={shop.photoUrl} alt="" /> : '🏬'}
+                {shop.photoUrl ? <img src={resolveImageUrl(shop.photoUrl)} alt="" /> : '🏬'}
               </div>
               <div className="shop-card-info">
                 <b>{shop.shopName}</b>
@@ -132,16 +129,20 @@ export default function Browse() {
                 {itemPrices[shop.id] != null && <span className="shop-item-price">₹{itemPrices[shop.id]}</span>}
               </div>
               <div className="shop-card-actions">
-                <a className="shop-btn-call" href={`tel:${shop.phone || '9876543210'}`} onClick={(e) => e.stopPropagation()}>📞</a>
-                <a
-                  className="shop-btn-wa"
-                  href={`https://wa.me/91${shop.phone || '9876543210'}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  💬
-                </a>
+                {shop.phone && (
+                  <>
+                    <a className="shop-btn-call" href={`tel:${shop.phone}`} onClick={(e) => e.stopPropagation()}>📞</a>
+                    <a
+                      className="shop-btn-wa"
+                      href={`https://wa.me/91${shop.phone}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      💬
+                    </a>
+                  </>
+                )}
                 <button className="shop-btn-view" onClick={() => navigate(`/near-shop/${shop.id}`)}>{t('shops:nearShop.viewShop')}</button>
               </div>
             </div>

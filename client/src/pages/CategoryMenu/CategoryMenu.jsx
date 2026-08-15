@@ -40,7 +40,6 @@ export default function CategoryMenu() {
         >
           ←
         </button>
-        <span className="cat-menu-icon">{category.icon}</span>
         <h1 className="cat-menu-title">{t(category.labelKey)}</h1>
       </header>
 

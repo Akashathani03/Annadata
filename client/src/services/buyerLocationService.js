@@ -4,11 +4,12 @@ import { DEFAULT_LOCATION } from '../config/constants';
 // If the buyer/farmer has explicitly set a location via the Change
 // Location sheet, that always wins (explicit choice) - even over live
 // GPS. Otherwise, live GPS captured this session (if granted) is used
-// next, then a logged-in user's own onboarded location (captured
-// during Login), then the anonymous default. liveLocation is optional
-// and additive - existing callers passing only authenticatedUser
-// behave exactly as before.
-export async function getBuyerLocation({ authenticatedUser, liveLocation } = {}) {
+// next, then a logged-in user's own onboarded GPS coordinates, then
+// an approximate location geocoded from their saved text address (if
+// GPS was never captured), then the anonymous default. liveLocation
+// and geocodedLocation are optional and additive - existing callers
+// passing only authenticatedUser behave exactly as before.
+export async function getBuyerLocation({ authenticatedUser, liveLocation, geocodedLocation } = {}) {
   const loc = await buyerLocationRepository.find();
   if (loc.lat != null && loc.lng != null) {
     return { ...loc, label: loc.label || DEFAULT_LOCATION.label };
@@ -27,6 +28,14 @@ export async function getBuyerLocation({ authenticatedUser, liveLocation } = {})
       lat: authenticatedUser.lat,
       lng: authenticatedUser.lng,
       label: loc.label || authenticatedUser.location || DEFAULT_LOCATION.label,
+    };
+  }
+  if (geocodedLocation?.lat != null && geocodedLocation?.lng != null) {
+    return {
+      ...loc,
+      lat: geocodedLocation.lat,
+      lng: geocodedLocation.lng,
+      label: loc.label || authenticatedUser?.location || DEFAULT_LOCATION.label,
     };
   }
   return { ...loc, label: loc.label || DEFAULT_LOCATION.label };

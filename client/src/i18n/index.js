@@ -12,6 +12,7 @@ import enShops from '../locales/en/shops.json';
 import enGovSchemes from '../locales/en/govSchemes.json';
 import enAnimals from '../locales/en/animals.json';
 import enAgroAI from '../locales/en/agroAI.json';
+import enEquipment from '../locales/en/equipment.json';
 import knCommon from '../locales/kn/common.json';
 import knNavigation from '../locales/kn/navigation.json';
 import knWeather from '../locales/kn/weather.json';
@@ -23,6 +24,7 @@ import knShops from '../locales/kn/shops.json';
 import knGovSchemes from '../locales/kn/govSchemes.json';
 import knAnimals from '../locales/kn/animals.json';
 import knAgroAI from '../locales/kn/agroAI.json';
+import knEquipment from '../locales/kn/equipment.json';
 import mixCommon from '../locales/mix/common.json';
 import mixNavigation from '../locales/mix/navigation.json';
 import mixWeather from '../locales/mix/weather.json';
@@ -34,6 +36,7 @@ import mixShops from '../locales/mix/shops.json';
 import mixGovSchemes from '../locales/mix/govSchemes.json';
 import mixAnimals from '../locales/mix/animals.json';
 import mixAgroAI from '../locales/mix/agroAI.json';
+import mixEquipment from '../locales/mix/equipment.json';
 
 // Supported locales. 'mix' is a first-class locale (not a runtime
 // conditional) so mixed-language labels live in their own translation
@@ -42,9 +45,9 @@ export const SUPPORTED_LOCALES = ['mix', 'kn', 'en'];
 export const DEFAULT_LOCALE = 'mix';
 
 const resources = {
-  en: { common: enCommon, navigation: enNavigation, weather: enWeather, marketPrices: enMarketPrices, listings: enListings, buyCrops: enBuyCrops, auth: enAuth, shops: enShops, govSchemes: enGovSchemes, animals: enAnimals, agroAI: enAgroAI },
-  kn: { common: knCommon, navigation: knNavigation, weather: knWeather, marketPrices: knMarketPrices, listings: knListings, buyCrops: knBuyCrops, auth: knAuth, shops: knShops, govSchemes: knGovSchemes, animals: knAnimals, agroAI: knAgroAI },
-  mix: { common: mixCommon, navigation: mixNavigation, weather: mixWeather, marketPrices: mixMarketPrices, listings: mixListings, buyCrops: mixBuyCrops, auth: mixAuth, shops: mixShops, govSchemes: mixGovSchemes, animals: mixAnimals, agroAI: mixAgroAI },
+  en: { common: enCommon, navigation: enNavigation, weather: enWeather, marketPrices: enMarketPrices, listings: enListings, buyCrops: enBuyCrops, auth: enAuth, shops: enShops, govSchemes: enGovSchemes, animals: enAnimals, agroAI: enAgroAI, equipment: enEquipment },
+  kn: { common: knCommon, navigation: knNavigation, weather: knWeather, marketPrices: knMarketPrices, listings: knListings, buyCrops: knBuyCrops, auth: knAuth, shops: knShops, govSchemes: knGovSchemes, animals: knAnimals, agroAI: knAgroAI, equipment: knEquipment },
+  mix: { common: mixCommon, navigation: mixNavigation, weather: mixWeather, marketPrices: mixMarketPrices, listings: mixListings, buyCrops: mixBuyCrops, auth: mixAuth, shops: mixShops, govSchemes: mixGovSchemes, animals: mixAnimals, agroAI: mixAgroAI, equipment: mixEquipment },
 };
 
 i18n.use(initReactI18next).init({

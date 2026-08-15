@@ -35,7 +35,6 @@
     "dashboard": "Dashboard",
     "myShop": "My Shop",
     "products": "Products",
-    "enquiries": "Enquiries",
     "yourShop": "ನಿಮ್ಮ Shop",
     "shopNotSetUp": "Shop ಇನ್ನೂ Set Up ಆಗಿಲ್ಲ",
     "statusIncomplete": "⚪ Incomplete — ವಿವರ ಹಾಕಿ, Live ಆಗಲಿ",
@@ -45,7 +44,6 @@
     "inStock": "Stock ಇದೆ",
     "outOfStock": "Stock ಇಲ್ಲ",
     "shopViews": "Shop Views",
-    "enquiriesCount": "Enquiries",
     "todaysSales": "ಇಂದಿನ ಮಾರಾಟ",
     "noSalesYet": "ಇಂದು ಇನ್ನೂ ಮಾರಾಟ ಆಗಿಲ್ಲ.",
     "shopDetails": "Shop ವಿವರ",
@@ -85,11 +83,10 @@
     "quantitySold": "ಮಾರಾಟವಾದ ಪ್ರಮಾಣ",
     "confirmSale": "ಮಾರಾಟ Confirm ಮಾಡಿ",
     "saleRecorded": "ಮಾರಾಟ Record ಆಗಿದೆ.",
-    "noEnquiriesTitle": "ಇಂದಿಗೆ ಇಷ್ಟೇ",
-    "noEnquiriesBody": "ರೈತರ ಹೊಸ Enquiries ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತವೆ.",
     "step1": "Category",
     "step2": "Products",
     "step3": "ಬೆಲೆ",
-    "saveFailed": "ಏನೋ ತಪ್ಪಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ Try ಮಾಡಿ."
+    "saveFailed": "ಏನೋ ತಪ್ಪಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ Try ಮಾಡಿ.",
+    "phoneRequired": "Buyers ನಿಮ್ಮ shop contact ಮಾಡಲು phone number ಅಗತ್ಯವಿದೆ."
   }
 }

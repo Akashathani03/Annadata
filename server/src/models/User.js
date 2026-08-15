@@ -26,9 +26,10 @@ const userSchema = new mongoose.Schema(
     taluk: { type: String, default: '' },
     district: { type: String, default: '' },
     state: { type: String, default: '' },
-    lat: { type: Number, default: null },
-    lng: { type: Number, default: null },
+    lat: { type: Number, min: -90, max: 90, default: null },
+    lng: { type: Number, min: -180, max: 180, default: null },
     language: { type: String, enum: ['en', 'kn', 'mix'], default: 'mix' },
+    profilePhotoUrl: { type: String, default: null },
   },
   { timestamps: true }
 );

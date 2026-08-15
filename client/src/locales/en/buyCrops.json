@@ -88,6 +88,20 @@
     "callFarmer": "📞 Call Farmer",
     "whatsapp": "💬 WhatsApp",
     "notAvailable": "This listing is no longer available.",
-    "whatsappMessage": "Hello, I found your {{crop}} listing on Annadata. Is it still available?"
+    "whatsappMessage": "Hello, I found your {{crop}} listing on Annadata. Is it still available?",
+    "share": "Share",
+    "shareMessage": "Check this listing on Annadata: {{title}}",
+    "shareSheetTitle": "Share Listing",
+    "shareViaWhatsapp": "Share via WhatsApp",
+    "copyLink": "Copy Link",
+    "linkCopied": "Link copied",
+    "copyLinkFailed": "Couldn't copy link. Please try again."
+  },
+  "distances": {
+    "all": "All",
+    "within5": "Within 5 km",
+    "within10": "Within 10 km",
+    "within25": "Within 25 km",
+    "within50": "Within 50 km"
   }
 }

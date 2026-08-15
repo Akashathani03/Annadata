@@ -1,7 +1,22 @@
+import mongoose from 'mongoose';
+import { ApiError } from '../../../utils/ApiError.js';
 import { distanceKm } from '../../../utils/geo.js';
 import { shopProductCatalog } from './shopProductCatalog.js';
 import * as shopRepository from '../../../repositories/shop.repository.js';
 import * as shopProductRepository from '../../../repositories/shopProduct.repository.js';
+
+// Same pattern already established in conversation.service.js and
+// listings.service.js - a malformed id is an input-validation
+// problem, not a "not found" problem, and should never surface as a
+// raw, unhandled Mongoose CastError falling through to a generic 500.
+// Only getShopDetail below needs this - every other function here
+// takes a search string or a catalog itemId (a string slug, not a
+// Mongoose ObjectId), never a user-supplied ObjectId directly.
+function assertValidObjectId(id, fieldName) {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw new ApiError(400, 'VALIDATION_ERROR', `${fieldName} is not a valid id.`);
+  }
+}
 
 function toShopShape(shop) {
   return { ...shop.toObject(), id: shop._id.toString() };
@@ -42,6 +57,7 @@ export async function getNearbyShops({ query, buyerLat, buyerLng } = {}) {
 // Mirrors getShopDetail exactly: only visible if active, includes its
 // products and a live distance calculation.
 export async function getShopDetail(shopId, { buyerLat, buyerLng } = {}) {
+  assertValidObjectId(shopId, 'shopId');
   const shop = await shopRepository.findById(shopId);
   if (!shop || shop.status !== 'active') return null;
 

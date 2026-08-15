@@ -2,9 +2,15 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import i18n from '../../i18n';
-import { updateUserProfile } from '../../services/usersService';
+import {
+  updateUserProfile,
+  updateProfilePhoto,
+} from '../../services/usersService';
+import { reverseGeocode } from '../../services/geocodingService';
+import { resolveImageUrl } from '../../utils/resolveImageUrl';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
+import { IconCurrentLocation } from '../../components/icons';
 import AppShell from '../../components/common/AppShell';
 import BottomSheet from '../../components/common/BottomSheet';
 import './Profile.css';
@@ -27,11 +33,29 @@ const EDIT_FIELDS = [
 export default function Profile() {
   const navigate = useNavigate();
   const { t } = useTranslation(['listings', 'common']);
-  const { user, loading, logout, refreshUser, openLoginModal } = useAuth();
+  const {
+    user,
+    loading,
+    logout,
+    refreshUser,
+    openLoginModal,
+  } = useAuth();
   const { showToast } = useToast();
 
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({});
+  const [avatarLoadFailed, setAvatarLoadFailed] = useState(false);
+
+  const [avatarStage, setAvatarStage] = useState(null);
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarPreviewUrl, setAvatarPreviewUrl] = useState(null);
+
+  const [locationStatus, setLocationStatus] = useState('idle');
+  // idle | capturing | geocoding | error
+
+  useEffect(() => {
+    setAvatarLoadFailed(false);
+  }, [user?.profilePhotoUrl]);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -43,21 +67,128 @@ export default function Profile() {
   if (!user) return null;
 
   function openEdit() {
-    setForm(user);
+    setForm({
+      ...user,
+    });
+    setLocationStatus('idle');
     setEditing(true);
   }
 
+  function handleAvatarFileSelected(file) {
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      setAvatarPreviewUrl(reader.result);
+      setAvatarFile(file);
+      setAvatarStage('preview');
+    };
+
+    reader.readAsDataURL(file);
+  }
+
+  function closeAvatarSheet() {
+    setAvatarStage(null);
+    setAvatarFile(null);
+    setAvatarPreviewUrl(null);
+  }
+
+  async function handleAvatarSave() {
+    if (!avatarFile) return;
+
+    try {
+      await updateProfilePhoto(user.id, avatarFile);
+      await refreshUser();
+      closeAvatarSheet();
+      showToast(t('listings:profileScreen.saved'));
+    } catch {
+      showToast(t('listings:profileScreen.photoUploadFailed'));
+    }
+  }
+
+  function handleUseCurrentLocation() {
+    if (!navigator.geolocation) {
+      setLocationStatus('error');
+      showToast(t('listings:create.gpsUnavailable'));
+      return;
+    }
+
+    setLocationStatus('capturing');
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+
+        setLocationStatus('geocoding');
+
+        try {
+          const address = await reverseGeocode(lat, lng);
+
+          if (
+            !address ||
+            !(
+              address.village ||
+              address.taluk ||
+              address.district ||
+              address.state
+            )
+          ) {
+            setLocationStatus('error');
+            showToast(t('listings:create.gpsGeocodeError'));
+            return;
+          }
+
+          setForm((prev) => ({
+            ...prev,
+            village: address.village || prev.village || '',
+            taluk: address.taluk || prev.taluk || '',
+            district: address.district || prev.district || '',
+            state: address.state || prev.state || '',
+            lat,
+            lng,
+          }));
+
+          setLocationStatus('idle');
+          showToast(t('listings:create.gpsCaptured'));
+        } catch {
+          setLocationStatus('error');
+          showToast(t('listings:create.gpsGeocodeError'));
+        }
+      },
+      () => {
+        setLocationStatus('error');
+        showToast(t('listings:create.gpsError'));
+      },
+      {
+        enableHighAccuracy: true,
+        maximumAge: 0,
+        timeout: 15000,
+      }
+    );
+  }
+
   async function handleSave() {
-    await updateUserProfile(user.id, form);
-    await refreshUser();
-    setEditing(false);
-    showToast(t('listings:profileScreen.saved'));
+    try {
+      await updateUserProfile(user.id, form);
+      await refreshUser();
+      setEditing(false);
+      setLocationStatus('idle');
+      showToast(t('listings:profileScreen.saved'));
+    } catch {
+      showToast(t('listings:profileScreen.saveFailed'));
+    }
   }
 
   async function handleLanguageChange(langId) {
-    await updateUserProfile(user.id, { language: langId });
-    await refreshUser();
-    i18n.changeLanguage(langId);
+    try {
+      await updateUserProfile(user.id, { language: langId });
+      await refreshUser();
+      i18n.changeLanguage(langId);
+    } catch {
+      showToast(t('listings:profileScreen.saveFailed'));
+    }
   }
 
   async function handleLogout() {
@@ -66,28 +197,76 @@ export default function Profile() {
   }
 
   return (
-    <AppShell title={t('common:profile')} onBack={() => navigate(-1)}>
+    <AppShell
+      title={t('common:profile')}
+      onBack={() => navigate(-1)}
+      hideAvatar
+    >
       <div className="profile-page">
         <div className="profile-hero">
-          <div className="profile-avatar">👨‍🌾</div>
+          <button
+            type="button"
+            className="profile-avatar profile-avatar-btn"
+            onClick={() => setAvatarStage('chooser')}
+            aria-label={t('listings:profileScreen.changePhoto')}
+          >
+            {user.profilePhotoUrl && !avatarLoadFailed ? (
+              <img
+                src={resolveImageUrl(user.profilePhotoUrl)}
+                alt=""
+                className="profile-avatar-img"
+                onError={() => setAvatarLoadFailed(true)}
+              />
+            ) : (
+              '👨‍🌾'
+            )}
+          </button>
+
           <b>{user.name || 'Farmer'}</b>
           <span>📞 {user.phone}</span>
           <span>📍 {user.location || '—'}</span>
         </div>
 
         <div className="profile-list">
-          <div className="row"><span>{t('listings:profileScreen.fullName')}</span><b>{user.name || '—'}</b></div>
-          <div className="row"><span>{t('listings:profileScreen.phone')}</span><b>{user.phone || '—'}</b></div>
-          <div className="row"><span>{t('listings:profileScreen.village')}</span><b>{user.village || '—'}</b></div>
-          <div className="row"><span>{t('listings:profileScreen.taluk')}</span><b>{user.taluk || '—'}</b></div>
-          <div className="row"><span>{t('listings:profileScreen.district')}</span><b>{user.district || '—'}</b></div>
-          <div className="row"><span>{t('common:state')}</span><b>{user.state || '—'}</b></div>
+          <div className="row">
+            <span>{t('listings:profileScreen.fullName')}</span>
+            <b>{user.name || '—'}</b>
+          </div>
+
+          <div className="row">
+            <span>{t('listings:profileScreen.phone')}</span>
+            <b>{user.phone || '—'}</b>
+          </div>
+
+          <div className="row">
+            <span>{t('listings:profileScreen.village')}</span>
+            <b>{user.village || '—'}</b>
+          </div>
+
+          <div className="row">
+            <span>{t('listings:profileScreen.taluk')}</span>
+            <b>{user.taluk || '—'}</b>
+          </div>
+
+          <div className="row">
+            <span>{t('listings:profileScreen.district')}</span>
+            <b>{user.district || '—'}</b>
+          </div>
+
+          <div className="row">
+            <span>{t('common:state')}</span>
+            <b>{user.state || '—'}</b>
+          </div>
         </div>
 
-        <div className="profile-section-label">{t('common:language')}</div>
+        <div className="profile-section-label">
+          {t('common:language')}
+        </div>
+
         <div className="lang-choice profile-lang-choice">
           {LANG_OPTIONS.map((opt) => (
             <button
+              type="button"
               key={opt.id}
               className={user.language === opt.id ? 'active' : ''}
               onClick={() => handleLanguageChange(opt.id)}
@@ -97,27 +276,195 @@ export default function Profile() {
           ))}
         </div>
 
-        <button className="sticky-bar-primary profile-full-btn" onClick={openEdit}>
+        <button
+          type="button"
+          className="sticky-bar-primary profile-full-btn"
+          onClick={openEdit}
+        >
           ✏️ {t('listings:profileScreen.editProfile')}
         </button>
-        <button className="sticky-bar-secondary profile-full-btn" onClick={handleLogout}>
+
+        <button
+          type="button"
+          className="sticky-bar-secondary profile-full-btn"
+          onClick={handleLogout}
+        >
           ↩️ {t('listings:profileScreen.logout')}
         </button>
 
-        <BottomSheet open={editing} onClose={() => setEditing(false)}>
+        {/* Edit Profile */}
+        <BottomSheet
+          open={editing}
+          onClose={() => {
+            setEditing(false);
+            setLocationStatus('idle');
+          }}
+        >
           <h3>✏️ {t('listings:profileScreen.editProfile')}</h3>
+
           {EDIT_FIELDS.map(([field, labelKey]) => (
             <div className="profile-field" key={field}>
               <label>{t(labelKey)}</label>
+
               <input
                 value={form[field] || ''}
-                onChange={(e) => setForm({ ...form, [field]: e.target.value })}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    [field]: e.target.value,
+                  })
+                }
               />
             </div>
           ))}
+
+          {/* Current Location */}
+          <button
+            type="button"
+            className="cl-gps-btn"
+            onClick={handleUseCurrentLocation}
+            disabled={
+              locationStatus === 'capturing' ||
+              locationStatus === 'geocoding'
+            }
+          >
+            <IconCurrentLocation
+              size={18}
+              strokeWidth={2}
+              aria-hidden="true"
+            />
+
+            <span>
+              {locationStatus === 'capturing'
+                ? t('listings:create.gpsCapturing')
+                : locationStatus === 'geocoding'
+                  ? t('listings:create.gpsGeocoding')
+                  : t('common:useCurrentLocation')}
+            </span>
+          </button>
+
+          {locationStatus === 'error' && (
+            <div className="cl-gps-status cl-gps-error">
+              {t('listings:create.gpsError')}
+            </div>
+          )}
+
           <div className="profile-sheet-actions">
-            <button className="sticky-bar-secondary" onClick={() => setEditing(false)}>{t('listings:profileScreen.cancel')}</button>
-            <button className="sticky-bar-primary" onClick={handleSave}>{t('listings:profileScreen.save')}</button>
+            <button
+              type="button"
+              className="sticky-bar-secondary"
+              onClick={() => {
+                setEditing(false);
+                setLocationStatus('idle');
+              }}
+            >
+              {t('listings:profileScreen.cancel')}
+            </button>
+
+            <button
+              type="button"
+              className="sticky-bar-primary"
+              onClick={handleSave}
+            >
+              {t('listings:profileScreen.save')}
+            </button>
+          </div>
+        </BottomSheet>
+
+        {/* Avatar chooser */}
+        <BottomSheet
+          open={avatarStage === 'chooser'}
+          onClose={closeAvatarSheet}
+        >
+          <h3>{t('listings:profileScreen.changePhoto')}</h3>
+
+          <input
+            id="avatar-camera-input"
+            type="file"
+            accept="image/*"
+            capture="environment"
+            style={{ display: 'none' }}
+            onChange={(e) =>
+              handleAvatarFileSelected(e.target.files?.[0])
+            }
+          />
+
+          <input
+            id="avatar-gallery-input"
+            type="file"
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={(e) =>
+              handleAvatarFileSelected(e.target.files?.[0])
+            }
+          />
+
+          <div className="profile-avatar-choice">
+            <button
+              type="button"
+              className="sticky-bar-secondary"
+              onClick={() =>
+                document
+                  .getElementById('avatar-camera-input')
+                  ?.click()
+              }
+            >
+              📷 {t('listings:profileScreen.takePhoto')}
+            </button>
+
+            <button
+              type="button"
+              className="sticky-bar-secondary"
+              onClick={() =>
+                document
+                  .getElementById('avatar-gallery-input')
+                  ?.click()
+              }
+            >
+              🖼️ {t('listings:profileScreen.chooseFromGallery')}
+            </button>
+
+            <button
+              type="button"
+              className="sticky-bar-secondary"
+              onClick={closeAvatarSheet}
+            >
+              ❌ {t('listings:profileScreen.cancel')}
+            </button>
+          </div>
+        </BottomSheet>
+
+        {/* Avatar preview */}
+        <BottomSheet
+          open={avatarStage === 'preview'}
+          onClose={closeAvatarSheet}
+        >
+          <h3>{t('listings:profileScreen.changePhoto')}</h3>
+
+          {avatarPreviewUrl && (
+            <img
+              src={avatarPreviewUrl}
+              alt=""
+              className="profile-avatar-preview-img"
+            />
+          )}
+
+          <div className="profile-sheet-actions">
+            <button
+              type="button"
+              className="sticky-bar-secondary"
+              onClick={closeAvatarSheet}
+            >
+              {t('listings:profileScreen.cancel')}
+            </button>
+
+            <button
+              type="button"
+              className="sticky-bar-primary"
+              onClick={handleAvatarSave}
+            >
+              {t('listings:profileScreen.save')}
+            </button>
           </div>
         </BottomSheet>
       </div>

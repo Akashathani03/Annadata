@@ -1,7 +1,6 @@
 {
   "nav": {
-    "myListings": "ನನ್ನ ಪಟ್ಟಿಗಳು",
-    "enquiries": "ವಿಚಾರಣೆಗಳು"
+    "myListings": "ನನ್ನ ಪಟ್ಟಿಗಳು"
   },
   "dashboard": {
     "greetingMorning": "ಶುಭೋದಯ, {{name}}",
@@ -11,12 +10,9 @@
     "myListingsCard": "ನನ್ನ ಪ್ರಾಣಿ ಪಟ್ಟಿಗಳು",
     "activeListings": "ಸಕ್ರಿಯ ಪಟ್ಟಿಗಳು",
     "soldListings": "ಮಾರಾಟವಾದ ಪಟ್ಟಿಗಳು",
-    "buyerInterest": "ಖರೀದಿದಾರರ ಆಸಕ್ತಿ",
-    "totalEnquiries": "ಒಟ್ಟು ವಿಚಾರಣೆಗಳು",
     "listingViews": "ಪಟ್ಟಿ ವೀಕ್ಷಣೆಗಳು",
-    "recentEnquiries": "ಇತ್ತೀಚಿನ ವಿಚಾರಣೆಗಳು",
-    "noEnquiriesTitle": "ಇನ್ನೂ ವಿಚಾರಣೆ ಇಲ್ಲ",
-    "noEnquiriesBody": "ಪಟ್ಟಿ ಪ್ರಕಟಿಸಿದ ನಂತರ ಖರೀದಿದಾರರ ವಿಚಾರಣೆ ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತದೆ."
+    "sellAnimalSubtitle": "ಹೊಸ ಪ್ರಾಣಿ ಪಟ್ಟಿ ರಚಿಸಿ",
+    "myListingsSubtitle": "ನಿಮ್ಮ ಪ್ರಾಣಿ ಪಟ್ಟಿಗಳನ್ನು ನಿರ್ವಹಿಸಿ"
   },
   "myListings": {
     "active": "ಸಕ್ರಿಯ",
@@ -69,7 +65,6 @@
     "lastUpdated": "ಕೊನೆಯ ಅಪ್ಡೇಟ್",
     "description": "ವಿವರಣೆ",
     "views": "ವೀಕ್ಷಣೆಗಳು",
-    "enquiries": "ವಿಚಾರಣೆಗಳು",
     "editPrice": "ಒಟ್ಟು ಬೆಲೆ ಬದಲಿಸಿ",
     "editQty": "ಪ್ರಮಾಣ ಬದಲಿಸಿ",
     "markSold": "ಮಾರಾಟ ಎಂದು ಗುರುತಿಸಿ",
@@ -89,19 +84,6 @@
     "buyerName": "ಖರೀದಿದಾರರ ಹೆಸರು (ಐಚ್ಛಿಕ)",
     "confirmSold": "ಮಾರಾಟ ಖಚಿತಪಡಿಸಿ",
     "markedSold": "ಪಟ್ಟಿ ಮಾರಾಟ ಎಂದು ಗುರುತಿಸಲಾಗಿದೆ!"
-  },
-  "enquiriesScreen": {
-    "title": "ಖರೀದಿದಾರರ ವಿಚಾರಣೆಗಳು",
-    "subtitle": "ಆಸಕ್ತ ಖರೀದಿದಾರರಿಂದ ಕರೆ ಮತ್ತು WhatsApp ಸಂದೇಶಗಳು.",
-    "all": "ಎಲ್ಲಾ",
-    "completed": "ಮುಗಿದಿದೆ",
-    "open": "ಬಾಕಿ",
-    "call": "ಕರೆ",
-    "whatsapp": "WhatsApp",
-    "done": "ಮುಗಿಯಿತು",
-    "emptyTitle": "ವಿಚಾರಣೆ ಇಲ್ಲ",
-    "emptyBody": "ಪಟ್ಟಿ ಪ್ರಕಟಿಸಿದ ನಂತರ ಖರೀದಿದಾರರ ಸಂದೇಶ ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತದೆ.",
-    "markedCompleted": "ವಿಚಾರಣೆ ಮುಗಿದಿದೆ ಎಂದು ಗುರುತಿಸಲಾಗಿದೆ."
   },
   "units": {
     "head": "ತಲೆ"

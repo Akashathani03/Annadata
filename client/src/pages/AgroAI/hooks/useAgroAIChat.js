@@ -1,59 +1,69 @@
 import { useCallback, useState } from 'react';
 import { useAuth } from '../../../context/AuthContext';
-import {
-  sendUserMessage,
-  sendMockDiagnosisResponse,
-  sendMockTextResponse,
-} from '../../../services/agroAIService';
+import { useUserLocation } from '../../../context/LocationContext';
+import { sendUserMessage, getAssistantReply } from '../../../services/agroAIService';
 
-// Step 6: real network calls now exist, so the old fake-timer +
-// "fails if text contains the word 'fail'" mock delivery logic
-// (Step 14) is gone - keeping it would mean a message could genuinely
-// succeed over the real network and then be artificially marked
-// failed anyway, which no longer serves the purpose it was built for.
-// Real failures (network errors, validation errors, a down backend)
-// now drive the exact same Pending/Failed UI Step 14 already built
-// and proved - only the trigger changed, not the states or their
-// visual treatment.
+// Step 15: real reply pipeline now exists, so the old
+// runAiThinkingThenMockDiagnosis/runAiThinkingThenMockTextReply split
+// (which guessed the reply type from whether a photo was attached,
+// entirely on the frontend) is gone. The backend's Intent Router
+// genuinely decides what kind of response fits a message - this hook
+// no longer makes that decision at all, it just asks for a reply and
+// renders whatever comes back. This is what "frontend remains a thin
+// client" means concretely here.
 //
 // The hook's exported shape below is unchanged: { messages,
 // sendMessage, sendImageMessage, retryMessage, isAiThinking }. No
 // component (AgroAI.jsx, ChatArea.jsx, InputArea.jsx) needs to change.
 export default function useAgroAIChat() {
   const { user } = useAuth();
+  const { lat, lng } = useUserLocation();
   const [messages, setMessages] = useState([]);
   const [isAiThinking, setIsAiThinking] = useState(false);
 
-  const runAiThinkingThenMockDiagnosis = useCallback(() => {
-    setIsAiThinking(true);
-    setTimeout(async () => {
-      const aiMessage = await sendMockDiagnosisResponse();
-      setMessages((prev) => [...prev, aiMessage]);
-      setIsAiThinking(false);
-    }, 1200);
-  }, []);
-
-  const runAiThinkingThenMockTextReply = useCallback(() => {
-    setIsAiThinking(true);
-    setTimeout(async () => {
-      const aiMessage = await sendMockTextResponse();
-      setMessages((prev) => [...prev, aiMessage]);
-      setIsAiThinking(false);
-    }, 1200);
-  }, []);
+  const runAiThinkingThenRealReply = useCallback(
+    async (userMessageId) => {
+      setIsAiThinking(true);
+      try {
+        const aiMessage = await getAssistantReply(userMessageId, { lat, lng });
+        setMessages((prev) => [...prev, aiMessage]);
+      } catch {
+        // A real reply failure - now visible and retryable, matching
+        // the same failed-message pattern already built for user
+        // messages. replyToMessageId is local-only state (never sent
+        // to the backend) so retryMessage below knows which original
+        // user message to re-attempt a reply for.
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `temp_reply_${Date.now()}`,
+            sender: 'assistant',
+            type: 'text',
+            status: 'failed',
+            replyToMessageId: userMessageId,
+          },
+        ]);
+      } finally {
+        setIsAiThinking(false);
+      }
+    },
+    [lat, lng]
+  );
 
   // Shared by sendMessage, sendImageMessage, AND retryMessage - this
   // is the "existing send pipeline" every one of them reuses, not a
   // parallel implementation. Shows an optimistic local placeholder
   // immediately (preserves the exact optimistic-UI behavior already
   // approved), then replaces it with the real backend message on
-  // success, or marks it failed on a real error.
+  // success, or marks it failed on a real error. onSuccess now
+  // receives the real saved message (needed to know its id for the
+  // reply call), not called with no arguments as before.
   const attemptSend = useCallback(
     async ({ tempId, text, photoUrl, onSuccess }) => {
       try {
         const message = await sendUserMessage({ text, photoUrl });
         setMessages((prev) => prev.map((m) => (m.id === tempId ? message : m)));
-        onSuccess?.();
+        onSuccess?.(message);
       } catch {
         setMessages((prev) =>
           prev.map((m) => (m.id === tempId ? { ...m, status: 'failed' } : m))
@@ -74,9 +84,13 @@ export default function useAgroAIChat() {
         { id: tempId, sender: 'user', type: 'text', text: trimmed, status: 'sending' },
       ]);
 
-      attemptSend({ tempId, text: trimmed, onSuccess: runAiThinkingThenMockTextReply });
+      attemptSend({
+        tempId,
+        text: trimmed,
+        onSuccess: (message) => runAiThinkingThenRealReply(message.id),
+      });
     },
-    [user, attemptSend, runAiThinkingThenMockTextReply]
+    [user, attemptSend, runAiThinkingThenRealReply]
   );
 
   const sendImageMessage = useCallback(
@@ -89,20 +103,33 @@ export default function useAgroAIChat() {
         { id: tempId, sender: 'user', type: 'image', text: caption, photoUrl, status: 'sending' },
       ]);
 
-      attemptSend({ tempId, text: caption, photoUrl, onSuccess: runAiThinkingThenMockDiagnosis });
+      attemptSend({
+        tempId,
+        text: caption,
+        photoUrl,
+        onSuccess: (message) => runAiThinkingThenRealReply(message.id),
+      });
     },
-    [user, attemptSend, runAiThinkingThenMockDiagnosis]
+    [user, attemptSend, runAiThinkingThenRealReply]
   );
 
-  // Retry means "attempt the send again" (see the note above) - the
-  // failed message almost certainly never reached the backend in the
-  // first place, so there's nothing server-side to flip back to
-  // sending. Re-runs the exact same attemptSend pipeline, not a
-  // separate implementation.
+  // Retry means "attempt the send again" - the failed message almost
+  // certainly never reached the backend in the first place, so there's
+  // nothing server-side to flip back to sending. Re-runs the exact
+  // same attemptSend pipeline, not a separate implementation.
   const retryMessage = useCallback(
     (messageId) => {
       const target = messages.find((m) => m.id === messageId);
       if (!target || target.status !== 'failed') return;
+
+      if (target.sender === 'assistant') {
+        // A failed reply, not a failed send - remove the placeholder
+        // and re-attempt against the same original user message. There
+        // is nothing to re-send; the user's message already succeeded.
+        setMessages((prev) => prev.filter((m) => m.id !== messageId));
+        runAiThinkingThenRealReply(target.replyToMessageId);
+        return;
+      }
 
       setMessages((prev) =>
         prev.map((m) => (m.id === messageId ? { ...m, status: 'sending' } : m))
@@ -112,10 +139,10 @@ export default function useAgroAIChat() {
         tempId: messageId,
         text: target.text,
         photoUrl: target.photoUrl,
-        onSuccess: target.photoUrl ? runAiThinkingThenMockDiagnosis : runAiThinkingThenMockTextReply,
+        onSuccess: (message) => runAiThinkingThenRealReply(message.id),
       });
     },
-    [messages, attemptSend, runAiThinkingThenMockDiagnosis, runAiThinkingThenMockTextReply]
+    [messages, attemptSend, runAiThinkingThenRealReply]
   );
 
   return { messages, sendMessage, sendImageMessage, retryMessage, isAiThinking };

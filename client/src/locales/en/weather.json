@@ -10,5 +10,6 @@
     "foggy": "Foggy",
     "rainy": "Rainy",
     "stormy": "Stormy"
-  }
+  },
+  "locationUnavailable": "Location unavailable"
 }

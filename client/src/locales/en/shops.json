@@ -35,7 +35,6 @@
     "dashboard": "Dashboard",
     "myShop": "My Shop",
     "products": "Products",
-    "enquiries": "Enquiries",
     "yourShop": "Your Shop",
     "shopNotSetUp": "Shop not set up yet",
     "statusIncomplete": "⚪ Incomplete — add your shop details to go live",
@@ -45,7 +44,6 @@
     "inStock": "In Stock",
     "outOfStock": "Out of Stock",
     "shopViews": "Shop Views",
-    "enquiriesCount": "Enquiries",
     "todaysSales": "Today's Recorded Sales",
     "noSalesYet": "No sales recorded yet today.",
     "shopDetails": "Shop Details",
@@ -85,11 +83,10 @@
     "quantitySold": "Quantity Sold",
     "confirmSale": "Confirm Sale",
     "saleRecorded": "Sale recorded.",
-    "noEnquiriesTitle": "That's all for today",
-    "noEnquiriesBody": "New enquiries from farmers will show up here.",
     "step1": "Category",
     "step2": "Products",
     "step3": "Price",
-    "saveFailed": "Something went wrong. Please try again."
+    "saveFailed": "Something went wrong. Please try again.",
+    "phoneRequired": "A phone number is required so buyers can contact your shop."
   }
 }

@@ -63,7 +63,9 @@
   padding: 11px 12px;
   border: 1px solid var(--border);
   border-radius: 9px;
-  font-size: 14px;
+  /* 16px minimum: below this, iOS Safari auto-zooms the page on
+     focus, which is jarring on the login/phone-number screen. */
+  font-size: 16px;
   font-family: inherit;
 }
 

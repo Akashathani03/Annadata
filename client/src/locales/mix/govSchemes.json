@@ -20,7 +20,7 @@
   "statusClosing": "ಬೇಗ ಮುಗಿಯುತ್ತದೆ",
   "appliedSuffix": "Apply ಮಾಡಿದ್ದಾರೆ",
   "deadlineLabel": "Deadline",
-  "applyNow": "Apply ಮಾಡಿ",
+  "applyNow": "Official Site ನಲ್ಲಿ Apply ಮಾಡಿ ↗",
   "viewDetails": "ವಿವರ ನೋಡಿ",
   "loadMore": "ಇನ್ನಷ್ಟು ನೋಡಿ ⌄",
   "loadMoreComingSoon": "ಇನ್ನಷ್ಟು ಯೋಜನೆಗಳು ಶೀಘ್ರದಲ್ಲೇ ಬರುತ್ತಿದೆ.",
@@ -46,5 +46,9 @@
     "button": "Helpdesk ಜೊತೆ ಮಾತಾಡಿ",
     "comingSoon": "ಇದು Demo — ಪೂರ್ಣ Version ನಲ್ಲಿ Helpdesk Chat ಕೆಲಸ ಮಾಡುತ್ತದೆ."
   },
-  "loadFailed": "ಏನೋ ತಪ್ಪಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ Try ಮಾಡಿ."
+  "loadFailed": "ಏನೋ ತಪ್ಪಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ Try ಮಾಡಿ.",
+  "stateFilterAllStates": "Central + all state schemes ತೋರಿಸಲಾಗುತ್ತಿದೆ",
+  "stateFilterKarnataka": "📍 Central + Karnataka schemes ತೋರಿಸಲಾಗುತ್ತಿದೆ",
+  "loading": "Schemes load ಆಗುತ್ತಿದೆ...",
+  "noSchemesFound": "ಈ filter ಗೆ ಯಾವುದೇ schemes ಸಿಗಲಿಲ್ಲ."
 }

@@ -1,25 +1,4 @@
-# Dependencies
-node_modules/
-client/node_modules/
-server/node_modules/
-
-# Environment files
+node_modules
 .env
-client/.env
-server/.env
-
-# Logs
-*.log
-npm-debug.log*
-
-# Build output
-client/dist/
-server/uploads/
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# IDE
-.vscode/
-.idea/
+.env.*
+!.env.example

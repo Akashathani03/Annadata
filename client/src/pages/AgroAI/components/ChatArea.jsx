@@ -30,7 +30,7 @@ function greetingKey() {
 
 const SCROLL_BOTTOM_THRESHOLD = 80; // px - "close enough to bottom" for auto-scroll purposes
 
-export default function ChatArea({ messages = [], onSend, isAiThinking = false, onRetry }) {
+export default function ChatArea({ messages = [], onSend, isAiThinking = false, onRetry, onAction }) {
   const { t } = useTranslation(['agroAI']);
   const { user } = useAuth();
   const hasMessages = messages.length > 0;
@@ -86,7 +86,7 @@ export default function ChatArea({ messages = [], onSend, isAiThinking = false, 
               />
             ) : (
               <div className="message-bubble-row is-assistant" key={message.id}>
-                <AIMessageContent message={message} />
+                <AIMessageContent message={message} onRetry={() => onRetry?.(message.id)} onAction={onAction} />
               </div>
             )
           )}

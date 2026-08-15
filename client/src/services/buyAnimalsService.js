@@ -1,16 +1,13 @@
-import { getListings, getListingById } from './listingsService';
-import { getUserById } from './usersService';
+import { getListings, getListingById, getListingSeller } from './listingsService';
 import { animalCatalog } from '../config/animalCatalog';
 import { distanceKm } from '../utils/geo';
 
-// Mirrors buyCropsService.js exactly - same pipeline, same reuse of
-// listingsService/usersService, same never-fake-a-distance rule.
-// Reads only { category: 'animal', status: 'published' } - the exact
-// same listings collection Sell Animals writes to. No separate data
-// source, and sold/draft listings are excluded by the status filter.
+// Mirrors buyCropsService.js exactly - same pipeline. Uses the
+// purpose-specific getListingSeller (real backend, name only) rather
+// than getUserById (stays mock-only, per the Step 6 finding).
 async function enrichListing(listing) {
   const meta = animalCatalog.find((a) => a.id === listing.itemId);
-  const owner = await getUserById(listing.ownerId);
+  const seller = await getListingSeller(listing.id);
 
   return {
     ...listing,
@@ -18,7 +15,7 @@ async function enrichListing(listing) {
     animalTypeName: meta?.name ?? '',
     animalKannadaName: meta?.kannadaName ?? '',
     animalGroup: meta?.group ?? 'cattle',
-    sellerName: owner?.name || 'Farmer',
+    sellerName: seller?.name || 'Farmer',
   };
 }
 

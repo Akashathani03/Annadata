@@ -46,4 +46,5 @@ export {
   Calendar as IconCalendar,
   SprayCan as IconSprayCan,
   RefreshCw as IconRefresh,
+  Share2 as IconShare,
 } from 'lucide-react';

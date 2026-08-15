@@ -1,0 +1,91 @@
+{
+  "buyBrowse": {
+    "browseTitle": "Buy Equipment",
+    "detailTitle": "Equipment Details",
+    "searchPlaceholder": "Search equipment...",
+    "equipmentNearYou": "Equipment near you",
+    "emptyTitle": "No equipment found",
+    "emptyBody": "Try changing your filters or search."
+  },
+  "detail": {
+    "equipmentType": "Equipment Type",
+    "condition": "Condition",
+    "active": "Active",
+    "location": "Location",
+    "phone": "Phone",
+    "lastUpdated": "Last Updated",
+    "description": "Description",
+    "editPrice": "Edit Total Price",
+    "markSold": "Mark Sold",
+    "sold": "Sold",
+    "delete": "Delete",
+    "deleteConfirm": "Delete this listing? This cannot be undone.",
+    "deleted": "Listing deleted.",
+    "newPrice": "New Total Price",
+    "save": "Save",
+    "cancel": "Cancel",
+    "priceUpdated": "Price updated.",
+    "markSoldTitle": "Mark as Sold",
+    "finalPrice": "Final Total Price",
+    "buyerName": "Buyer Name (optional)",
+    "confirmSold": "Confirm Sold",
+    "markedSold": "Listing marked as sold!"
+  },
+  "condition": {
+    "new": "New",
+    "used-good": "Used - Good",
+    "used-fair": "Used - Fair"
+  },
+  "nav": {
+    "myListings": "My Listings"
+  },
+  "dashboard": {
+    "greetingMorning": "Good morning, {{name}}",
+    "greetingAfternoon": "Good afternoon, {{name}}",
+    "greetingEvening": "Good evening, {{name}}",
+    "myListingsCard": "My Equipment Listings",
+    "activeListings": "Active Listings",
+    "soldListings": "Sold Listings"
+  },
+  "create": {
+    "subtitle": "List your equipment for nearby buyers to see.",
+    "step1Title": "Equipment Details",
+    "equipmentType": "Equipment Type",
+    "titleLabel": "Title",
+    "titlePlaceholder": "e.g. New Holland Tractor, 2019",
+    "conditionLabel": "Condition",
+    "priceLabel": "Total Price (₹)",
+    "description": "Description",
+    "descriptionPlaceholder": "Add more details (optional)",
+    "uploadImage": "Photo",
+    "uploadLabel": "Add Photo",
+    "uploadHint": "A clear photo helps buyers trust your listing.",
+    "step2Title": "Location",
+    "saveDraft": "Save as Draft",
+    "publishListing": "Publish Listing",
+    "draftSaved": "Saved as draft.",
+    "successTitle": "🎉 Listing Published!",
+    "successBody": "Your equipment listing is now live for nearby buyers.",
+    "addAnother": "Add Another",
+    "viewListing": "View Listing",
+    "validationCategory": "Please choose an equipment type.",
+    "validationCondition": "Please choose a condition.",
+    "validationPhoto": "Please add a photo.",
+    "validationTitle": "Please enter a title.",
+    "validationPrice": "Enter a valid total price."
+  },
+  "myListings": {
+    "active": "Active",
+    "sold": "Sold",
+    "emptyActiveTitle": "No active listings",
+    "emptyActiveBody": "Your published equipment and drafts will appear here.",
+    "emptySoldTitle": "No sold listings",
+    "emptySoldBody": "Listings you mark sold appear here.",
+    "createListing": "Sell Equipment",
+    "details": "Details",
+    "edit": "Edit"
+  },
+  "units": {
+    "unit": "Unit"
+  }
+}

@@ -66,9 +66,14 @@
     "previewAlt": "ಆಯ್ಕೆ ಮಾಡಿದ ಬೆಳೆ ಫೋಟೋ"
   },
   "message": {
-    "retry": "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ"
+    "retry": "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ",
+    "replyFailed": "ನನಗೆ ಪ್ರತ್ಯುತ್ತರ ಸಿಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "goThere": "ಅಲ್ಲಿಗೆ ಹೋಗಿ"
   },
   "typingIndicator": {
     "ariaLabel": "Agro AI ಉತ್ತರಿಸುತ್ತಿದೆ"
+  },
+  "listingResultCard": {
+    "viewListing": "ಪಟ್ಟಿ ನೋಡಿ"
   }
 }

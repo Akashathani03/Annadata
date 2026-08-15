@@ -1,6 +1,8 @@
-// Reusable test script for Step 14's Intent Router. Requires a real
-// GEMINI_API_KEY (Step 11) and a running MongoDB with the Steps
-// 7/9/10 seed data loaded, same as test-tool-calling.js.
+// Reusable test script for the Intent Router, updated for the flat
+// 5-intent architecture (lookup/diagnosis/conversation/navigate/
+// out_of_scope - no nested generationType). Requires a real
+// GEMINI_API_KEY and a running MongoDB with the Steps 7/9/10 seed
+// data loaded.
 //
 // Usage: node scripts/test-intent-router.js
 
@@ -14,10 +16,13 @@ const TEST_CONTEXT = { lat: 12.5242, lng: 76.8958 };
 
 const testCases = [
   { label: 'Lookup', prompt: 'What is the price of onion today?' },
-  { label: 'Generate (diagnosis)', prompt: 'My tomato leaves have yellow spots and are wilting, what is wrong?' },
-  { label: 'Generate (general guidance)', prompt: 'When is the best time to sow ragi in Karnataka?' },
+  { label: 'Diagnosis', prompt: 'My tomato leaves have yellow spots and are wilting, what is wrong?' },
+  { label: 'Conversation - greeting', prompt: 'Hello, how are you today?' },
+  { label: 'Conversation - acknowledgement', prompt: 'Okay, thank you.' },
+  { label: 'Conversation - general farming question', prompt: 'When is the best time to sow ragi in Karnataka?' },
+  { label: 'Conversation - transformation request', prompt: 'Can you explain that more simply?' },
   { label: 'Navigate', prompt: 'Take me to the page where I can sell my crops' },
-  { label: 'Out of scope', prompt: 'Hello, how are you today?' },
+  { label: 'Out of scope', prompt: 'What is the capital of France?' },
 ];
 
 async function run() {
@@ -34,8 +39,6 @@ async function run() {
       console.log(`Tool: ${decision.targetTool}`);
       console.log(`Args: ${JSON.stringify(decision.toolArgs)}`);
       console.log(`Real result:`, decision.toolResult);
-    } else if (decision.intent === 'generate') {
-      console.log(`Generation type: ${decision.generationType}`);
     } else if (decision.intent === 'navigate') {
       console.log(`Destination: ${decision.destination}`);
     }

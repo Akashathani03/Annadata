@@ -61,9 +61,8 @@ export default function Dashboard() {
       </div>
 
       <div className="som-sec-title">{t('shops:manage.shopViews')}</div>
-      <div className="som-stat-row">
+      <div className="som-stat-row som-stat-row-single">
         <StatCard label={t('shops:manage.shopViews')} value={shop?.views || 0} icon="👁" />
-        <StatCard label={t('shops:manage.enquiriesCount')} value={0} icon="💬" />
       </div>
 
       <div className="som-sec-title">{t('shops:manage.todaysSales')}</div>

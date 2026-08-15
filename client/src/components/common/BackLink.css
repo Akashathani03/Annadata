@@ -1,10 +1,45 @@
 .ui-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   background: none;
   border: none;
-  color: var(--green-dark);
-  font-weight: 700;
-  font-size: 13.5px;
+  color: var(--text);
+  font-weight: 800;
+  font-size: 14px;
   cursor: pointer;
   padding: 0 0 16px;
+  text-align: left;
+}
+
+.ui-back-link-icon {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1f6b3a;
+  color: #fff;
+  border-radius: 13px;
+  box-shadow: 0 3px 8px rgba(31, 107, 58, 0.18);
+}
+
+.ui-back-link-icon svg {
   display: block;
+}
+
+.ui-back-link-label {
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.ui-back-link:active .ui-back-link-icon {
+  transform: scale(0.96);
+}
+
+@media (hover: hover) {
+  .ui-back-link:hover .ui-back-link-icon {
+    background: #185b30;
+  }
 }

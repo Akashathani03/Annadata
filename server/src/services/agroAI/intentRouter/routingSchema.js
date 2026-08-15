@@ -13,7 +13,7 @@ import { VALID_DESTINATIONS } from './destinations.js';
 export const ROUTING_RESPONSE_SCHEMA = {
   type: 'OBJECT',
   properties: {
-    intent: { type: 'STRING', enum: ['lookup', 'generate', 'navigate', 'out_of_scope'] },
+    intent: { type: 'STRING', enum: ['lookup', 'diagnosis', 'conversation', 'navigate', 'out_of_scope'] },
     targetTool: { type: 'STRING', description: 'The exact tool name to call, if intent is lookup. Empty string otherwise.' },
     toolArgs: {
       type: 'OBJECT',
@@ -22,10 +22,13 @@ export const ROUTING_RESPONSE_SCHEMA = {
         cropName: { type: 'STRING', description: 'For market_price_lookup.' },
         productQuery: { type: 'STRING', description: 'For nearby_shops_lookup.' },
         query: { type: 'STRING', description: 'For government_scheme_lookup.' },
+        category: { type: 'STRING', enum: ['crop', 'animal', 'equipment'], description: 'For search_marketplace_listings.' },
+        itemQuery: { type: 'STRING', description: 'For search_marketplace_listings - the specific item named, e.g. "tractor".' },
+        priceMax: { type: 'NUMBER', description: 'For search_marketplace_listings - maximum price in rupees, e.g. "under 5 lakh" -> 500000.' },
+        condition: { type: 'STRING', enum: ['new', 'used-good', 'used-fair'], description: 'For search_marketplace_listings - equipment condition only, if the farmer specified one.' },
       },
     },
     destination: { type: 'STRING', description: `If intent is navigate, one of: ${VALID_DESTINATIONS.join(', ')}. Empty string otherwise.` },
-    generationType: { type: 'STRING', description: 'Which kind of response is needed, if intent is generate: "diagnosis" or "general_guidance". Empty string otherwise.' },
     confidence: { type: 'STRING', enum: ['low', 'medium', 'high'] },
   },
   required: ['intent', 'confidence'],
@@ -40,8 +43,7 @@ export function buildToolsDescription() {
     .join('\n');
 }
 
-const VALID_INTENTS = ['lookup', 'generate', 'navigate', 'out_of_scope'];
-const VALID_GENERATION_TYPES = ['diagnosis', 'general_guidance', ''];
+const VALID_INTENTS = ['lookup', 'diagnosis', 'conversation', 'navigate', 'out_of_scope'];
 const VALID_CONFIDENCE = ['low', 'medium', 'high'];
 
 // Independent of Gemini's own schema constraint, same two-layer
@@ -76,12 +78,6 @@ export function validateRoutingResponse(raw) {
     }
   }
 
-  if (raw.intent === 'generate') {
-    if (typeof raw.generationType !== 'string' || !VALID_GENERATION_TYPES.includes(raw.generationType) || raw.generationType === '') {
-      errors.push(`Field generationType must be one of diagnosis, general_guidance when intent is generate, got "${raw.generationType}"`);
-    }
-  }
-
   return { valid: errors.length === 0, errors };
 }
 
@@ -95,7 +91,6 @@ export function buildRoutingFallback() {
     targetTool: '',
     toolArgs: {},
     destination: '',
-    generationType: '',
     confidence: 'low',
   };
 }

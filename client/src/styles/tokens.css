@@ -9,6 +9,11 @@
   --border: #e1e8e2;
 }
 
+html,
+body {
+  font-family: 'Inter', 'Noto Sans Kannada', sans-serif;
+}
+
 *,
 *::before,
 *::after {

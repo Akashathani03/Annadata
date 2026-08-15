@@ -67,33 +67,14 @@
   font-size: 15px;
   cursor: pointer;
   color: var(--text);
+  overflow: hidden;
 }
 
-.home-bell {
-  width: 36px;
-  height: 36px;
+.home-auth-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   border-radius: 50%;
-  background: var(--cream);
-  border: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 15px;
-  cursor: pointer;
-}
-
-.home-hamburger {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border: 1px solid var(--border);
-  border-radius: 50%;
-  background: #fff;
-  color: var(--text);
-  cursor: pointer;
-  padding: 0;
 }
 
 /* ---- Weather card sits here, styled by WeatherCard.css ---- */

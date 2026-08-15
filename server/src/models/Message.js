@@ -36,7 +36,7 @@ const messageSchema = new mongoose.Schema(
     },
     cardType: {
       type: String,
-      enum: ['diagnosis', 'weather', 'marketPrice', 'fertilizer', null],
+      enum: ['diagnosis', 'weather', 'marketPrice', 'fertilizer', 'marketplaceListing', null],
       default: null,
     },
     cardData: {

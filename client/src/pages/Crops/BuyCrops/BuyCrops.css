@@ -23,6 +23,12 @@
   color: #fff;
 }
 
+.btn-call:disabled,
+.btn-whatsapp:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .btn-view {
   background: var(--green-dark);
   color: #fff;
@@ -33,6 +39,14 @@
   font-weight: 700;
   cursor: pointer;
 }
+
+.btn-view:hover {
+  background: var(--green);
+}
+
+/* =========================
+   BUY CROP INTRO
+========================= */
 
 .bc-intro {
   padding: 2px 2px 12px;
@@ -49,6 +63,10 @@
   font-size: 12.5px;
   line-height: 1.4;
 }
+
+/* =========================
+   LOCATION
+========================= */
 
 .bc-locrow {
   display: flex;
@@ -74,13 +92,31 @@
   white-space: nowrap;
 }
 
-.bc-locrow a {
+/*
+ * JSX uses a button, not an <a>.
+ * This keeps the location action consistent
+ * with the rest of the app.
+ */
+.bc-change-location {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
   font-weight: 800;
   color: var(--green-dark);
   text-decoration: underline;
   flex-shrink: 0;
   cursor: pointer;
 }
+
+.bc-change-location:hover {
+  color: var(--green);
+}
+
+/* =========================
+   SORT TOOLBAR
+========================= */
 
 .bc-toolbar {
   display: flex;
@@ -104,6 +140,15 @@
   gap: 6px;
 }
 
+.bc-toolbar button:hover {
+  border-color: var(--green);
+  background: var(--green-light);
+}
+
+/* =========================
+   SECTION HEADER
+========================= */
+
 .bc-sec-head {
   display: flex;
   align-items: baseline;
@@ -122,6 +167,10 @@
   font-weight: 700;
 }
 
+/* =========================
+   CROP CARD
+========================= */
+
 .bc-crop-card {
   background: #fff;
   border: 1px solid var(--border);
@@ -131,6 +180,14 @@
   box-shadow: 0 8px 20px rgba(31, 43, 35, 0.05);
   cursor: pointer;
 }
+
+.bc-crop-card:hover {
+  border-color: var(--green);
+}
+
+/* =========================
+   CROP TOP
+========================= */
 
 .bc-crop-top {
   display: flex;
@@ -193,6 +250,10 @@
   color: #1e8f4f;
 }
 
+/* =========================
+   QUANTITY / PRICE
+========================= */
+
 .bc-crop-mid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -217,17 +278,97 @@
   font-size: 14px;
 }
 
+/* =========================
+   UPDATED
+========================= */
+
 .bc-updated {
   font-size: 11px;
   color: var(--muted);
   margin-bottom: 10px;
 }
 
+/* =========================
+   CARD ACTIONS
+========================= */
+
 .bc-crop-actions {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 8px;
 }
+
+/* =========================
+   LOADING SKELETON
+   Deliberately mirrors the shape of a real listing row (thumb + two
+   text lines) so "loading" reads as forthcoming content, clearly
+   distinct from the dashed-border empty state below.
+========================= */
+
+.bc-skeleton-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.bc-skeleton-card {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #fff;
+}
+
+.bc-skeleton-thumb {
+  width: 64px;
+  height: 64px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.bc-skeleton-lines {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.bc-skeleton-line {
+  height: 12px;
+  border-radius: 6px;
+}
+
+.bc-skeleton-line.short {
+  width: 45%;
+}
+
+.bc-skeleton-thumb,
+.bc-skeleton-line {
+  background: linear-gradient(90deg, #eef2ef 25%, #f7faf8 50%, #eef2ef 75%);
+  background-size: 200% 100%;
+  animation: bcSkeletonPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes bcSkeletonPulse {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Respect users who prefer reduced motion - the skeleton still shows,
+   it just doesn't animate. */
+@media (prefers-reduced-motion: reduce) {
+  .bc-skeleton-thumb,
+  .bc-skeleton-line {
+    animation: none;
+  }
+}
+
+/* =========================
+   EMPTY STATE
+========================= */
 
 .bc-empty {
   padding: 50px 16px;
@@ -262,6 +403,10 @@
   flex-wrap: wrap;
 }
 
+/* =========================
+   LOCATION / FILTER SHEET
+========================= */
+
 .bc-sheet-label {
   font-size: 12.5px;
   font-weight: 900;
@@ -286,11 +431,35 @@
   outline: none;
 }
 
+.bc-price-range input:focus {
+  border-color: var(--green-dark);
+  box-shadow: 0 0 0 3px rgba(46, 125, 70, 0.1);
+}
+
+/* =========================
+   GPS
+========================= */
+
+.cl-gps-btn {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.cl-gps-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .bc-gps-result {
+  min-height: 18px;
   font-size: 12px;
   color: var(--muted);
   margin: 14px 0;
 }
+
+/* =========================
+   DETAIL HERO
+========================= */
 
 .bc-detail-hero {
   width: 100%;
@@ -310,6 +479,10 @@
   height: 100%;
   object-fit: cover;
 }
+
+/* =========================
+   DETAIL CARD
+========================= */
 
 .bc-detail-card {
   background: #fff;
@@ -339,6 +512,10 @@
   font-weight: 700;
   text-align: right;
 }
+
+/* =========================
+   MARKET REFERENCE
+========================= */
 
 .bc-market-ref {
   display: flex;
@@ -373,4 +550,33 @@
   text-align: center;
   margin-top: -4px;
   margin-bottom: 14px;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 420px) {
+  .bc-crop-card {
+    padding: 12px;
+  }
+
+  .bc-crop-actions {
+    gap: 6px;
+  }
+
+  .btn-call,
+  .btn-whatsapp {
+    font-size: 11px;
+  }
+
+  .btn-view {
+    padding: 9px 8px;
+    font-size: 11.5px;
+  }
+
+  .bc-avail-pill {
+    font-size: 9.5px;
+    padding: 4px 7px;
+  }
 }

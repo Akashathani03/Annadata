@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getShopDetail } from '../../../services/nearShopService';
+import { resolveImageUrl } from '../../../utils/resolveImageUrl';
 import { getBuyerLocation } from '../../../services/buyerLocationService';
 import { shopProductCategories } from '../../../config/shopProductCatalog';
 import { useAuth } from '../../../context/AuthContext';
@@ -48,7 +49,6 @@ export default function Detail() {
     );
   }
 
-  const phone = shop.phone || '9876543210';
   const categoriesWithProducts = shopProductCategories.filter((c) =>
     shop.products.some((p) => p.category === c.id)
   );
@@ -60,17 +60,19 @@ export default function Detail() {
       title={shop.shopName}
       onBack={() => navigate('/near-shop')}
       stickyBar={
-        <ContactButtons
-          phone={phone}
-          message={`Hello, I found ${shop.shopName} on Annadata.`}
-          callLabel={`📞 ${t('shops:detail.call')}`}
-          whatsappLabel={`💬 ${t('shops:detail.chatWhatsapp')}`}
-          size="large"
-        />
+        shop.phone && (
+          <ContactButtons
+            phone={shop.phone}
+            message={`Hello, I found ${shop.shopName} on Annadata.`}
+            callLabel={`📞 ${t('shops:detail.call')}`}
+            whatsappLabel={`💬 ${t('shops:detail.chatWhatsapp')}`}
+            size="large"
+          />
+        )
       }
     >
       <div className="shop-detail-hero">
-        {shop.photoUrl ? <img src={shop.photoUrl} alt="" /> : <span>🏬</span>}
+        {shop.photoUrl ? <img src={resolveImageUrl(shop.photoUrl)} alt="" /> : <span>🏬</span>}
       </div>
 
       <h2 style={{ margin: '0 0 6px', fontSize: 19 }}>{shop.shopName}</h2>

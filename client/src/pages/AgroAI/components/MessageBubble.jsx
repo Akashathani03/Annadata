@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { IconRefresh } from '../../../components/icons';
+import { IconRefresh, IconChevronRight } from '../../../components/icons';
 import './MessageBubble.css';
 
 // Purely presentational. photoUrl is optional and additive (Step 13) -
@@ -22,7 +22,13 @@ import './MessageBubble.css';
 //            when status is 'failed'. The retry pipeline itself lives
 //            entirely in useAgroAIChat; this component only reports
 //            the tap.
-export default function MessageBubble({ sender, text, photoUrl, timestamp, status, onRetry }) {
+// onAction:  Step 17, Design B - called with no args when a "Go there"
+//            button is tapped, only rendered when the caller passes
+//            one (i.e. the message carries a navigate action). This
+//            component never decides where to go - it only reports
+//            the tap; resolving and performing the actual navigation
+//            happens entirely outside this purely presentational file.
+export default function MessageBubble({ sender, text, photoUrl, timestamp, status, onRetry, onAction }) {
   const { t } = useTranslation(['agroAI']);
   const isUser = sender === 'user';
   const isFailed = status === 'failed';
@@ -46,6 +52,13 @@ export default function MessageBubble({ sender, text, photoUrl, timestamp, statu
           <button type="button" className="message-bubble-retry-btn" onClick={onRetry}>
             <IconRefresh size={13} strokeWidth={2} aria-hidden="true" />
             {t('agroAI:message.retry')}
+          </button>
+        )}
+
+        {onAction && !isFailed && (
+          <button type="button" className="message-bubble-action-btn" onClick={onAction}>
+            {t('agroAI:message.goThere')}
+            <IconChevronRight size={13} strokeWidth={2} aria-hidden="true" />
           </button>
         )}
       </div>

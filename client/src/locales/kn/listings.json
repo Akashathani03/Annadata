@@ -1,7 +1,6 @@
 {
   "nav": {
-    "myListings": "ನನ್ನ ಪಟ್ಟಿ",
-    "enquiries": "ವಿಚಾರಣೆಗಳು"
+    "myListings": "ನನ್ನ ಪಟ್ಟಿ"
   },
   "dashboard": {
     "greetingMorning": "ಶುಭೋದಯ, {{name}}",
@@ -11,12 +10,9 @@
     "myListingsCard": "ನನ್ನ ಪಟ್ಟಿ",
     "activeListings": "ಸಕ್ರಿಯ ಪಟ್ಟಿಗಳು",
     "soldListings": "ಮಾರಾಟವಾದ ಪಟ್ಟಿಗಳು",
-    "buyerInterest": "ಖರೀದಿದಾರರ ಆಸಕ್ತಿ",
-    "totalEnquiries": "ಒಟ್ಟು ವಿಚಾರಣೆಗಳು",
     "listingViews": "ವೀಕ್ಷಣೆಗಳು",
-    "recentEnquiries": "ಇತ್ತೀಚಿನ ವಿಚಾರಣೆಗಳು",
-    "noEnquiriesTitle": "ಇನ್ನೂ ವಿಚಾರಣೆ ಬಂದಿಲ್ಲ",
-    "noEnquiriesBody": "ಖರೀದಿದಾರರ ಸಂದೇಶಗಳು ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತವೆ."
+    "sellCropSubtitle": "ಹೊಸ ಬೆಳೆ ಪಟ್ಟಿ ರಚಿಸಿ",
+    "myListingsSubtitle": "ನಿಮ್ಮ ಬೆಳೆ ಪಟ್ಟಿಗಳನ್ನು ನಿರ್ವಹಿಸಿ"
   },
   "myListings": {
     "active": "ಸಕ್ರಿಯ",
@@ -27,7 +23,10 @@
     "emptySoldBody": "ಮಾರಾಟವಾಗಿ ಗುರುತಿಸಿದ ಪಟ್ಟಿಗಳು ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತವೆ.",
     "createListing": "ಪಟ್ಟಿ ಮಾಡಿ",
     "details": "ವಿವರ",
-    "edit": "ಬದಲಿಸಿ"
+    "edit": "ಬದಲಿಸಿ",
+    "qty": "ಪ್ರಮಾಣ",
+    "price": "ಬೆಲೆ",
+    "updated": "ನವೀಕರಿಸಿದ್ದು"
   },
   "detail": {
     "active": "ಸಕ್ರಿಯ",
@@ -39,7 +38,6 @@
     "lastUpdated": "ಕೊನೆಯ ಅಪ್ಡೇಟ್",
     "description": "ವಿವರಣೆ",
     "views": "ವೀಕ್ಷಣೆಗಳು",
-    "enquiries": "ವಿಚಾರಣೆಗಳು",
     "editPrice": "ಬೆಲೆ ಬದಲಿಸಿ",
     "editQty": "ಪ್ರಮಾಣ ಬದಲಿಸಿ",
     "markSold": "ಮಾರಾಟವಾಯಿತು ಎಂದು ಗುರುತಿಸಿ",
@@ -59,19 +57,6 @@
     "buyerName": "ಖರೀದಿದಾರರ ಹೆಸರು (ಐಚ್ಛಿಕ)",
     "confirmSold": "ಮಾರಾಟ ಖಚಿತಪಡಿಸಿ",
     "markedSold": "ಪಟ್ಟಿ ಮಾರಾಟವಾಗಿದೆ ಎಂದು ಗುರುತಿಸಲಾಗಿದೆ!"
-  },
-  "enquiriesScreen": {
-    "title": "ಖರೀದಿದಾರರ ವಿಚಾರಣೆಗಳು",
-    "subtitle": "ಆಸಕ್ತ ಖರೀದಿದಾರರ ಕರೆ ಮತ್ತು WhatsApp ಸಂದೇಶಗಳು.",
-    "all": "ಎಲ್ಲಾ",
-    "completed": "ಮುಗಿದಿದೆ",
-    "open": "ಬಾಕಿ ಇದೆ",
-    "call": "ಕರೆ",
-    "whatsapp": "WhatsApp",
-    "done": "ಮುಗಿಯಿತು",
-    "emptyTitle": "ವಿಚಾರಣೆ ಇಲ್ಲ",
-    "emptyBody": "ಪಟ್ಟಿ ಪ್ರಕಟಿಸಿದ ನಂತರ ಖರೀದಿದಾರರ ಸಂದೇಶಗಳು ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತವೆ.",
-    "markedCompleted": "ವಿಚಾರಣೆ ಮುಗಿದಿದೆ ಎಂದು ಗುರುತಿಸಲಾಗಿದೆ."
   },
   "salesScreen": {
     "todaySales": "ಇಂದಿನ ಮಾರಾಟ",
@@ -93,7 +78,11 @@
     "farmerName": "ರೈತರ ಹೆಸರು",
     "save": "ಪ್ರೊಫೈಲ್ ಉಳಿಸಿ",
     "cancel": "ರದ್ದು ಮಾಡಿ",
-    "saved": "ಪ್ರೊಫೈಲ್ ಉಳಿಸಲಾಗಿದೆ."
+    "saved": "ಪ್ರೊಫೈಲ್ ಉಳಿಸಲಾಗಿದೆ.",
+    "changePhoto": "ಫೋಟೋ ಬದಲಾಯಿಸಿ",
+    "takePhoto": "ಫೋಟೋ ತೆಗೆಯಿರಿ",
+    "chooseFromGallery": "ಗ್ಯಾಲರಿಯಿಂದ ಆಯ್ಕೆಮಾಡಿ",
+    "photoUploadFailed": "ಫೋಟೋ ಅಪ್‌ಲೋಡ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ."
   },
   "units": {
     "kg": "Kilogram (Kg) / ಕಿಲೋಗ್ರಾಂ (ಕೆಜಿ)",
@@ -146,6 +135,12 @@
     "addAnother": "ಇನ್ನೊಂದು ಸೇರಿಸಿ",
     "viewListing": "ಪಟ್ಟಿ ನೋಡಿ",
     "validationQuantity": "ಸರಿಯಾದ ಪ್ರಮಾಣ ನಮೂದಿಸಿ.",
-    "validationPrice": "ಸರಿಯಾದ ಮಾರಾಟ ಬೆಲೆ ನಮೂದಿಸಿ."
-  }
+    "validationPrice": "ಸರಿಯಾದ ಮಾರಾಟ ಬೆಲೆ ನಮೂದಿಸಿ.",
+    "photoTooLarge": "Photo 5 MB ಗಿಂತ ಚಿಕ್ಕದಾಗಿರಬೇಕು.",
+    "unsavedChangesWarning": "ನಿಮ್ಮ ಬದಲಾವಣೆಗಳು ಉಳಿಸಿಲ್ಲ. ಈ ಪುಟದಿಂದ ಹೊರಡಬೇಕೇ?",
+    "gpsGettingLocation": "ನಿಮ್ಮ ಪ್ರಸ್ತುತ ಸ್ಥಳ ಪಡೆಯಲಾಗುತ್ತಿದೆ...",
+    "gpsTimeout": "⚠️ ನಿಮ್ಮ ಸ್ಥಳ ಸಿಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+    "gpsPermissionDenied": "⚠️ ಸ್ಥಳದ ಅನುಮತಿ ನಿರಾಕರಿಸಲಾಗಿದೆ. ದಯವಿಟ್ಟು ಸ್ಥಳ ಪ್ರವೇಶಕ್ಕೆ ಅನುಮತಿಸಿ."
+  },
+  "loadFailed": "ಫಾರ್ಮ್ ಲೋಡ್ ಮಾಡುವಲ್ಲಿ ಏನೋ ತಪ್ಪಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ."
 }

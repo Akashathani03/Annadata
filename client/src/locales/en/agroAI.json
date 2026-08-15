@@ -66,9 +66,14 @@
     "previewAlt": "Selected crop photo preview"
   },
   "message": {
-    "retry": "Retry"
+    "retry": "Retry",
+    "replyFailed": "I couldn't get a reply. Please try again.",
+    "goThere": "Go there"
   },
   "typingIndicator": {
     "ariaLabel": "Agro AI is responding"
+  },
+  "listingResultCard": {
+    "viewListing": "View Listing"
   }
 }

@@ -1,7 +1,6 @@
 {
   "nav": {
-    "myListings": "My Listings",
-    "enquiries": "Enquiries"
+    "myListings": "My Listings"
   },
   "dashboard": {
     "greetingMorning": "Good morning, {{name}}",
@@ -11,12 +10,9 @@
     "myListingsCard": "My Listings",
     "activeListings": "Active Listings",
     "soldListings": "Sold Listings",
-    "buyerInterest": "Buyer Interest",
-    "totalEnquiries": "Total Enquiries",
     "listingViews": "Listing Views",
-    "recentEnquiries": "Recent Enquiries",
-    "noEnquiriesTitle": "No enquiries yet",
-    "noEnquiriesBody": "Buyer messages will appear here."
+    "sellCropSubtitle": "Create a new crop listing",
+    "myListingsSubtitle": "Manage your crop listings"
   },
   "myListings": {
     "active": "Active",
@@ -27,7 +23,10 @@
     "emptySoldBody": "Listings you mark sold appear here.",
     "createListing": "Create Listing",
     "details": "Details",
-    "edit": "Edit"
+    "edit": "Edit",
+    "qty": "Qty",
+    "price": "Price",
+    "updated": "Updated"
   },
   "detail": {
     "active": "Active",
@@ -39,7 +38,6 @@
     "lastUpdated": "Last Updated",
     "description": "Description",
     "views": "Views",
-    "enquiries": "Enquiries",
     "editPrice": "Edit Price",
     "editQty": "Edit Qty",
     "markSold": "Mark Sold",
@@ -59,19 +57,6 @@
     "buyerName": "Buyer Name (optional)",
     "confirmSold": "Confirm Sold",
     "markedSold": "Listing marked as sold!"
-  },
-  "enquiriesScreen": {
-    "title": "Buyer Enquiries",
-    "subtitle": "Calls and WhatsApp leads from interested buyers.",
-    "all": "All",
-    "completed": "Completed",
-    "open": "Open",
-    "call": "Call",
-    "whatsapp": "WhatsApp",
-    "done": "Done",
-    "emptyTitle": "No enquiries",
-    "emptyBody": "Buyer messages will appear here after you publish a listing.",
-    "markedCompleted": "Enquiry marked as completed."
   },
   "salesScreen": {
     "todaySales": "Today's Sales",
@@ -93,7 +78,11 @@
     "farmerName": "Farmer Name",
     "save": "Save Profile",
     "cancel": "Cancel",
-    "saved": "Profile saved."
+    "saved": "Profile saved.",
+    "changePhoto": "Change photo",
+    "takePhoto": "Take photo",
+    "chooseFromGallery": "Choose from gallery",
+    "photoUploadFailed": "Could not upload photo. Please try again."
   },
   "units": {
     "kg": "Kilogram (Kg) / ಕಿಲೋಗ್ರಾಂ (ಕೆಜಿ)",
@@ -121,6 +110,7 @@
     "district": "District",
     "state": "State",
     "useGps": "Use Current Location",
+    "gpsGettingLocation": "Getting your current location...",
     "locationPermissionTitle": "Allow Annadata to access your location?",
     "locationPermissionMessage": "Your current location will be used to auto-fill the location details.",
     "allowLocation": "Allow Location",
@@ -129,6 +119,8 @@
     "gpsGeocoding": "Fetching address…",
     "gpsCaptured": "📍 Location captured.",
     "gpsUnavailable": "GPS not available on this device/browser.",
+    "gpsPermissionDenied": "Location permission was denied. Please allow location access.",
+    "gpsTimeout": "Could not get your location. Please try again.",
     "gpsError": "⚠️ Could not get location — enter manually.",
     "gpsGeocodeError": "⚠️ Could not fetch address — enter manually.",
     "apmcMarket": "APMC Market (Nearest)",
@@ -146,6 +138,9 @@
     "addAnother": "Add Another",
     "viewListing": "View Listing",
     "validationQuantity": "Please enter a valid quantity.",
-    "validationPrice": "Please enter a valid selling price."
-  }
+    "validationPrice": "Please enter a valid selling price.",
+    "photoTooLarge": "Photo must be smaller than 5 MB.",
+    "unsavedChangesWarning": "You have unsaved changes. Leave this page?"
+  },
+  "loadFailed": "Something went wrong loading this form. Please try again."
 }

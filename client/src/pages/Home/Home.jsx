@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { marketplaceCategories } from '../../config/marketplaceCategories';
@@ -6,8 +6,8 @@ import { DEFAULT_LOCATION } from '../../config/constants';
 import { useAuth } from '../../context/AuthContext';
 import { useUserLocation } from '../../context/LocationContext';
 import WeatherCard from '../../components/weather/WeatherCard';
-import { useToast } from '../../context/ToastContext';
-import { IconProfile, IconNotifications, IconMenu } from '../../components/icons';
+import { IconProfile } from '../../components/icons';
+import { resolveImageUrl } from '../../utils/resolveImageUrl';
 import './Home.css';
 
 // Navigation logic is unchanged from the approved category-based IA -
@@ -16,8 +16,12 @@ import './Home.css';
 export default function Home() {
   const navigate = useNavigate();
   const { t } = useTranslation(['navigation', 'common', 'auth']);
-  const { showToast } = useToast();
   const { user, isAuthenticated, openLoginModal } = useAuth();
+  const [avatarLoadFailed, setAvatarLoadFailed] = useState(false);
+
+  useEffect(() => {
+    setAvatarLoadFailed(false);
+  }, [user?.profilePhotoUrl]);
 
   function openCategory(category) {
     navigate(category.hasMenu ? `/category/${category.key}` : category.route);
@@ -28,15 +32,31 @@ export default function Home() {
   // location setup. useUserLocation already resolves live GPS (this
   // session) over the profile location over the default, so this
   // component doesn't need to know which source won.
-  const { lat: weatherLat, lng: weatherLng, liveLocation, refreshIfStale } = useUserLocation();
-  const weatherLocationLabel = liveLocation ? t('common:currentLocationLabel') : user?.location || DEFAULT_LOCATION.label;
+  const {
+    lat: weatherLat,
+    lng: weatherLng,
+    liveLocation,
+    refreshIfStale,
+  } = useUserLocation();
+
+  const weatherLocationLabel = liveLocation
+    ? t('common:currentLocationLabel')
+    : user?.location || DEFAULT_LOCATION.label;
 
   // Home becoming active is the trigger point for a staleness check -
   // reuses the current session location if still fresh, silently
   // re-requests GPS only if it's aged past the configurable threshold.
   // No prompt, no visible "refreshing" state, no manual control.
   useEffect(() => {
-    refreshIfStale();
+    try {
+      Promise.resolve(refreshIfStale()).catch(() => {
+        // Location refresh is optional on Home.
+        // Keep using the existing/profile/default location if it fails.
+      });
+    } catch {
+      // Protect Home from an unexpected synchronous location error.
+    }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -45,46 +65,63 @@ export default function Home() {
       <header className="home-header">
         <div className="home-logo">
           <div className="home-logo-badge">🌾</div>
+
           <div>
             <h1>{t('common:appName')}</h1>
             <p>{t('common:tagline')}</p>
           </div>
         </div>
+
         <div className="home-header-right">
           {isAuthenticated ? (
-            <button className="home-auth-btn" onClick={() => navigate('/profile')} aria-label={t('auth:profileEntry')}>
-              <IconProfile size={18} strokeWidth={2} />
+            <button
+              className="home-auth-btn"
+              onClick={() => navigate('/profile')}
+              aria-label={t('auth:profileEntry')}
+            >
+              {user?.profilePhotoUrl && !avatarLoadFailed ? (
+                <img
+                  src={resolveImageUrl(user.profilePhotoUrl)}
+                  alt=""
+                  className="home-auth-avatar-img"
+                  onError={() => setAvatarLoadFailed(true)}
+                />
+              ) : (
+                <IconProfile size={18} strokeWidth={2} />
+              )}
             </button>
           ) : (
-            <button className="home-auth-btn" onClick={openLoginModal} aria-label={t('auth:loginEntry')}>
+            <button
+              className="home-auth-btn"
+              onClick={openLoginModal}
+              aria-label={t('auth:loginEntry')}
+            >
               <IconProfile size={18} strokeWidth={2} />
             </button>
           )}
-          <button
-            className="home-bell"
-            aria-label={t('common:notifications')}
-            onClick={() => showToast(t('common:notificationsPlaceholder'))}
-          >
-            <IconNotifications size={17} strokeWidth={2} />
-          </button>
-          <button
-            className="home-hamburger"
-            aria-label="Menu"
-            onClick={() => showToast(t('common:menuPlaceholder'))}
-          >
-            <IconMenu size={18} strokeWidth={2} />
-          </button>
         </div>
       </header>
 
-      <WeatherCard lat={weatherLat} lon={weatherLng} locationLabel={weatherLocationLabel} />
+      <WeatherCard
+        lat={weatherLat}
+        lon={weatherLng}
+        locationLabel={weatherLocationLabel}
+      />
 
       <div className="home-grid">
         {marketplaceCategories.map((category) => (
-          <div key={category.key} className="home-card" onClick={() => openCategory(category)}>
-            <div className="home-card-icon" style={{ background: category.iconBg }}>
+          <div
+            key={category.key}
+            className="home-card"
+            onClick={() => openCategory(category)}
+          >
+            <div
+              className="home-card-icon"
+              style={{ background: category.iconBg }}
+            >
               {category.icon}
             </div>
+
             <h3>{t(category.labelKey)}</h3>
             <p>{t(category.descKey)}</p>
           </div>

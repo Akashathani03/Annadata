@@ -15,7 +15,7 @@ const shopSchema = new mongoose.Schema(
     },
     shopName: { type: String, default: '' },
     ownerName: { type: String, default: '' },
-    phone: { type: String, default: '' },
+    phone: { type: String, required: true },
     whatsapp: { type: String, default: '' },
     location: { type: String, default: '' },
     address: { type: String, default: '' },

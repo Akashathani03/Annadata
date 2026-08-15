@@ -3,13 +3,26 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import AppShell from '../../../components/common/AppShell';
 import { useAuth } from '../../../context/AuthContext';
-import { IconHome, IconShop, IconPackage, IconChat, IconProfile } from '../../../components/icons';
+import { resolveBackRoute } from '../../../utils/navigationPolicy';
+import { IconHome, IconShop, IconPackage, IconProfile } from '../../../components/icons';
 
 const TITLE_KEY_BY_PATH = {
   dashboard: 'shops:manage.dashboard',
   myshop: 'shops:manage.myShop',
   products: 'shops:manage.products',
-  enquiries: 'shops:manage.enquiries',
+};
+
+// Same declarative policy pattern as the other two modules - Manage
+// Shop has no drill-down/detail routes today, so every segment simply
+// backs out to dashboard, but this stays consistent with Sell Crop
+// and Sell Animals rather than being a one-off inline expression.
+const BACK_POLICY = {
+  homeRoute: '/',
+  defaultSegment: 'dashboard',
+  parents: {
+    myshop: '/shop-owner/dashboard',
+    products: '/shop-owner/dashboard',
+  },
 };
 
 // Same requiresAuth subtree-guard pattern as SellCropLayout - Manage
@@ -33,7 +46,6 @@ export default function ManageShopLayout() {
     { key: 'dashboard', icon: IconHome, label: t('shops:manage.dashboard'), route: '/shop-owner/dashboard' },
     { key: 'myshop', icon: IconShop, label: t('shops:manage.myShop'), route: '/shop-owner/myshop' },
     { key: 'products', icon: IconPackage, label: t('shops:manage.products'), route: '/shop-owner/products' },
-    { key: 'enquiries', icon: IconChat, label: t('shops:manage.enquiries'), route: '/shop-owner/enquiries' },
     { key: 'profile', icon: IconProfile, label: t('common:profile'), route: '/profile' },
   ];
 
@@ -42,7 +54,7 @@ export default function ManageShopLayout() {
   return (
     <AppShell
       title={t(TITLE_KEY_BY_PATH[activeSegment] ?? 'shops:manage.dashboard')}
-      onBack={() => navigate(activeSegment === 'dashboard' ? '/' : '/shop-owner/dashboard')}
+      onBack={() => navigate(resolveBackRoute(location.pathname, BACK_POLICY))}
       navItems={navItems}
       activeNavKey={activeSegment}
     >

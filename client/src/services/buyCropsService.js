@@ -1,21 +1,23 @@
-import { getListings, getListingById } from './listingsService';
+import { getListings, getListingById, getListingSeller } from './listingsService';
 import { getCropCatalog } from './marketPricesService';
-import { getUserById } from './usersService';
 import { distanceKm } from '../utils/geo';
 
 // Enriches a raw listing with display-only fields (crop icon/group,
 // farmer name looked up from its actual owner, live distance). Never
-// mutates the underlying listing.
+// mutates the underlying listing. Uses the purpose-specific
+// getListingSeller (real backend, name only) rather than getUserById
+// (which stays mock-only, per the Step 6 finding that it unsafely
+// served both a user's own profile and arbitrary lookups).
 async function enrichListing(listing, catalog) {
   const meta = catalog.find((c) => c.id === listing.itemId);
-  const owner = await getUserById(listing.ownerId);
+  const seller = await getListingSeller(listing.id);
 
   return {
     ...listing,
     cropIcon: meta?.icon ?? '🌾',
     cropKannadaName: meta?.kannadaName ?? '',
     cropGroup: meta?.group ?? 'veg',
-    farmerName: owner?.name || 'Farmer',
+    farmerName: seller?.name || 'Farmer',
   };
 }
 

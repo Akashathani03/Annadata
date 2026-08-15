@@ -8,7 +8,6 @@ import AppShell from '../../components/common/AppShell';
 import Modal from '../../components/common/Modal';
 import Panel from '../../components/common/Panel';
 import SchemeCard from './SchemeCard';
-import { IconSettings, IconHelp } from '../../components/icons';
 import './Schemes.css';
 
 export default function Schemes() {
@@ -18,11 +17,12 @@ export default function Schemes() {
 
   const [type, setType] = useState('all');
   const [stateFilter, setStateFilter] = useState('Karnataka');
-  const [schemes, setSchemes] = useState([]);
+  const [schemes, setSchemes] = useState(null); // null = loading, [] = loaded but empty
   const [applications, setApplications] = useState([]);
   const [detailScheme, setDetailScheme] = useState(null);
 
   async function reload() {
+    setSchemes(null);
     try {
       const [schemeList, appList] = await Promise.all([
         getSchemes({ type, stateFilter }),
@@ -31,6 +31,7 @@ export default function Schemes() {
       setSchemes(schemeList);
       setApplications(appList);
     } catch {
+      setSchemes([]);
       showToast(t('govSchemes:loadFailed'));
     }
   }
@@ -42,7 +43,7 @@ export default function Schemes() {
 
   function handleStateFilterChange(value) {
     setStateFilter(value);
-    showToast(value === 'All' ? 'Showing central + all state schemes' : '📍 Showing central + Karnataka state schemes');
+    showToast(value === 'All' ? t('govSchemes:stateFilterAllStates') : t('govSchemes:stateFilterKarnataka'));
   }
 
   async function handleApply(scheme) {
@@ -80,15 +81,15 @@ export default function Schemes() {
             <option value="Karnataka">{t('govSchemes:filterState.karnataka')}</option>
             <option value="All">{t('govSchemes:filterState.all')}</option>
           </select>
-          <select>
-            <option>{t('govSchemes:sortByDeadline')}</option>
-          </select>
-          <button className="scheme-filter-icon-btn" onClick={() => showToast(t('govSchemes:filtersComingSoon'))}>
-            <IconSettings size={14} strokeWidth={2} /> {t('govSchemes:filtersButton')}
-          </button>
         </div>
 
-        {schemes.map((scheme) => (
+        {schemes === null && <p className="scheme-track-empty">{t('govSchemes:loading')}</p>}
+
+        {schemes !== null && schemes.length === 0 && (
+          <p className="scheme-track-empty">{t('govSchemes:noSchemesFound')}</p>
+        )}
+
+        {schemes?.map((scheme) => (
           <SchemeCard
             key={scheme.id}
             scheme={scheme}
@@ -96,10 +97,6 @@ export default function Schemes() {
             onApply={handleApply}
           />
         ))}
-
-        <button className="scheme-loadmore-btn" onClick={() => showToast(t('govSchemes:loadMoreComingSoon'))}>
-          {t('govSchemes:loadMore')}
-        </button>
 
         <Panel title={t('govSchemes:myApplications.title')}>
           {applications.length === 0 ? (
@@ -121,14 +118,6 @@ export default function Schemes() {
           <div className="elig-item">{t('govSchemes:eligibility.item1')}</div>
           <div className="elig-item">{t('govSchemes:eligibility.item2')}</div>
           <div className="elig-item" style={{ marginBottom: 0 }}>{t('govSchemes:eligibility.item3')}</div>
-        </Panel>
-
-        <Panel className="helpdesk-box">
-          <b>{t('govSchemes:helpdesk.title')}</b>
-          <p>{t('govSchemes:helpdesk.body')}</p>
-          <button className="scheme-helpdesk-icon-btn" onClick={() => showToast(t('govSchemes:helpdesk.comingSoon'))}>
-            <IconHelp size={15} strokeWidth={2} /> {t('govSchemes:helpdesk.button')}
-          </button>
         </Panel>
       </div>
 

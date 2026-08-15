@@ -24,6 +24,37 @@
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
 }
 
+.profile-avatar-btn {
+  padding: 0;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.profile-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.profile-avatar-choice {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.profile-avatar-preview-img {
+  display: block;
+  width: 160px;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin: 12px auto;
+  border: 3px solid #fff;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
 .profile-hero b {
   display: block;
   font-size: 17px;
@@ -114,6 +145,44 @@
 .profile-field input:focus {
   border-color: #2e7d46;
   box-shadow: 0 0 0 4px rgba(46, 125, 70, 0.1);
+}
+
+/* Current location button */
+.profile-location-btn {
+  width: 100%;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 4px 0 12px;
+  background: #2e7d46;
+  color: #fff;
+  border: none;
+  border-radius: 16px;
+  padding: 12px 14px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.16s, opacity 0.16s;
+}
+
+.profile-location-btn:hover {
+  background: #25663a;
+}
+
+.profile-location-btn:active {
+  background: #1f5732;
+}
+
+.profile-location-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.profile-location-btn svg {
+  flex-shrink: 0;
 }
 
 .profile-sheet-actions {

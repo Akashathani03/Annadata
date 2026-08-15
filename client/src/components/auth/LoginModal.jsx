@@ -22,6 +22,8 @@ export default function LoginModal() {
   const [sending, setSending] = useState(false);
   const [newUserId, setNewUserId] = useState(null);
   const [locationValue, setLocationValue] = useState({ village: '', taluk: '', district: '', state: '', lat: null, lng: null });
+  const [locationError, setLocationError] = useState('');
+  const [savingLocation, setSavingLocation] = useState(false);
 
   useEffect(() => {
     if (step === 'otp') {
@@ -107,7 +109,15 @@ export default function LoginModal() {
   }
 
   async function handleLocationContinue() {
-    await usersService.saveOnboardingLocation(newUserId, locationValue);
+    setLocationError('');
+    setSavingLocation(true);
+    const result = await usersService.saveOnboardingLocation(newUserId, locationValue);
+    setSavingLocation(false);
+
+    if (!result.success) {
+      setLocationError(t('auth:locationSaveFailed'));
+      return;
+    }
     resetAndClose();
   }
 
@@ -176,7 +186,8 @@ export default function LoginModal() {
           <h3>{t('auth:locationTitle')}</h3>
           <p className="msub">{t('auth:locationSubtitle')}</p>
           <LocationCapture value={locationValue} onChange={setLocationValue} />
-          <button className="btn-primary login-full-btn" onClick={handleLocationContinue}>
+          {locationError && <span className="modal-field-error" style={{ display: 'block', marginTop: -8, marginBottom: 12 }}>{locationError}</span>}
+          <button className="btn-primary login-full-btn" onClick={handleLocationContinue} disabled={savingLocation}>
             {t('auth:locationContinue')}
           </button>
           <button className="login-skip-btn" onClick={handleLocationSkip}>

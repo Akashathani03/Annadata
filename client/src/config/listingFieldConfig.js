@@ -18,6 +18,13 @@ export const listingFieldConfig = {
     defaultQuantity: 1,
     hasApmcStep: false,
   },
+  equipment: {
+    categoryLabelKey: 'navigation:equipment.sellEquipment',
+    itemCatalogCategory: 'equipment',
+    unitOptions: ['Unit'],
+    defaultQuantity: 1,
+    hasApmcStep: false,
+  },
 };
 
 // Bilingual unit labels, keyed by the same ids used in unitOptions above.
@@ -28,6 +35,7 @@ export const unitMeta = {
   Ton: { icon: '⚖️', labelKey: 'listings:units.ton' },
   Bag: { icon: '⚖️', labelKey: 'listings:units.bag' },
   Head: { icon: '🐾', labelKey: 'animals:units.head' },
+  Unit: { icon: '🔧', labelKey: 'equipment:units.unit' },
 };
 
 export function getListingFieldConfig(category) {

@@ -88,6 +88,20 @@
     "callFarmer": "📞 ರೈತರಿಗೆ ಕರೆ ಮಾಡಿ",
     "whatsapp": "💬 WhatsApp",
     "notAvailable": "ಈ ಪಟ್ಟಿ ಇನ್ನು ಲಭ್ಯವಿಲ್ಲ.",
-    "whatsappMessage": "ನಮಸ್ಕಾರ, Annadata ನಲ್ಲಿ ನಿಮ್ಮ {{crop}} ಪಟ್ಟಿ ನೋಡಿದೆ. ಇನ್ನೂ ಲಭ್ಯವಿದೆಯೇ?"
+    "whatsappMessage": "ನಮಸ್ಕಾರ, Annadata ನಲ್ಲಿ ನಿಮ್ಮ {{crop}} ಪಟ್ಟಿ ನೋಡಿದೆ. ಇನ್ನೂ ಲಭ್ಯವಿದೆಯೇ?",
+    "share": "ಹಂಚಿಕೊಳ್ಳಿ",
+    "shareMessage": "ಈ ಪಟ್ಟಿಯನ್ನು Annadata ನಲ್ಲಿ ನೋಡಿ: {{title}}",
+    "shareSheetTitle": "ಪಟ್ಟಿ ಹಂಚಿಕೊಳ್ಳಿ",
+    "shareViaWhatsapp": "WhatsApp ಮೂಲಕ ಹಂಚಿಕೊಳ್ಳಿ",
+    "copyLink": "ಲಿಂಕ್ ನಕಲಿಸಿ",
+    "linkCopied": "ಲಿಂಕ್ ನಕಲಿಸಲಾಗಿದೆ",
+    "copyLinkFailed": "ಲಿಂಕ್ ನಕಲಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ."
+  },
+  "distances": {
+    "all": "ಎಲ್ಲಾ",
+    "within5": "5 ಕಿಮೀ ಒಳಗೆ",
+    "within10": "10 ಕಿಮೀ ಒಳಗೆ",
+    "within25": "25 ಕಿಮೀ ಒಳಗೆ",
+    "within50": "50 ಕಿಮೀ ಒಳಗೆ"
   }
 }

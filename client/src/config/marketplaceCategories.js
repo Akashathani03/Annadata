@@ -39,6 +39,19 @@ export const marketplaceCategories = [
     ],
   },
   {
+    key: 'equipment',
+    icon: '🚜',
+    iconBg: '#fdf3e0',
+    labelKey: 'navigation:category.equipment',
+    descKey: 'navigation:categoryDesc.equipment',
+    hasMenu: true,
+    route: '/equipment',
+    items: [
+      { key: 'sellEquipment', icon: '🚜', labelKey: 'navigation:equipment.sellEquipment', route: '/sell-equipment', requiresAuth: true },
+      { key: 'buyEquipment', icon: '🛒', labelKey: 'navigation:equipment.buyEquipment', route: '/buy-equipment' },
+    ],
+  },
+  {
     key: 'shops',
     icon: '🏬',
     iconBg: '#e6f0fb',

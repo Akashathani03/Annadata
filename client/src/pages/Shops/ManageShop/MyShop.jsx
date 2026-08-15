@@ -63,6 +63,10 @@ export default function MyShop() {
   }
 
   async function handleSave() {
+    if (!form.phone.trim()) {
+      showToast(t('shops:manage.phoneRequired'));
+      return;
+    }
     try {
       await saveShop(user.id, form);
       showToast(t('shops:manage.shopSaved'));

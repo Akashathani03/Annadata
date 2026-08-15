@@ -4,14 +4,16 @@
     "animals": "Animals",
     "shops": "Shops",
     "schemes": "Government Schemes",
-    "agroAI": "Agro AI"
+    "agroAI": "Agro AI",
+    "equipment": "Equipment"
   },
   "categoryDesc": {
     "crops": "Sell your crops, buy fresh produce, and check today's market prices.",
     "animals": "Sell and buy livestock directly with nearby farmers.",
     "shops": "Explore nearby agri shops or manage your own shop.",
     "schemes": "Explore and apply for schemes for farmers.",
-    "agroAI": "Ask anything about farming and get instant answers."
+    "agroAI": "Ask anything about farming and get instant answers.",
+    "equipment": "Buy and sell farm equipment"
   },
   "crops": {
     "marketPrices": "Market Prices",
@@ -19,11 +21,15 @@
     "buyCrop": "Buy Crops"
   },
   "animals": {
-    "sellAnimal": "Sell Animals",
+    "sellAnimal": "Sell Animal",
     "buyAnimal": "Buy Animals"
   },
   "shops": {
     "nearShop": "Near Shops",
-    "manageShop": "🏪 Shop Owner"
+    "manageShop": "Shop Owner"
+  },
+  "equipment": {
+    "buyEquipment": "Buy Equipment",
+    "sellEquipment": "Sell Equipment"
   }
 }

@@ -54,6 +54,10 @@
   margin-bottom: 4px;
 }
 
+.som-stat-row-single {
+  grid-template-columns: 1fr;
+}
+
 .som-label {
   display: block;
   font-size: 12px;
@@ -141,7 +145,7 @@
   background: none;
   border: none;
   color: var(--green-dark);
-  font-weight: 700;
+  font-weight: 800;
   font-size: 13px;
   cursor: pointer;
   padding: 0 0 12px;

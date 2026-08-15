@@ -20,7 +20,7 @@
   "statusClosing": "Closing Soon",
   "appliedSuffix": "applied",
   "deadlineLabel": "Deadline",
-  "applyNow": "Apply Now",
+  "applyNow": "Apply on Official Site ↗",
   "viewDetails": "View Details",
   "loadMore": "Load More ⌄",
   "loadMoreComingSoon": "More schemes coming soon.",
@@ -46,5 +46,9 @@
     "button": "Talk to Helpdesk",
     "comingSoon": "This is a demo — helpdesk chat will work in the full version."
   },
-  "loadFailed": "Something went wrong. Please try again."
+  "loadFailed": "Something went wrong. Please try again.",
+  "stateFilterAllStates": "Showing central + all state schemes",
+  "stateFilterKarnataka": "📍 Showing central + Karnataka state schemes",
+  "loading": "Loading schemes...",
+  "noSchemesFound": "No schemes match this filter right now."
 }

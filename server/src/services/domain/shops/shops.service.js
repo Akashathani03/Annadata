@@ -8,10 +8,6 @@ export async function getMyShop(ownerId) {
   return shopRepository.findByOwnerId(ownerId);
 }
 
-export async function getShopById(id) {
-  return shopRepository.findById(id);
-}
-
 // A shop is "active" (visible in Near Shop) once the required fields
 // are filled - exact same rule as the frontend's existing saveShop,
 // ported unchanged, not reinterpreted.
@@ -28,6 +24,10 @@ function determineStatus(patch) {
 // becomes a real URL is via this same upload path).
 export async function saveShop(ownerId, patch, imageFile) {
   const nextPatch = { ...patch };
+
+  if (!nextPatch.phone?.trim()) {
+    throw new ApiError(400, 'VALIDATION_ERROR', 'A phone number is required so buyers can contact your shop.');
+  }
 
   if (imageFile) {
     if (!ALLOWED_IMAGE_MIME_TYPES.includes(imageFile.mimetype)) {
