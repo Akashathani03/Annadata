@@ -1,44 +1,34 @@
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getApmcMarkets } from '../../../services/marketPricesService';
 import { useUserLocation } from '../../../context/LocationContext';
-import BackLink from '../../../components/common/BackLink';
+import { formatDistanceKm } from '../../../utils/geo';
+import AppShell from '../../../components/common/AppShell';
 import './MarketPrices.css';
 
 export default function ApmcList() {
   const navigate = useNavigate();
-  const location = useLocation();
   const { t } = useTranslation('marketPrices');
-  const { lat, lng } = useUserLocation();
+  const { profileLat: lat, profileLng: lng } = useUserLocation();
 
   const [apmcs, setApmcs] = useState([]);
   const [showAll, setShowAll] = useState(false);
 
   const VISIBLE_COUNT = 5;
-  const skipAutoRedirect = location.state?.showAllMarkets === true;
 
   useEffect(() => {
     let cancelled = false;
 
+    // Always lands here first and shows the nearest 5 (rest under
+    // "Show more markets") - no longer auto-redirects straight into
+    // the single nearest market's price list, so a farmer always sees
+    // and can pick from real nearby options instead of only ever
+    // reaching whichever one happened to sort first.
     getApmcMarkets({ lat, lng })
       .then((result) => {
         if (cancelled) return;
-
         setApmcs(result);
-
-        // Only when GPS is genuinely available - without real
-        // coordinates the backend has no meaningful "nearest" to offer.
-        if (
-          !skipAutoRedirect &&
-          lat != null &&
-          lng != null &&
-          result[0]?.isNearest
-        ) {
-          navigate(`/market-prices/${result[0].id}`, {
-            replace: true,
-          });
-        }
       })
       .catch(() => {
         if (cancelled) return;
@@ -51,7 +41,7 @@ export default function ApmcList() {
     return () => {
       cancelled = true;
     };
-  }, [lat, lng, skipAutoRedirect, navigate]);
+  }, [lat, lng]);
 
   // getApmcMarkets already returns markets sorted nearest-first
   // (per the backend service), so the first 5 are genuinely the
@@ -61,17 +51,11 @@ export default function ApmcList() {
     : apmcs.slice(0, VISIBLE_COUNT);
 
   return (
-    <div className="mp-page">
-      <BackLink
-        label={t('backToHome')}
-        onClick={() => navigate('/')}
-      />
-
-      <div className="mp-header">
-        <h1 className="mp-title">{t('title')}</h1>
-        <p className="mp-subtitle">{t('subtitle')}</p>
-      </div>
-
+    <AppShell
+      title={t('title')}
+      subtitle={t('subtitle')}
+      onBack={() => navigate('/')}
+    >
       <div className="mp-apmc-list">
         {visibleApmcs.map((apmc) => (
           <button
@@ -90,7 +74,7 @@ export default function ApmcList() {
                 <b>{apmc.name}</b>
 
                 <span className="mp-dist">
-                  {apmc.distanceKm?.toFixed(1)} km away
+                  {formatDistanceKm(apmc.distanceKm)} km away
                 </span>
               </div>
             </div>
@@ -120,6 +104,6 @@ export default function ApmcList() {
       <div className="mp-note">
         ℹ️ {t('sourceNote')}
       </div>
-    </div>
+    </AppShell>
   );
 }

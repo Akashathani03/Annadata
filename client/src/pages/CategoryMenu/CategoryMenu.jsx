@@ -2,6 +2,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getCategoryByKey } from '../../config/marketplaceCategories';
 import { useAuth } from '../../context/AuthContext';
+import AppShell from '../../components/common/AppShell';
 import './CategoryMenu.css';
 
 // Renders the same layout for every category (Crops / Animals / Shops).
@@ -31,18 +32,7 @@ export default function CategoryMenu() {
   }
 
   return (
-    <div className="cat-menu">
-      <header className="cat-menu-header">
-        <button
-          className="cat-menu-back"
-          onClick={() => navigate('/')}
-          aria-label={t('common:back')}
-        >
-          ←
-        </button>
-        <h1 className="cat-menu-title">{t(category.labelKey)}</h1>
-      </header>
-
+    <AppShell title={t(category.labelKey)} onBack={() => navigate('/')}>
       <div className="cat-menu-list">
         {category.items.map((item) => (
           <button
@@ -56,6 +46,6 @@ export default function CategoryMenu() {
           </button>
         ))}
       </div>
-    </div>
+    </AppShell>
   );
 }

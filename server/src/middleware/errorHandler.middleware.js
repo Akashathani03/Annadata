@@ -1,4 +1,5 @@
 import multer from 'multer';
+import mongoose from 'mongoose';
 import { ApiError } from '../utils/ApiError.js';
 import { sendError } from '../utils/apiResponse.js';
 import { logger } from '../config/logger.js';
@@ -30,6 +31,22 @@ export function errorHandler(err, req, res, next) {
     // a clean, farmer-safe validation error (Step 5).
     logger.warn({ code: err.code }, err.message);
     return sendError(res, 400, 'INVALID_FILE_UPLOAD', err.message);
+  }
+
+  if (err instanceof mongoose.Error.ValidationError) {
+    // A schema-level constraint (max/min/enum/maxlength) rejected the
+    // write - e.g. Listing.price's max or description's maxlength.
+    // Without this, any such rejection fell through to the generic
+    // 500 below: the write was correctly blocked, but a farmer saw
+    // "Something went wrong, please try again" instead of what was
+    // actually wrong with what they typed. Mongoose's own per-field
+    // .message is already the human-readable text set on the schema
+    // (see Listing.js's field comments), safe to return as-is - the
+    // first one is enough context, not a dump of every failing field.
+    const firstError = Object.values(err.errors)[0];
+    const message = firstError?.message || 'One of the values entered is not valid.';
+    logger.warn({ code: 'VALIDATION_ERROR' }, message);
+    return sendError(res, 400, 'VALIDATION_ERROR', message);
   }
 
   if (err.type === 'entity.too.large' || err.status === 413) {

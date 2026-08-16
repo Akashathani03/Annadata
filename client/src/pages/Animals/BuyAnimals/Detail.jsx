@@ -5,15 +5,17 @@ import { useTranslation } from 'react-i18next';
 import { getAnimalListingDetail } from '../../../services/buyAnimalsService';
 import { getBuyerLocation } from '../../../services/buyerLocationService';
 
-import { resolveImageUrl } from '../../../utils/resolveImageUrl';
 import { formatRelativeTime } from '../../../utils/formatDate';
+import { formatDistanceKm } from '../../../utils/geo';
 
 import { useAuth } from '../../../context/AuthContext';
+import { useUserLocation } from '../../../context/LocationContext';
 
 import AppShell from '../../../components/common/AppShell';
 import SellerInfoCard from '../../../components/common/SellerInfoCard';
 import ContactButtons from '../../../components/common/ContactButtons';
 import ShareListing from '../../../components/common/ShareListing';
+import PhotoGallery from '../../../components/common/PhotoGallery';
 
 import '../../Crops/BuyCrops/BuyCrops.css';
 
@@ -29,6 +31,7 @@ export default function Detail() {
   ]);
 
   const { user } = useAuth();
+  const { liveLocation, geocodedLocation } = useUserLocation();
 
   const [listing, setListing] = useState(undefined);
 
@@ -45,6 +48,8 @@ export default function Detail() {
       try {
         const loc = await getBuyerLocation({
           authenticatedUser: user,
+          liveLocation,
+          geocodedLocation,
         });
 
         const result = await getAnimalListingDetail(id, {
@@ -67,7 +72,7 @@ export default function Detail() {
     return () => {
       cancelled = true;
     };
-  }, [id, user]);
+  }, [id, user, liveLocation, geocodedLocation]);
 
 
   /*
@@ -151,9 +156,9 @@ export default function Detail() {
   /*
    * WhatsApp message.
    */
-  const whatsappMessage =
-    `Hello, I found your ${listing.itemName} ` +
-    `listing on Annadata. Is it still available?`;
+  const whatsappMessage = t('animals:detail.whatsappMessage', {
+    item: listing.itemName,
+  });
 
 
   /*
@@ -195,20 +200,11 @@ export default function Detail() {
       }
     >
       {/* Animal Image */}
-      <div className="bc-detail-hero">
-        {listing.photoUrl ? (
-          <img
-            src={resolveImageUrl(
-              listing.photoUrl
-            )}
-            alt={listing.itemName || 'Animal'}
-          />
-        ) : (
-          <span>
-            {listing.animalIcon || '🐄'}
-          </span>
-        )}
-      </div>
+      <PhotoGallery
+        photoUrls={listing.photoUrls}
+        className="bc-detail-hero"
+        fallback={<span>{listing.animalIcon || '🐄'}</span>}
+      />
 
 
       {/* Animal Title */}
@@ -324,9 +320,7 @@ export default function Detail() {
 
           <span>
             {listing.distanceKm != null
-              ? `${listing.distanceKm.toFixed(
-                  1
-                )} km away`
+              ? `${formatDistanceKm(listing.distanceKm)} km away`
               : '—'}
           </span>
         </div>
@@ -348,22 +342,6 @@ export default function Detail() {
                   listing.createdAt
                 )
               : '—'}
-          </span>
-        </div>
-
-
-        <div
-          className="bc-detail-row"
-          style={{ padding: '14px 16px' }}
-        >
-          <span>
-            {t(
-              'animals:detail.phone'
-            )}
-          </span>
-
-          <span>
-            {phone || '—'}
           </span>
         </div>
 

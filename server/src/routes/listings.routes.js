@@ -31,7 +31,7 @@ router.get('/sales', requireAuth, getMySales);
 router.get('/:id', getListingById);
 router.get('/:id/seller', getSeller);
 
-router.post('/', requireAuth, rateLimit('IMAGE_UPLOAD'), upload.single('photo'), postListing);
+router.post('/', requireAuth, rateLimit('IMAGE_UPLOAD'), upload.array('photos', 4), postListing);
 router.patch('/:id', requireAuth, patchListing);
 router.patch('/:id/sold', requireAuth, patchListingSold);
 router.delete('/:id', requireAuth, deleteListing);

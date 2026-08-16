@@ -15,7 +15,10 @@ const VALID_CONDITIONS = ['new', 'used-good', 'used-fair'];
 
 const ALLOWED_IMAGE_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
-const REQUIRED_LISTING_FIELDS = ['category', 'itemId', 'itemName', 'quantity', 'unit', 'price', 'phone'];
+// itemId is deliberately not in this list - it's category-conditionally
+// required (see assertValidItemForCategory), not universally required,
+// since a crop listing may legitimately have no catalog itemId at all.
+const REQUIRED_LISTING_FIELDS = ['category', 'itemName', 'quantity', 'unit', 'price', 'phone'];
 
 // The explicit set of fields a farmer may edit via PATCH /listings/:id.
 // Closes a mass-assignment gap where the raw request body previously
@@ -45,7 +48,7 @@ const EDITABLE_LISTING_FIELDS = [
   'lat',
   'lng',
   'phone',
-  'photoUrl',
+  'photoUrls',
 ];
 
 function pickEditableFields(payload) {
@@ -160,6 +163,16 @@ export async function getListingSeller(id, viewerId) {
 }
 
 async function assertValidItemForCategory(itemId, category) {
+  if (!itemId) {
+    // A crop listing may legitimately name something outside the
+    // catalog (a local/uncommon variety) - itemName is the required,
+    // trustworthy field in that case (see Listing.js), and there's
+    // simply no market-price lookup possible for it. Animal/equipment
+    // listings stay catalog-only - no signal they need this escape
+    // hatch, and loosening them isn't part of this fix.
+    if (category === 'crop') return;
+    throw new ApiError(400, 'VALIDATION_ERROR', `itemId is required for ${category} listings.`);
+  }
   const item = await cropRepository.findById(itemId);
   if (!item || item.category !== category) {
     throw new ApiError(400, 'VALIDATION_ERROR', `itemId does not reference a valid ${category} catalog item.`);
@@ -218,7 +231,37 @@ function assertValidSearchRadius(radiusKm, lat, lng) {
   }
 }
 
-export async function createListing(ownerId, payload, imageFile) {
+const MAX_LISTING_PHOTOS = 4;
+
+// imageFiles is the multer-populated array from upload.array('photos', 4)
+// (empty/undefined when the request had no files, e.g. a JSON-only
+// PATCH elsewhere). Validated and saved as a batch, in the order the
+// farmer added them - the first is always the listing's primary
+// thumbnail everywhere it's shown as one image.
+async function saveListingPhotos(imageFiles) {
+  const files = imageFiles ?? [];
+  if (files.length === 0) {
+    throw new ApiError(400, 'VALIDATION_ERROR', 'At least one photo is required.');
+  }
+  if (files.length > MAX_LISTING_PHOTOS) {
+    throw new ApiError(400, 'VALIDATION_ERROR', `A listing can have at most ${MAX_LISTING_PHOTOS} photos.`);
+  }
+  for (const file of files) {
+    if (!ALLOWED_IMAGE_MIME_TYPES.includes(file.mimetype)) {
+      throw new ApiError(
+        400,
+        'INVALID_FILE_TYPE',
+        `Unsupported image type. Allowed types: ${ALLOWED_IMAGE_MIME_TYPES.join(', ')}.`
+      );
+    }
+  }
+  const saved = await Promise.all(
+    files.map((file) => storageProvider.saveFile(file.buffer, { mimeType: file.mimetype }))
+  );
+  return saved.map((s) => s.url);
+}
+
+export async function createListing(ownerId, payload, imageFiles) {
   assertRequiredFields(payload);
   await assertValidItemForCategory(payload.itemId, payload.category);
   assertValidUnitForCategory(payload.unit, payload.category);
@@ -228,18 +271,7 @@ export async function createListing(ownerId, payload, imageFile) {
     throw new ApiError(400, 'VALIDATION_ERROR', 'apmcId is not valid for animal listings.');
   }
 
-  let photoUrl = payload.photoUrl ?? '';
-  if (imageFile) {
-    if (!ALLOWED_IMAGE_MIME_TYPES.includes(imageFile.mimetype)) {
-      throw new ApiError(
-        400,
-        'INVALID_FILE_TYPE',
-        `Unsupported image type. Allowed types: ${ALLOWED_IMAGE_MIME_TYPES.join(', ')}.`
-      );
-    }
-    const saved = await storageProvider.saveFile(imageFile.buffer, { mimeType: imageFile.mimetype });
-    photoUrl = saved.url;
-  }
+  const photoUrls = await saveListingPhotos(imageFiles);
 
   const listing = await listingRepository.insert({
     ownerId,
@@ -251,7 +283,7 @@ export async function createListing(ownerId, payload, imageFile) {
     unit: payload.unit,
     price: payload.price,
     description: payload.description ?? '',
-    photoUrl,
+    photoUrls,
     condition: payload.category === 'equipment' ? payload.condition : null,
     apmcId: payload.category === 'crop' ? payload.apmcId ?? null : null,
     apmcName: payload.apmcName ?? '',

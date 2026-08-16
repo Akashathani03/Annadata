@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getCropPriceDetail } from '../../../services/marketPricesService';
 import { formatDisplayDate } from '../../../utils/formatDate';
-import BackLink from '../../../components/common/BackLink';
+import AppShell from '../../../components/common/AppShell';
 import { PriceGrid, PriceBox } from '../../../components/common/PriceBox';
 import './MarketPrices.css';
 
@@ -39,35 +39,27 @@ export default function CropDetail() {
 
   if (detail === undefined) {
     return (
-      <div className="mp-page">
-        <BackLink
-          label={t('backToPrices')}
-          onClick={() =>
-            navigate(`/market-prices/${apmcId}`)
-          }
-        />
-
+      <AppShell
+        title={t('title')}
+        onBack={() => navigate(`/market-prices/${apmcId}`)}
+      >
         <div className="mp-note">
           {t('loading')}
         </div>
-      </div>
+      </AppShell>
     );
   }
 
   if (detail === null) {
     return (
-      <div className="mp-page">
-        <BackLink
-          label={t('backToPrices')}
-          onClick={() =>
-            navigate(`/market-prices/${apmcId}`)
-          }
-        />
-
+      <AppShell
+        title={t('title')}
+        onBack={() => navigate(`/market-prices/${apmcId}`)}
+      >
         <div className="mp-note">
           {t('notFound')}
         </div>
-      </div>
+      </AppShell>
     );
   }
 
@@ -81,14 +73,10 @@ export default function CropDetail() {
   } = detail;
 
   return (
-    <div className="mp-page">
-      <BackLink
-        label={t('backToPrices')}
-        onClick={() =>
-          navigate(`/market-prices/${apmcId}`)
-        }
-      />
-
+    <AppShell
+      title={crop.name}
+      onBack={() => navigate(`/market-prices/${apmcId}`)}
+    >
       <div className="mp-market-bar">
         <div className="mp-market-left">
           📍 <b>{apmc.name}</b>
@@ -179,6 +167,6 @@ export default function CropDetail() {
           🛒 {t('sellThisCrop')}
         </button>
       </div>
-    </div>
+    </AppShell>
   );
 }

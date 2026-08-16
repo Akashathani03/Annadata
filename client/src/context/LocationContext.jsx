@@ -143,10 +143,76 @@ export function LocationProvider({ children }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id, user?.lat, user?.lng, user?.village, user?.taluk, user?.district, user?.state]);
 
-  const lat = liveLocation?.lat ?? user?.lat ?? geocodedLocation?.lat ?? DEFAULT_LOCATION.lat;
-  const lng = liveLocation?.lng ?? user?.lng ?? geocodedLocation?.lng ?? DEFAULT_LOCATION.lng;
+  // Geocodes the profile address for profile-first features (Market
+  // Prices), independently of the GPS-deferred geocodedLocation above.
+  // Fires immediately - never waits on or yields to live GPS - so
+  // profileLat/profileLng reflect the saved address even when GPS
+  // resolves quickly (the case the GPS-deferred geocode above misses).
+  //
+  // Deliberately runs even when user.lat/lng are already set (unlike
+  // the GPS-deferred geocode above) - a farmer's typed district/state
+  // is what they can see and correct on the Profile screen, while
+  // lat/lng is invisible plumbing they never review. A stale or
+  // coarse GPS fix from months ago (or a desktop/IP-based fix that
+  // landed in the wrong city) can leave user.lat/lng permanently
+  // wrong even after the farmer fixes their district text - trusting
+  // that lat/lng over the address they just corrected would silently
+  // keep showing them the old, wrong city. See profileLat/profileLng
+  // below for the priority this produces.
+  const [profileGeocodedLocation, setProfileGeocodedLocation] = useState(null);
+  const profileGeocodeAttemptedForUserRef = useRef(null);
+  useEffect(() => {
+    if (!user) return;
+    if (!user.district || !user.state) return; // too little address to search meaningfully
+    if (profileGeocodeAttemptedForUserRef.current === user.id) return; // already tried this user this session
 
-  const value = { lat, lng, liveLocation, geocodedLocation, refreshIfStale };
+    let cancelled = false;
+    profileGeocodeAttemptedForUserRef.current = user.id;
+
+    forwardGeocode({
+      village: user.village,
+      taluk: user.taluk,
+      district: user.district,
+      state: user.state,
+    }).then((result) => {
+      if (!cancelled) setProfileGeocodedLocation(result);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, user?.lat, user?.lng, user?.village, user?.taluk, user?.district, user?.state]);
+
+  // geocodedLocation (this session's typed-address fallback) is
+  // checked ahead of the raw saved user.lat/lng for the same reason as
+  // profileLat/profileLng below: a farmer can see and fix a wrong
+  // district/state on the Profile screen, but never sees the raw
+  // lat/lng, so a stale or coarse fix from months ago can outrank a
+  // freshly-correct address indefinitely otherwise. Live GPS from
+  // this session still wins over both, since it's the one source that
+  // is actually current.
+  const lat = liveLocation?.lat ?? geocodedLocation?.lat ?? user?.lat ?? DEFAULT_LOCATION.lat;
+  const lng = liveLocation?.lng ?? geocodedLocation?.lng ?? user?.lng ?? DEFAULT_LOCATION.lng;
+
+  // Profile-first coordinates, for features (Market Prices) that must
+  // reflect the farmer's registered address rather than wherever the
+  // device's live GPS currently reports. Never falls through to
+  // liveLocation - only the profile's address, its saved lat/lng, or
+  // the hardcoded default.
+  //
+  // The geocoded typed address comes first, ahead of the raw saved
+  // lat/lng - district/state is what the farmer typed and can see is
+  // right on the Profile screen; lat/lng is a number they never see,
+  // and can go stale (an old capture, or a coarse desktop/IP-based
+  // fix that landed in the wrong city - Bengaluru's IP ranges are a
+  // common false positive for farmers physically elsewhere in
+  // Karnataka). Only fall back to the raw lat/lng when there's no
+  // district/state to geocode at all.
+  const profileLat = profileGeocodedLocation?.lat ?? user?.lat ?? DEFAULT_LOCATION.lat;
+  const profileLng = profileGeocodedLocation?.lng ?? user?.lng ?? DEFAULT_LOCATION.lng;
+
+  const value = { lat, lng, profileLat, profileLng, liveLocation, geocodedLocation, refreshIfStale };
 
   return <LocationContext.Provider value={value}>{children}</LocationContext.Provider>;
 }

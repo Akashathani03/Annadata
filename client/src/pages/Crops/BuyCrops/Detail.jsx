@@ -3,16 +3,18 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import { getCropListingDetail } from '../../../services/buyCropsService';
-import { resolveImageUrl } from '../../../utils/resolveImageUrl';
 import { getBuyerLocation } from '../../../services/buyerLocationService';
 import { getCropPriceDetail } from '../../../services/marketPricesService';
 import { useAuth } from '../../../context/AuthContext';
+import { useUserLocation } from '../../../context/LocationContext';
 import { formatRelativeTime } from '../../../utils/formatDate';
+import { formatDistanceKm } from '../../../utils/geo';
 
 import AppShell from '../../../components/common/AppShell';
 import SellerInfoCard from '../../../components/common/SellerInfoCard';
 import ContactButtons from '../../../components/common/ContactButtons';
 import ShareListing from '../../../components/common/ShareListing';
+import PhotoGallery from '../../../components/common/PhotoGallery';
 
 import './BuyCrops.css';
 
@@ -26,6 +28,7 @@ export default function Detail() {
   ]);
 
   const { user } = useAuth();
+  const { liveLocation, geocodedLocation } = useUserLocation();
 
   // undefined = loading
   // null = not found
@@ -49,6 +52,8 @@ export default function Detail() {
         try {
           buyerLocation = await getBuyerLocation({
             authenticatedUser: user,
+            liveLocation,
+            geocodedLocation,
           });
         } catch {
           buyerLocation = null;
@@ -101,7 +106,7 @@ export default function Detail() {
     return () => {
       cancelled = true;
     };
-  }, [id, user]);
+  }, [id, user, liveLocation, geocodedLocation]);
 
   /*
    * Loading state
@@ -180,7 +185,7 @@ export default function Detail() {
 
   const distanceText =
     listing.distanceKm != null
-      ? `${Number(listing.distanceKm).toFixed(1)} km away`
+      ? `${formatDistanceKm(listing.distanceKm)} km away`
       : '—';
 
   return (
@@ -201,20 +206,11 @@ export default function Detail() {
           CROP IMAGE
       ========================= */}
 
-      <div className="bc-detail-hero">
-        {listing.photoUrl ? (
-          <img
-            src={resolveImageUrl(
-              listing.photoUrl
-            )}
-            alt=""
-          />
-        ) : (
-          <span>
-            {listing.cropIcon || '🌾'}
-          </span>
-        )}
-      </div>
+      <PhotoGallery
+        photoUrls={listing.photoUrls}
+        className="bc-detail-hero"
+        fallback={<span>{listing.cropIcon || '🌾'}</span>}
+      />
 
       {/* =========================
           CROP BASIC INFO

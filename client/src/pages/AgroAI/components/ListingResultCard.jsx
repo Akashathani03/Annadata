@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { resolveImageUrl } from '../../../utils/resolveImageUrl';
+import { formatDistanceKm } from '../../../utils/geo';
 import './ListingResultCard.css';
 
 // Maps each category to its existing, already-built Buy Detail route -
@@ -27,7 +28,7 @@ export default function ListingResultCard({ listings = [] }) {
         return (
           <div className="listing-result-row" key={l.id}>
             <div className="listing-result-photo">
-              {l.photoUrl ? <img src={resolveImageUrl(l.photoUrl)} alt="" /> : <span>{icon}</span>}
+              {l.photoUrls?.[0] ? <img src={resolveImageUrl(l.photoUrls[0])} alt="" /> : <span>{icon}</span>}
             </div>
             <div className="listing-result-info">
               <p className="listing-result-title">{l.itemName}</p>
@@ -36,7 +37,7 @@ export default function ListingResultCard({ listings = [] }) {
                 {l.condition && <span className="listing-result-condition">{t(`equipment:condition.${l.condition}`)}</span>}
               </p>
               <p className="listing-result-location">
-                {l.distanceKm != null ? `${l.distanceKm.toFixed(1)} km away` : l.location || ''}
+                {l.distanceKm != null ? `${formatDistanceKm(l.distanceKm)} km away` : l.location || ''}
               </p>
             </div>
             {routeFor && (

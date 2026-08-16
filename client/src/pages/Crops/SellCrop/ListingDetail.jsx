@@ -7,13 +7,13 @@ import {
   deleteListing,
   markListingSold,
 } from '../../../services/listingsService';
-import { resolveImageUrl } from '../../../utils/resolveImageUrl';
 import { getCropCatalog } from '../../../services/marketPricesService';
 import { useToast } from '../../../context/ToastContext';
 import { formatRelativeTime } from '../../../utils/formatDate';
 import AppShell from '../../../components/common/AppShell';
 import ShareListing from '../../../components/common/ShareListing';
 import BottomSheet from '../../../components/common/BottomSheet';
+import PhotoGallery from '../../../components/common/PhotoGallery';
 import './ListingDetail.css';
 
 export default function ListingDetail() {
@@ -311,16 +311,11 @@ export default function ListingDetail() {
       onBack={() => navigate('/sell/listings')}
     >
       <div className="ld-page">
-        <div className="ld-hero">
-          {listing.photoUrl ? (
-            <img
-              src={resolveImageUrl(listing.photoUrl)}
-              alt=""
-            />
-          ) : (
-            icon
-          )}
-
+        <PhotoGallery
+          photoUrls={listing.photoUrls}
+          className="ld-hero"
+          fallback={icon}
+        >
           <span className="badge">
             <span
               className={`listing-card-status${
@@ -334,7 +329,7 @@ export default function ListingDetail() {
                 : listing.status}
             </span>
           </span>
-        </div>
+        </PhotoGallery>
 
         <h2 className="ld-title">
           {listing.itemName}

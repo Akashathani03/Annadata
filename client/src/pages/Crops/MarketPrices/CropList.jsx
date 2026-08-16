@@ -6,7 +6,7 @@ import {
   getCropPricesForApmc,
 } from '../../../services/marketPricesService';
 import { useUserLocation } from '../../../context/LocationContext';
-import BackLink from '../../../components/common/BackLink';
+import AppShell from '../../../components/common/AppShell';
 import SearchInput from '../../../components/common/SearchInput';
 import './MarketPrices.css';
 
@@ -14,7 +14,7 @@ export default function CropList() {
   const { apmcId } = useParams();
   const navigate = useNavigate();
   const { t } = useTranslation('marketPrices');
-  const { lat, lng } = useUserLocation();
+  const { profileLat: lat, profileLng: lng } = useUserLocation();
 
   const [apmc, setApmc] = useState(undefined);
   // undefined = loading
@@ -77,16 +77,10 @@ export default function CropList() {
   }, [rows, query]);
 
   return (
-    <div className="mp-page">
-      <BackLink
-        label={t('backToMarkets')}
-        onClick={() =>
-          navigate('/market-prices', {
-            state: { showAllMarkets: true },
-          })
-        }
-      />
-
+    <AppShell
+      title={apmc?.name || t('title')}
+      onBack={() => navigate('/market-prices')}
+    >
       {apmc === undefined && (
         <div className="mp-note">
           {t('loading')}
@@ -172,6 +166,6 @@ export default function CropList() {
           </div>
         </>
       )}
-    </div>
+    </AppShell>
   );
 }

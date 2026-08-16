@@ -93,7 +93,7 @@ export default function Dashboard() {
           <div
             className="dash-hero-sold"
             onClick={() =>
-              navigate('/sell-animal/sales')
+              navigate('/sell-animal/listings')
             }
           >
             <span>

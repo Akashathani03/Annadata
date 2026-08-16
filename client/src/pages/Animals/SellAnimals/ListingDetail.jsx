@@ -7,13 +7,13 @@ import {
   deleteListing,
   markListingSold,
 } from '../../../services/listingsService';
-import { resolveImageUrl } from '../../../utils/resolveImageUrl';
 import { animalCatalog } from '../../../config/animalCatalog';
 import { useToast } from '../../../context/ToastContext';
 import { formatRelativeTime } from '../../../utils/formatDate';
 import AppShell from '../../../components/common/AppShell';
 import ShareListing from '../../../components/common/ShareListing';
 import BottomSheet from '../../../components/common/BottomSheet';
+import PhotoGallery from '../../../components/common/PhotoGallery';
 import '../../Crops/SellCrop/ListingDetail.css';
 
 export default function ListingDetail() {
@@ -137,7 +137,11 @@ export default function ListingDetail() {
 
     try {
       await markListingSold(id, {
-        quantitySold: 1,
+        // Was hardcoded to 1 - harmless while every listing's own
+        // quantity was also always 1, but Sell Animal's quantity field
+        // is now farmer-editable, so a listing of e.g. 5 goats sold in
+        // full needs to record 5, not silently understate it to 1.
+        quantitySold: listing?.quantity ?? 1,
         saleAmount: price,
         buyerName: soldBuyer.trim() || 'Buyer',
       });
@@ -190,16 +194,11 @@ export default function ListingDetail() {
       <div className="ld-page">
 
         {/* Animal Photo / Icon */}
-        <div className="ld-hero">
-          {listing.photoUrl ? (
-            <img
-              src={resolveImageUrl(listing.photoUrl)}
-              alt={listing.itemName || 'Animal'}
-            />
-          ) : (
-            icon
-          )}
-
+        <PhotoGallery
+          photoUrls={listing.photoUrls}
+          className="ld-hero"
+          fallback={icon}
+        >
           <span className="badge">
             <span
               className={`listing-card-status ${
@@ -211,7 +210,7 @@ export default function ListingDetail() {
                 : t('animals:detail.active')}
             </span>
           </span>
-        </div>
+        </PhotoGallery>
 
         {/* Animal Name */}
         <h2 className="ld-title">

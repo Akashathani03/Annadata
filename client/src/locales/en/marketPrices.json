@@ -21,6 +21,8 @@
   "compareNearby": "Compare nearby APMCs",
   "sellThisCrop": "Sell this crop",
   "perKg": "/kg",
+  "perQuintal": "/quintal",
+  "perTon": "/ton",
   "notFound": "Price not available for this crop.",
   "backToHome": "Back to home",
   "loading": "Loading...",

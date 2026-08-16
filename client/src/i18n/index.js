@@ -41,8 +41,8 @@ import mixEquipment from '../locales/mix/equipment.json';
 // Supported locales. 'mix' is a first-class locale (not a runtime
 // conditional) so mixed-language labels live in their own translation
 // files and never require language-branching logic in components.
-export const SUPPORTED_LOCALES = ['mix', 'kn', 'en'];
-export const DEFAULT_LOCALE = 'mix';
+export const SUPPORTED_LOCALES = ['en', 'kn', 'mix'];
+export const DEFAULT_LOCALE = 'en';
 
 const resources = {
   en: { common: enCommon, navigation: enNavigation, weather: enWeather, marketPrices: enMarketPrices, listings: enListings, buyCrops: enBuyCrops, auth: enAuth, shops: enShops, govSchemes: enGovSchemes, animals: enAnimals, agroAI: enAgroAI, equipment: enEquipment },
@@ -53,7 +53,7 @@ const resources = {
 i18n.use(initReactI18next).init({
   resources,
   lng: DEFAULT_LOCALE,
-  fallbackLng: ['mix', 'kn', 'en'],
+  fallbackLng: ['en', 'kn', 'mix'],
   defaultNS: 'common',
   ns: ['common', 'navigation', 'weather', 'marketPrices', 'listings', 'buyCrops', 'auth', 'shops', 'govSchemes', 'animals', 'agroAI'],
   interpolation: {

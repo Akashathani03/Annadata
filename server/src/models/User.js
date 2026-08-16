@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema(
     state: { type: String, default: '' },
     lat: { type: Number, min: -90, max: 90, default: null },
     lng: { type: Number, min: -180, max: 180, default: null },
-    language: { type: String, enum: ['en', 'kn', 'mix'], default: 'mix' },
+    language: { type: String, enum: ['en', 'kn', 'mix'], default: 'en' },
     profilePhotoUrl: { type: String, default: null },
   },
   { timestamps: true }

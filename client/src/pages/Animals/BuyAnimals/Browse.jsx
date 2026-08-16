@@ -10,6 +10,7 @@ import {
 
 import { resolveImageUrl } from '../../../utils/resolveImageUrl';
 import { formatRelativeTime } from '../../../utils/formatDate';
+import { formatDistanceKm } from '../../../utils/geo';
 
 import ListingSkeleton from '../../../components/common/ListingSkeleton';
 import { useAuth } from '../../../context/AuthContext';
@@ -76,53 +77,31 @@ export default function Browse() {
   /*
    * Load buyer location.
    */
-  async function loadLocation() {
-    try {
-      const loc = await getBuyerLocation({
-        authenticatedUser: user,
-        liveLocation,
-        geocodedLocation,
-      });
-
-      setBuyerLoc(loc);
-    } catch {
-      setBuyerLoc(null);
-    }
-  }
-
   useEffect(() => {
-    loadLocation();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, liveLocation, geocodedLocation]);
+    let cancelled = false;
 
-  /*
-   * Search animal listings.
-   */
-  async function runSearch() {
-    setSearchLoading(true);
-    try {
-      const list = await getBrowseAnimals({
-        query,
-        category,
-        sort,
-        filters: {
-          distance,
-        },
-        buyerLat: buyerLoc?.lat,
-        buyerLng: buyerLoc?.lng,
-      });
+    async function loadLocation() {
+      try {
+        const loc = await getBuyerLocation({
+          authenticatedUser: user,
+          liveLocation,
+          geocodedLocation,
+        });
 
-      setResults(
-        Array.isArray(list)
-          ? list
-          : []
-      );
-    } catch {
-      setResults([]);
-    } finally {
-      setSearchLoading(false);
+        if (cancelled) return;
+        setBuyerLoc(loc);
+      } catch {
+        if (cancelled) return;
+        setBuyerLoc(null);
+      }
     }
-  }
+
+    loadLocation();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user, liveLocation, geocodedLocation]);
 
   /*
    * Re-run search whenever browsing criteria change.
@@ -130,9 +109,37 @@ export default function Browse() {
   useEffect(() => {
     if (!buyerLoc) return;
 
+    let cancelled = false;
+
+    async function runSearch() {
+      setSearchLoading(true);
+      try {
+        const list = await getBrowseAnimals({
+          query,
+          category,
+          sort,
+          filters: {
+            distance,
+          },
+          buyerLat: buyerLoc?.lat,
+          buyerLng: buyerLoc?.lng,
+        });
+
+        if (cancelled) return;
+        setResults(Array.isArray(list) ? list : []);
+      } catch {
+        if (cancelled) return;
+        setResults([]);
+      } finally {
+        if (!cancelled) setSearchLoading(false);
+      }
+    }
+
     runSearch();
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return () => {
+      cancelled = true;
+    };
   }, [
     buyerLoc,
     query,
@@ -268,7 +275,7 @@ export default function Browse() {
       : `91${phone}`;
 
     const message = encodeURIComponent(
-      `Hello, I found your ${listing.itemName} listing on Annadata. Is it still available?`
+      t('animals:detail.whatsappMessage', { item: listing.itemName })
     );
 
     return `https://wa.me/${phoneWithCountryCode}?text=${message}`;
@@ -398,10 +405,10 @@ export default function Browse() {
               {/* Top */}
               <div className="bc-crop-top">
                 <div className="bc-crop-thumb">
-                  {listing.photoUrl ? (
+                  {listing.photoUrls?.[0] ? (
                     <img
                       src={resolveImageUrl(
-                        listing.photoUrl
+                        listing.photoUrls[0]
                       )}
                       alt=""
                     />
@@ -426,9 +433,7 @@ export default function Browse() {
                     {listing.location || '—'}
 
                     {listing.distanceKm != null
-                      ? ` · ${listing.distanceKm.toFixed(
-                          1
-                        )} km away`
+                      ? ` · ${formatDistanceKm(listing.distanceKm)} km away`
                       : ''}
                   </span>
                 </div>

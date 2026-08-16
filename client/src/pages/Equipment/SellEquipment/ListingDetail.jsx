@@ -9,7 +9,6 @@ import {
   markListingSold,
 } from '../../../services/listingsService';
 
-import { resolveImageUrl } from '../../../utils/resolveImageUrl';
 import { equipmentCatalog } from '../../../config/equipmentCatalog';
 import { useToast } from '../../../context/ToastContext';
 import { formatRelativeTime } from '../../../utils/formatDate';
@@ -17,6 +16,7 @@ import { formatRelativeTime } from '../../../utils/formatDate';
 import AppShell from '../../../components/common/AppShell';
 import ShareListing from '../../../components/common/ShareListing';
 import BottomSheet from '../../../components/common/BottomSheet';
+import PhotoGallery from '../../../components/common/PhotoGallery';
 
 import '../../Crops/SellCrop/ListingDetail.css';
 
@@ -271,16 +271,11 @@ export default function ListingDetail() {
       <div className="ld-page">
 
         {/* Hero */}
-        <div className="ld-hero">
-          {listing.photoUrl ? (
-            <img
-              src={resolveImageUrl(listing.photoUrl)}
-              alt={listing.itemName || 'Equipment'}
-            />
-          ) : (
-            icon
-          )}
-
+        <PhotoGallery
+          photoUrls={listing.photoUrls}
+          className="ld-hero"
+          fallback={icon}
+        >
           <span className="badge">
             <span
               className={`listing-card-status ${
@@ -292,7 +287,7 @@ export default function ListingDetail() {
                 : listing.status}
             </span>
           </span>
-        </div>
+        </PhotoGallery>
 
 
         {/* Title */}

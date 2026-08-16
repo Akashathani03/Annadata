@@ -110,6 +110,7 @@ export async function getCropPriceDetail(apmcId, cropId) {
   return {
     crop: toCropShape(crop),
     apmc: apmc ? { ...apmc.toObject(), id: apmc._id } : null,
+    unit: entry.unit,
     minPrice: entry.minPrice,
     modalPrice: entry.modalPrice,
     maxPrice: entry.maxPrice,

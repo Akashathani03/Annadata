@@ -42,6 +42,11 @@ const crops = [
   { _id: 'groundnut', category: 'crop', group: 'oilseed', name: 'Groundnut', kannadaName: 'ಶೇಂಗಾ', icon: '🥜', defaultUnit: 'Quintal' },
   { _id: 'chilli', category: 'crop', group: 'spice', name: 'Chilli', kannadaName: 'ಮೆಣಸಿನಕಾಯಿ', icon: '🌶️', defaultUnit: 'Kg' },
   { _id: 'brinjal', category: 'crop', group: 'veg', name: 'Brinjal', kannadaName: 'ಬದನೆಕಾಯಿ', icon: '🍆', defaultUnit: 'Kg' },
+  { _id: 'jowar', category: 'crop', group: 'cereal', name: 'Jowar', kannadaName: 'ಜೋಳ', icon: '🌾', defaultUnit: 'Quintal' },
+  { _id: 'potato', category: 'crop', group: 'veg', name: 'Potato', kannadaName: 'ಆಲೂಗಡ್ಡೆ', icon: '🥔', defaultUnit: 'Kg' },
+  { _id: 'turmeric', category: 'crop', group: 'spice', name: 'Turmeric', kannadaName: 'ಅರಿಶಿನ', icon: '🟡', defaultUnit: 'Quintal' },
+  { _id: 'coconut', category: 'crop', group: 'plantation', name: 'Coconut', kannadaName: 'ತೆಂಗಿನಕಾಯಿ', icon: '🥥', defaultUnit: 'Quintal' },
+  { _id: 'sugarcane', category: 'crop', group: 'cash', name: 'Sugarcane', kannadaName: 'ಕಬ್ಬು', icon: '🎋', defaultUnit: 'Ton' },
 ];
 
 const today = new Date().toISOString().slice(0, 10);
@@ -109,7 +114,87 @@ const marketPrices = [
 
   { apmcId: 'kudachi', cropId: 'onion', minPrice: 12, modalPrice: 15, maxPrice: 19 },
   { apmcId: 'kudachi', cropId: 'maize', minPrice: 1730, modalPrice: 1840, maxPrice: 1930 },
-].map((p) => ({ ...p, priceDate: today }));
+];
+
+// The hand-picked list above only covers each APMC's few headline
+// crops (mirroring real markets, which don't all trade everything) -
+// but that sparsity means a genuinely common question ("onion price
+// near me?") silently returns "not found" the moment the farmer's
+// nearest market isn't one of the few that happened to list onion.
+// market_price_lookup is deliberately built to never invent a price
+// for a real gap (see tools.js) - the fix belongs here, in the data,
+// not by loosening that guarantee.
+//
+// So every market gets a price for every crop: explicit entries above
+// are kept exactly as authored, and this fills only the combinations
+// missing from that list, deterministically varied per-market (a
+// simple string hash, not Math.random - reseeding must produce the
+// same numbers every time) so prices look regionally realistic
+// instead of identical everywhere.
+const BASE_PRICES = {
+  tomato: { minPrice: 18, modalPrice: 22, maxPrice: 27 },
+  onion: { minPrice: 13, modalPrice: 16, maxPrice: 19 },
+  paddy: { minPrice: 1960, modalPrice: 2090, maxPrice: 2210 },
+  maize: { minPrice: 1750, modalPrice: 1860, maxPrice: 1950 },
+  ragi: { minPrice: 3100, modalPrice: 3250, maxPrice: 3400 },
+  groundnut: { minPrice: 5200, modalPrice: 5450, maxPrice: 5700 },
+  chilli: { minPrice: 60, modalPrice: 73, maxPrice: 86 },
+  brinjal: { minPrice: 12, modalPrice: 15, maxPrice: 19 },
+  jowar: { minPrice: 2700, modalPrice: 2900, maxPrice: 3100 },
+  potato: { minPrice: 10, modalPrice: 14, maxPrice: 18 },
+  turmeric: { minPrice: 7200, modalPrice: 7800, maxPrice: 8500 },
+  coconut: { minPrice: 3600, modalPrice: 4000, maxPrice: 4400 },
+  sugarcane: { minPrice: 3050, modalPrice: 3200, maxPrice: 3350 },
+};
+
+function hashVariation(key) {
+  let hash = 0;
+  for (let i = 0; i < key.length; i++) {
+    hash = (hash * 31 + key.charCodeAt(i)) | 0;
+  }
+  // +/-8% band - enough to look like real market-to-market spread
+  // without a crop's price ever swinging into an implausible range.
+  return ((Math.abs(hash) % 17) - 8) / 100;
+}
+
+function roundToUnit(value, unit) {
+  const step = unit === 'Kg' ? 1 : 10;
+  return Math.round(value / step) * step;
+}
+
+const explicitKeys = new Set(marketPrices.map((p) => `${p.apmcId}|${p.cropId}`));
+const cropUnitById = Object.fromEntries(crops.map((c) => [c._id, c.defaultUnit]));
+
+for (const market of apmcMarkets) {
+  for (const crop of crops) {
+    const key = `${market._id}|${crop._id}`;
+    if (explicitKeys.has(key)) continue;
+
+    const base = BASE_PRICES[crop._id];
+    const variation = 1 + hashVariation(key);
+    const unit = cropUnitById[crop._id];
+
+    marketPrices.push({
+      apmcId: market._id,
+      cropId: crop._id,
+      unit,
+      minPrice: roundToUnit(base.minPrice * variation, unit),
+      modalPrice: roundToUnit(base.modalPrice * variation, unit),
+      maxPrice: roundToUnit(base.maxPrice * variation, unit),
+    });
+  }
+}
+
+// Every hand-authored row above predates the `unit` field - rather
+// than annotate all 47 individually (easy to get one wrong/stale),
+// backfill from the same cropUnitById map the generated rows already
+// use, so a price record's unit can never drift from its crop's own
+// defaultUnit.
+const marketPricesWithDate = marketPrices.map((p) => ({
+  ...p,
+  unit: p.unit ?? cropUnitById[p.cropId],
+  priceDate: today,
+}));
 
 async function seed() {
   await connectDatabase();
@@ -124,14 +209,14 @@ async function seed() {
   }
   console.log(`Seeded ${crops.length} crops.`);
 
-  for (const price of marketPrices) {
+  for (const price of marketPricesWithDate) {
     await MarketPrice.findOneAndUpdate(
       { apmcId: price.apmcId, cropId: price.cropId },
       price,
       { upsert: true }
     );
   }
-  console.log(`Seeded ${marketPrices.length} market price records.`);
+  console.log(`Seeded ${marketPricesWithDate.length} market price records.`);
 
   process.exit(0);
 }

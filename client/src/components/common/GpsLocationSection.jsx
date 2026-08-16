@@ -1,10 +1,34 @@
-import { useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { reverseGeocode } from '../../services/geocodingService';
+import { getVillageSuggestions } from '../../services/geocodingService';
 import { updateUserProfile } from '../../services/usersService';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
+import { useGpsLocation } from '../../hooks/useGpsLocation';
+import {
+  KARNATAKA,
+  KARNATAKA_DISTRICTS,
+  getTaluksForDistrict,
+} from '../../data/karnatakaLocations';
 import BottomSheet from './BottomSheet';
+import LocationSuggestInput from './LocationSuggestInput';
+import './LocationCapture.css';
+
+// Leaflet + react-leaflet is a real chunk of JS a farmer never needs
+// unless they actually tap "Adjust on map" - lazy-loaded so it never
+// costs anything on the common path (GPS fix accepted as-is).
+const LocationPickerMap = lazy(() => import('./LocationPickerMap'));
+
+// Accuracy above this (meters) is flagged as low-confidence in the
+// confirm step - kept in sync with LocationCapture's own threshold.
+const LOW_ACCURACY_THRESHOLD_M = 100;
+
+const ERROR_MESSAGE_KEY = {
+  'permission-denied': 'listings:create.gpsPermissionDenied',
+  timeout: 'listings:create.gpsTimeout',
+  unavailable: 'listings:create.gpsUnavailable',
+  'position-unavailable': 'listings:create.gpsUnavailable',
+};
 
 export default function GpsLocationSection({
   locationParts,
@@ -12,17 +36,39 @@ export default function GpsLocationSection({
   coords,
   onCoordsChange,
 }) {
-  const { t } = useTranslation(['listings']);
+  const { t } = useTranslation(['listings', 'common']);
   const { showToast } = useToast();
   const { user, refreshUser } = useAuth();
+  const {
+    status,
+    errorCode,
+    coords: gpsCoords,
+    address,
+    capture,
+  } = useGpsLocation();
 
-  const [gpsStatus, setGpsStatus] = useState('idle');
   const [locationPermissionOpen, setLocationPermissionOpen] =
     useState(false);
+  // A detected address is held here for the farmer to review, rather
+  // than overwriting Village/Taluk/District/State the moment GPS
+  // resolves - desktop/indoor fixes are often too coarse to trust
+  // silently, and a wrong auto-fill is easy to miss until the listing
+  // is already published.
+  const [addressResolved, setAddressResolved] = useState(false);
+  const [mapOpen, setMapOpen] = useState(false);
+  // Set when the farmer drags the pin on the map to a spot other than
+  // the raw GPS fix - takes over from `gpsCoords`/`address` for
+  // display and confirm, without touching the hook's own state.
+  const [override, setOverride] = useState(null); // { lat, lng, address }
 
   const mountedRef = useRef(true);
+  // Guards against re-running the "fix settled" effect below on every
+  // intermediate accuracy update while watchPosition is still
+  // converging - it should fire exactly once per capture.
+  const settledRef = useRef(false);
 
   useEffect(() => {
+    mountedRef.current = true;
     return () => {
       mountedRef.current = false;
     };
@@ -36,10 +82,7 @@ export default function GpsLocationSection({
     if (!user) return;
 
     try {
-      await updateUserProfile(user.id, {
-        lat,
-        lng,
-      });
+      await updateUserProfile(user.id, { lat, lng });
 
       if (mountedRef.current) {
         await refreshUser();
@@ -50,11 +93,54 @@ export default function GpsLocationSection({
     }
   }
 
+  // Fires once the hook has settled on the fix it's going to use (it
+  // has moved on to geocoding, or finished with no address) - not on
+  // every intermediate position update while still converging on
+  // accuracy.
+  useEffect(() => {
+    if (status !== 'geocoding' && status !== 'done') return;
+    if (!gpsCoords || settledRef.current) return;
+    settledRef.current = true;
+
+    onCoordsChange({
+      lat: gpsCoords.lat,
+      lng: gpsCoords.lng,
+      accuracy: gpsCoords.accuracy,
+    });
+
+    persistLocationToProfile(gpsCoords.lat, gpsCoords.lng);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status, gpsCoords]);
+
+  useEffect(() => {
+    if (status !== 'done') return;
+
+    if (!address) {
+      // GPS worked, but no useful address was found. Coordinates
+      // (persisted above) are still valid.
+      showToast(t('listings:create.gpsGeocodeError'));
+    }
+    // A resolved address is surfaced via the confirm card below
+    // instead of being merged here - see handleConfirmAddress.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status, address]);
+
+  useEffect(() => {
+    if (status !== 'error') return;
+
+    if (import.meta.env.DEV) {
+      console.warn('[GpsLocationSection] GPS failed', { errorCode });
+    }
+
+    showToast(t(ERROR_MESSAGE_KEY[errorCode] || 'listings:create.gpsError'));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status, errorCode]);
+
   /*
    * Open our own permission explanation first.
    */
   function handleUseGpsClick() {
-    if (gpsStatus === 'capturing' || gpsStatus === 'geocoding') {
+    if (status === 'capturing' || status === 'geocoding') {
       return;
     }
 
@@ -66,196 +152,52 @@ export default function GpsLocationSection({
    */
   function handleAllowLocation() {
     setLocationPermissionOpen(false);
-    requestGpsLocation();
+    settledRef.current = false;
+    setAddressResolved(false);
+    setOverride(null);
+    capture();
   }
 
-  /*
-   * Request fresh high-accuracy GPS.
-   */
-  function requestGpsLocation() {
-    if (!navigator.geolocation) {
-      setGpsStatus('error');
+  function handleConfirmAddress() {
+    onLocationPartsChange((prev) => ({
+      village: effectiveAddress.village || prev.village || '',
+      taluk: effectiveAddress.taluk || prev.taluk || '',
+      district: effectiveAddress.district || prev.district || '',
+      state: effectiveAddress.state || prev.state || '',
+    }));
 
-      showToast(
-        t('listings:create.gpsUnavailable')
-      );
-
-      return;
+    if (override) {
+      onCoordsChange({ lat: override.lat, lng: override.lng, accuracy: null });
+      persistLocationToProfile(override.lat, override.lng);
     }
 
-    setGpsStatus('capturing');
-
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        if (!mountedRef.current) return;
-
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
-        const accuracy = position.coords.accuracy;
-
-        /*
-         * Save coordinates immediately.
-         *
-         * Even if reverse geocoding fails, the listing still
-         * has valid GPS coordinates.
-         */
-        onCoordsChange({
-          lat,
-          lng,
-          accuracy,
-        });
-
-        /*
-         * Save GPS position to user profile in the background.
-         */
-        persistLocationToProfile(lat, lng);
-
-        setGpsStatus('geocoding');
-
-        try {
-          const address = await reverseGeocode(
-            lat,
-            lng
-          );
-
-          if (!mountedRef.current) return;
-
-          if (
-            address &&
-            (
-              address.village ||
-              address.taluk ||
-              address.district ||
-              address.state
-            )
-          ) {
-            /*
-             * Merge the detected address with the
-             * existing manually entered values.
-             */
-            onLocationPartsChange((prev) => ({
-              village:
-                address.village ||
-                prev.village ||
-                '',
-
-              taluk:
-                address.taluk ||
-                prev.taluk ||
-                '',
-
-              district:
-                address.district ||
-                prev.district ||
-                '',
-
-              state:
-                address.state ||
-                prev.state ||
-                '',
-            }));
-
-            setGpsStatus('captured');
-
-            showToast(
-              t('listings:create.gpsCaptured')
-            );
-          } else {
-            /*
-             * GPS worked, but no useful address was found.
-             * Keep the coordinates.
-             */
-            setGpsStatus('captured');
-
-            showToast(
-              t(
-                'listings:create.gpsGeocodeError'
-              )
-            );
-          }
-        } catch {
-          if (!mountedRef.current) return;
-
-          /*
-           * Coordinates are still valid even though
-           * reverse geocoding failed.
-           */
-          setGpsStatus('captured');
-
-          showToast(
-            t(
-              'listings:create.gpsGeocodeError'
-            )
-          );
-        }
-      },
-
-      (error) => {
-        if (!mountedRef.current) return;
-
-        if (import.meta.env.DEV) {
-          console.warn(
-            '[GpsLocationSection] GPS failed',
-            {
-              code: error.code,
-              message: error.message,
-            }
-          );
-        }
-
-        setGpsStatus('error');
-
-        /*
-         * Different browser GPS error codes:
-         *
-         * 1 = permission denied
-         * 2 = position unavailable
-         * 3 = timeout
-         */
-        if (error.code === 1) {
-          showToast(
-            t(
-              'listings:create.gpsPermissionDenied'
-            )
-          );
-        } else if (error.code === 3) {
-          showToast(
-            t(
-              'listings:create.gpsTimeout'
-            )
-          );
-        } else {
-          showToast(
-            t(
-              'listings:create.gpsError'
-            )
-          );
-        }
-      },
-
-      {
-        /*
-         * Request actual device GPS instead of
-         * coarse IP/WiFi location when possible.
-         */
-        enableHighAccuracy: true,
-
-        /*
-         * Never use an old cached position.
-         */
-        maximumAge: 0,
-
-        /*
-         * Don't keep the farmer waiting forever.
-         */
-        timeout: 15000,
-      }
-    );
+    setAddressResolved(true);
+    showToast(t('listings:create.gpsCaptured'));
   }
 
-  const isGpsBusy =
-    gpsStatus === 'capturing' ||
-    gpsStatus === 'geocoding';
+  function handleRetryAddress() {
+    settledRef.current = false;
+    setAddressResolved(false);
+    setOverride(null);
+    capture();
+  }
+
+  function handleDismissAddress() {
+    setOverride(null);
+    setAddressResolved(true);
+  }
+
+  function handleMapConfirm({ lat, lng, address: mapAddress }) {
+    setOverride({ lat, lng, address: mapAddress || {} });
+    setMapOpen(false);
+  }
+
+  const isGpsBusy = status === 'capturing' || status === 'geocoding';
+  const confirmingAddress = status === 'done' && !!address && !addressResolved;
+  const effectiveCoords = override
+    ? { lat: override.lat, lng: override.lng, accuracy: null }
+    : gpsCoords;
+  const effectiveAddress = override ? override.address : address;
 
   return (
     <>
@@ -267,40 +209,63 @@ export default function GpsLocationSection({
           )}
         </div>
 
-        {[
-          'village',
-          'taluk',
-          'district',
-          'state',
-        ].map((field) => (
-          <div
-            className="cl-loc-row"
-            key={field}
-          >
-            <label>
-              {t(
-                `listings:create.${field}`
-              )}
-            </label>
+        <div className="cl-loc-row">
+          <label>{t('listings:create.village')}</label>
 
-            <input
-              type="text"
-              value={
-                locationParts?.[field] || ''
-              }
-              onChange={(e) =>
-                onLocationPartsChange(
-                  (prev) => ({
-                    ...prev,
-                    [field]:
-                      e.target.value,
-                  })
-                )
-              }
-              placeholder="—"
-            />
-          </div>
-        ))}
+          <LocationSuggestInput
+            value={locationParts?.village}
+            fetchOptions={() =>
+              getVillageSuggestions({
+                taluk: locationParts?.taluk,
+                district: locationParts?.district,
+                state: locationParts?.state || KARNATAKA,
+              })
+            }
+            placeholder="—"
+            label={t('listings:create.village')}
+            onChange={(newValue) =>
+              onLocationPartsChange((prev) => ({
+                ...prev,
+                village: newValue,
+              }))
+            }
+          />
+        </div>
+
+        {[
+          {
+            field: 'taluk',
+            options: getTaluksForDistrict(locationParts?.district),
+          },
+          { field: 'district', options: KARNATAKA_DISTRICTS },
+          { field: 'state', options: [KARNATAKA] },
+        ].map(({ field, options }) => {
+          const fieldLabel = t(`listings:create.${field}`);
+
+          return (
+            <div
+              className="cl-loc-row"
+              key={field}
+            >
+              <label>{fieldLabel}</label>
+
+              <LocationSuggestInput
+                value={locationParts?.[field]}
+                options={options}
+                placeholder="—"
+                label={fieldLabel}
+                onChange={(newValue) =>
+                  onLocationPartsChange(
+                    (prev) => ({
+                      ...prev,
+                      [field]: newValue,
+                    })
+                  )
+                }
+              />
+            </div>
+          );
+        })}
 
         <button
           type="button"
@@ -318,7 +283,7 @@ export default function GpsLocationSection({
               )}
         </button>
 
-        {gpsStatus === 'capturing' && (
+        {status === 'capturing' && (
           <div className="cl-gps-status">
             {t(
               'listings:create.gpsCapturing'
@@ -326,7 +291,7 @@ export default function GpsLocationSection({
           </div>
         )}
 
-        {gpsStatus === 'geocoding' && (
+        {status === 'geocoding' && (
           <div className="cl-gps-status">
             {t(
               'listings:create.gpsGeocoding'
@@ -334,7 +299,7 @@ export default function GpsLocationSection({
           </div>
         )}
 
-        {gpsStatus === 'captured' && (
+        {status === 'done' && (address ? addressResolved : true) && (
           <div className="cl-gps-status">
             ✓{' '}
             {t(
@@ -354,12 +319,91 @@ export default function GpsLocationSection({
           </div>
         )}
 
-        {gpsStatus === 'error' && (
+        {status === 'error' && (
           <div className="cl-gps-status cl-gps-error">
-            {t(
-              'listings:create.gpsError'
-            )}
+            {t(ERROR_MESSAGE_KEY[errorCode] || 'listings:create.gpsError')}
           </div>
+        )}
+
+        {confirmingAddress && (
+          <div className="loc-confirm-card">
+            <div className="loc-confirm-title">
+              {t('common:confirmDetectedTitle')}
+            </div>
+
+            <div className="loc-confirm-address">
+              {[
+                effectiveAddress.village,
+                effectiveAddress.taluk,
+                effectiveAddress.district,
+                effectiveAddress.state,
+              ]
+                .filter(Boolean)
+                .join(', ') || t('common:noAddressAtPin')}
+            </div>
+
+            {effectiveCoords?.accuracy != null && (
+              <div
+                className={`loc-confirm-accuracy${
+                  effectiveCoords.accuracy > LOW_ACCURACY_THRESHOLD_M ? ' low' : ''
+                }`}
+              >
+                {effectiveCoords.accuracy > LOW_ACCURACY_THRESHOLD_M
+                  ? t('common:gpsLowAccuracy', {
+                      accuracy: Math.round(effectiveCoords.accuracy),
+                    })
+                  : t('common:gpsAccuracy', {
+                      accuracy: Math.round(effectiveCoords.accuracy),
+                    })}
+              </div>
+            )}
+
+            <div className="loc-confirm-actions">
+              <button
+                type="button"
+                className="loc-confirm-btn-primary"
+                onClick={handleConfirmAddress}
+              >
+                {t('common:confirmLocation')}
+              </button>
+
+              <button
+                type="button"
+                className="loc-confirm-btn-secondary"
+                onClick={() => setMapOpen(true)}
+              >
+                {t('common:adjustOnMap')}
+              </button>
+
+              <button
+                type="button"
+                className="loc-confirm-btn-secondary"
+                onClick={handleRetryAddress}
+              >
+                {t('common:retryGps')}
+              </button>
+
+              <button
+                type="button"
+                className="loc-confirm-btn-text"
+                onClick={handleDismissAddress}
+              >
+                {t('common:enterManually')}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {mapOpen && (
+          <Suspense fallback={null}>
+            <LocationPickerMap
+              initialLat={effectiveCoords.lat}
+              initialLng={effectiveCoords.lng}
+              initialAccuracy={effectiveCoords.accuracy}
+              onConfirm={handleMapConfirm}
+              onCancel={() => setMapOpen(false)}
+            />
+          </Suspense>
         )}
       </div>
 

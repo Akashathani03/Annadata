@@ -1,0 +1,82 @@
+.loc-map-picker {
+  position: fixed;
+  inset: 0;
+  z-index: 480;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+}
+
+.loc-map-picker-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.loc-map-picker-close {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: none;
+  font-size: 16px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.loc-map-picker-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.loc-map-picker-map {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.loc-map-picker-pin {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -100%);
+  font-size: 34px;
+  line-height: 1;
+  pointer-events: none;
+  filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.35));
+  z-index: 400;
+}
+
+.loc-map-picker-recenter {
+  position: absolute;
+  right: 12px;
+  bottom: 16px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  font-size: 16px;
+  cursor: pointer;
+  z-index: 400;
+}
+
+.loc-map-picker-footer {
+  flex-shrink: 0;
+  padding: 12px 14px 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.loc-map-picker-address {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  min-height: 18px;
+}

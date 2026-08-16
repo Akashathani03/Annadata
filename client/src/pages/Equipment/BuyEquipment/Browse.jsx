@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { getBrowseEquipment } from '../../../services/buyEquipmentService';
 import { resolveImageUrl } from '../../../utils/resolveImageUrl';
 import { formatRelativeTime } from '../../../utils/formatDate';
+import { formatDistanceKm } from '../../../utils/geo';
 import {
   getBuyerLocation,
   updateBuyerLocation,
@@ -247,9 +248,8 @@ export default function Browse() {
   /* ---------------- WHATSAPP ---------------- */
 
   function getWhatsAppUrl(listing) {
-    const phone = String(
-      listing.phone || '9876543210'
-    ).replace(/\D/g, '');
+    const phone = String(listing.phone || '').replace(/\D/g, '');
+    if (!phone) return null;
 
     const message = encodeURIComponent(
       `Hello, I found your ${listing.itemName} listing on Annadata. Is it still available?`
@@ -383,10 +383,10 @@ export default function Browse() {
               <div className="bc-crop-top">
 
                 <div className="bc-crop-thumb">
-                  {listing.photoUrl ? (
+                  {listing.photoUrls?.[0] ? (
                     <img
                       src={resolveImageUrl(
-                        listing.photoUrl
+                        listing.photoUrls[0]
                       )}
                       alt=""
                     />
@@ -410,7 +410,7 @@ export default function Browse() {
                     📍 {listing.location || '—'}
 
                     {listing.distanceKm != null &&
-                      ` · ${listing.distanceKm.toFixed(1)} km away`}
+                      ` · ${formatDistanceKm(listing.distanceKm)} km away`}
                   </span>
 
                   {listing.condition && (
@@ -487,22 +487,32 @@ export default function Browse() {
                 </button>
 
 
-                <a
-                  className="btn-call"
-                  href={`tel:${listing.phone || '9876543210'}`}
-                >
-                  {t('call')}
-                </a>
+                {listing.phone ? (
+                  <>
+                    <a className="btn-call" href={`tel:${listing.phone}`}>
+                      {t('call')}
+                    </a>
 
+                    <a
+                      className="btn-whatsapp"
+                      href={getWhatsAppUrl(listing)}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {t('chat')}
+                    </a>
+                  </>
+                ) : (
+                  <>
+                    <button type="button" className="btn-call" disabled>
+                      {t('call')}
+                    </button>
 
-                <a
-                  className="btn-whatsapp"
-                  href={getWhatsAppUrl(listing)}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {t('chat')}
-                </a>
+                    <button type="button" className="btn-whatsapp" disabled>
+                      {t('chat')}
+                    </button>
+                  </>
+                )}
 
               </div>
 

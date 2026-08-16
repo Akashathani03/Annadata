@@ -1,0 +1,29 @@
+.photo-gallery-scroll {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.photo-gallery-scroll img {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  scroll-snap-align: start;
+}
+
+.photo-gallery-count {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  background: rgba(31, 43, 35, 0.65);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 20px;
+  z-index: 1;
+}

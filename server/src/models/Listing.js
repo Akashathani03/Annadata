@@ -22,19 +22,46 @@ const listingSchema = new mongoose.Schema(
 
     // References the Crop collection (Step 7) - same collection for
     // both categories, distinguished by that document's own category
-    // field, not a separate Animal model.
-    itemId: { type: String, ref: 'Crop', required: true },
+    // field, not a separate Animal model. Nullable: a farmer selling a
+    // crop that isn't in the catalog (a local/uncommon variety) types
+    // its name directly instead - itemName is the field that's always
+    // required and always trustworthy; itemId is only present when the
+    // listing is actually catalog-backed (which is also what gates
+    // whether a market-price lookup is even possible for it).
+    itemId: { type: String, ref: 'Crop', default: null },
     // Denormalized snapshot of the item's display name at listing
     // time, per the approved decision - matches the frontend's own
     // existing pattern (itemName passed explicitly by the caller, not
-    // derived fresh on every read).
+    // derived fresh on every read). For a non-catalog crop, this is
+    // the farmer's own typed name and the only record of it.
     itemName: { type: String, required: true },
 
     quantity: { type: Number, required: true, min: 0 },
     unit: { type: String, enum: ['Kg', 'Quintal', 'Ton', 'Bag', 'Head', 'Unit'], required: true },
-    price: { type: Number, required: true, min: 0 },
-    description: { type: String, default: '' },
-    photoUrl: { type: String, default: '' },
+    // max is a typo guard, not a business rule - large but real sales
+    // (a tractor, a premium bull, a big harvest) still fit well under
+    // it; an extra accidental zero doesn't (flagged in both the Sell
+    // Crop and Sell Animal audits). Custom message so a rejection
+    // reads like guidance, not a stack trace - see
+    // errorHandler.middleware.js for how this reaches the client.
+    price: {
+      type: Number,
+      required: true,
+      min: 0,
+      max: [10000000, 'Price seems too high - please check the number and try again.'],
+    },
+    description: {
+      type: String,
+      default: '',
+      maxlength: [200, 'Description must be 200 characters or less.'],
+    },
+    // Up to 4 photos, farmer's own order (first is the primary
+    // thumbnail everywhere a listing is shown as a single image - Buy
+    // Browse cards, MyListings, Dashboard). Multiple angles are a real
+    // trust signal for a marketplace where farmers are the sellers -
+    // a single stock-looking photo is a known pattern in low-trust
+    // listings, especially for livestock.
+    photoUrls: { type: [String], default: [] },
 
     // Equipment-only - null for crop/animal listings. Deliberately a
     // constrained enum, not free text, since "new/used" is a small,

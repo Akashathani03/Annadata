@@ -1,25 +1,3 @@
-.mp-page {
-  max-width: 480px;
-  margin: 0 auto;
-  padding: 16px;
-}
-
-.mp-header {
-  margin-bottom: 16px;
-}
-
-.mp-title {
-  font-size: 20px;
-  margin: 0 0 4px;
-  color: var(--text);
-}
-
-.mp-subtitle {
-  color: var(--muted);
-  font-size: 13px;
-  margin: 0;
-}
-
 .mp-apmc-list {
   display: flex;
   flex-direction: column;

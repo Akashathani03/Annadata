@@ -89,7 +89,7 @@ export async function getSeller(req, res, next) {
 
 export async function postListing(req, res, next) {
   try {
-    const listing = await listingsService.createListing(req.user.id, req.body, req.file);
+    const listing = await listingsService.createListing(req.user.id, req.body, req.files);
     sendSuccess(res, { listing }, 201);
   } catch (err) {
     next(err);

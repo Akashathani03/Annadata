@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { getBrowseCrops } from '../../../services/buyCropsService';
 import { resolveImageUrl } from '../../../utils/resolveImageUrl';
 import { formatRelativeTime } from '../../../utils/formatDate';
+import { formatDistanceKm } from '../../../utils/geo';
 import {
   getBuyerLocation,
   updateBuyerLocation,
@@ -528,10 +529,10 @@ export default function Browse() {
             >
               <div className="bc-crop-top">
                 <div className="bc-crop-thumb">
-                  {listing.photoUrl ? (
+                  {listing.photoUrls?.[0] ? (
                     <img
                       src={resolveImageUrl(
-                        listing.photoUrl
+                        listing.photoUrls[0]
                       )}
                       alt=""
                     />
@@ -566,9 +567,7 @@ export default function Browse() {
                     {listing.location || '—'}
 
                     {listing.distanceKm != null &&
-                      ` · ${Number(
-                        listing.distanceKm
-                      ).toFixed(1)} km away`}
+                      ` · ${formatDistanceKm(listing.distanceKm)} km away`}
                   </span>
                 </div>
 

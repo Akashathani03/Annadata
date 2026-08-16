@@ -6,6 +6,7 @@ import { resolveImageUrl } from '../../../utils/resolveImageUrl';
 import { getBuyerLocation } from '../../../services/buyerLocationService';
 import { useAuth } from '../../../context/AuthContext';
 import { useUserLocation } from '../../../context/LocationContext';
+import { formatDistanceKm } from '../../../utils/geo';
 import { shopProductCategories, getShopCatalogByCategory } from '../../../config/shopProductCatalog';
 import AppShell from '../../../components/common/AppShell';
 import SearchInput from '../../../components/common/SearchInput';
@@ -16,7 +17,7 @@ export default function Browse() {
   const navigate = useNavigate();
   const { t } = useTranslation(['shops']);
   const { user } = useAuth();
-  const { liveLocation } = useUserLocation();
+  const { liveLocation, geocodedLocation } = useUserLocation();
 
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('seeds');
@@ -39,7 +40,7 @@ export default function Browse() {
 
   useEffect(() => {
     let cancelled = false;
-    getBuyerLocation({ authenticatedUser: user, liveLocation }).then((loc) =>
+    getBuyerLocation({ authenticatedUser: user, liveLocation, geocodedLocation }).then((loc) =>
       getNearbyShops({ query, buyerLat: loc.lat, buyerLng: loc.lng }).then((result) => {
         if (cancelled) return;
         setShops(result);
@@ -49,7 +50,7 @@ export default function Browse() {
     return () => {
       cancelled = true;
     };
-  }, [query, user, liveLocation]);
+  }, [query, user, liveLocation, geocodedLocation]);
 
   useEffect(() => {
     let cancelled = false;
@@ -125,7 +126,7 @@ export default function Browse() {
               <div className="shop-card-info">
                 <b>{shop.shopName}</b>
                 <span>📍 {shop.location}</span>
-                {shop.distanceKm != null && <span>{t('shops:nearShop.distanceAway', { km: shop.distanceKm.toFixed(1) })}</span>}
+                {shop.distanceKm != null && <span>{t('shops:nearShop.distanceAway', { km: formatDistanceKm(shop.distanceKm) })}</span>}
                 {itemPrices[shop.id] != null && <span className="shop-item-price">₹{itemPrices[shop.id]}</span>}
               </div>
               <div className="shop-card-actions">

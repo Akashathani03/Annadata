@@ -1,108 +1,97 @@
-import { useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { reverseGeocode } from '../../services/geocodingService';
+import { getVillageSuggestions } from '../../services/geocodingService';
+import { useGpsLocation } from '../../hooks/useGpsLocation';
 import { IconCurrentLocation } from '../icons';
+import LocationSuggestInput from './LocationSuggestInput';
+import {
+  KARNATAKA,
+  KARNATAKA_DISTRICTS,
+  getTaluksForDistrict,
+} from '../../data/karnatakaLocations';
 import './LocationCapture.css';
+
+// Leaflet + react-leaflet is a real chunk of JS a farmer never needs
+// unless they actually tap "Adjust on map" - lazy-loaded so it never
+// costs anything on the common path (GPS fix accepted as-is).
+const LocationPickerMap = lazy(() => import('./LocationPickerMap'));
 
 // Accuracy above this (meters) is flagged as low-confidence - common
 // when GPS falls back to WiFi/IP-based positioning indoors.
 const LOW_ACCURACY_THRESHOLD_M = 100;
 
+const ERROR_MESSAGE_KEY = {
+  'permission-denied': 'common:gpsPermissionDenied',
+  timeout: 'common:gpsTimeout',
+  unavailable: 'common:gpsUnavailable',
+  'position-unavailable': 'common:gpsUnavailable',
+};
+
 export default function LocationCapture({ value, onChange }) {
   const { t } = useTranslation(['common']);
-  const [status, setStatus] = useState('idle'); // idle | capturing | geocoding | confirming | error
-  const [pending, setPending] = useState(null); // { village, taluk, district, state, lat, lng, accuracy }
+  const { status, errorCode, coords, address, capture, reset } = useGpsLocation();
+  const [mapOpen, setMapOpen] = useState(false);
+  // Set when the farmer drags the pin on the map to a spot other than
+  // the raw GPS fix - takes over from `coords`/`address` for display
+  // and confirm, without touching the hook's own state.
+  const [override, setOverride] = useState(null); // { lat, lng, address }
+
+  // A 'done' status with no resolved address means GPS succeeded but
+  // reverse geocoding didn't - there's nothing useful to confirm, so
+  // fall straight through to manual entry instead of an empty card.
+  const confirming = status === 'done' && !!address;
+  const effectiveCoords = override
+    ? { lat: override.lat, lng: override.lng, accuracy: null }
+    : coords;
+  const effectiveAddress = override ? override.address : address;
+
+  useEffect(() => {
+    if (status === 'done' && !address) reset();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status, address]);
+
+  function handleConfirm() {
+    onChange({
+      ...value,
+      village: effectiveAddress.village || value.village,
+      taluk: effectiveAddress.taluk || value.taluk,
+      district: effectiveAddress.district || value.district,
+      state: effectiveAddress.state || value.state,
+      lat: effectiveCoords.lat,
+      lng: effectiveCoords.lng,
+    });
+
+    setOverride(null);
+    reset();
+  }
+
+  function handleRetry() {
+    setOverride(null);
+    capture();
+  }
+
+  function handleEnterManually() {
+    setOverride(null);
+    reset();
+  }
+
+  function handleMapConfirm({ lat, lng, address: mapAddress }) {
+    setOverride({ lat, lng, address: mapAddress || {} });
+    setMapOpen(false);
+  }
 
   function setField(field, fieldValue) {
     onChange({ ...value, [field]: fieldValue });
   }
 
-  function handleUseGps() {
-    if (!navigator.geolocation) {
-      setStatus('error');
-      return;
-    }
-
-    setStatus('capturing');
-
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
-        const accuracy = pos.coords.accuracy;
-
-        setStatus('geocoding');
-
-        try {
-          const address = await reverseGeocode(lat, lng);
-
-          if (
-            address &&
-            (address.village ||
-              address.taluk ||
-              address.district ||
-              address.state)
-          ) {
-            setPending({
-              ...address,
-              lat,
-              lng,
-              accuracy,
-            });
-
-            setStatus('confirming');
-          } else {
-            // Coordinates were captured successfully, but no useful
-            // address could be resolved.
-            setStatus('error');
-          }
-        } catch {
-          // Network/API/geocoding failure.
-          // Make sure the farmer is not stuck in the "geocoding" state.
-          setStatus('error');
-        }
-      },
-      () => setStatus('error'),
-      {
-        enableHighAccuracy: true,
-        maximumAge: 0,
-        timeout: 15000,
-      }
-    );
-  }
-
-  function handleConfirm() {
-    onChange({
-      ...value,
-      village: pending.village || value.village,
-      taluk: pending.taluk || value.taluk,
-      district: pending.district || value.district,
-      state: pending.state || value.state,
-      lat: pending.lat,
-      lng: pending.lng,
-    });
-
-    setPending(null);
-    setStatus('idle');
-  }
-
-  function handleRetry() {
-    setPending(null);
-    handleUseGps();
-  }
-
-  function handleEnterManually() {
-    setPending(null);
-    setStatus('idle');
-  }
-
   return (
     <div className="loc-capture">
-      {status !== 'confirming' && (
+      {!confirming && (
         <button
           type="button"
           className="loc-capture-gps-btn"
-          onClick={handleUseGps}
+          onClick={capture}
+          disabled={status === 'capturing' || status === 'geocoding'}
         >
           <IconCurrentLocation size={16} strokeWidth={2} />
           {t('common:useCurrentLocation')}
@@ -112,10 +101,11 @@ export default function LocationCapture({ value, onChange }) {
       <div className="loc-capture-status">
         {status === 'capturing' && t('common:gpsCapturing')}
         {status === 'geocoding' && t('common:gpsGeocoding')}
-        {status === 'error' && t('common:gpsError')}
+        {status === 'error' &&
+          t(ERROR_MESSAGE_KEY[errorCode] || 'common:gpsError')}
       </div>
 
-      {status === 'confirming' && pending && (
+      {confirming && (
         <div className="loc-confirm-card">
           <div className="loc-confirm-title">
             {t('common:confirmDetectedTitle')}
@@ -123,27 +113,27 @@ export default function LocationCapture({ value, onChange }) {
 
           <div className="loc-confirm-address">
             {[
-              pending.village,
-              pending.taluk,
-              pending.district,
-              pending.state,
+              effectiveAddress.village,
+              effectiveAddress.taluk,
+              effectiveAddress.district,
+              effectiveAddress.state,
             ]
               .filter(Boolean)
-              .join(', ')}
+              .join(', ') || t('common:noAddressAtPin')}
           </div>
 
-          {pending.accuracy != null && (
+          {effectiveCoords?.accuracy != null && (
             <div
               className={`loc-confirm-accuracy${
-                pending.accuracy > LOW_ACCURACY_THRESHOLD_M ? ' low' : ''
+                effectiveCoords.accuracy > LOW_ACCURACY_THRESHOLD_M ? ' low' : ''
               }`}
             >
-              {pending.accuracy > LOW_ACCURACY_THRESHOLD_M
+              {effectiveCoords.accuracy > LOW_ACCURACY_THRESHOLD_M
                 ? t('common:gpsLowAccuracy', {
-                    accuracy: Math.round(pending.accuracy),
+                    accuracy: Math.round(effectiveCoords.accuracy),
                   })
                 : t('common:gpsAccuracy', {
-                    accuracy: Math.round(pending.accuracy),
+                    accuracy: Math.round(effectiveCoords.accuracy),
                   })}
             </div>
           )}
@@ -155,6 +145,14 @@ export default function LocationCapture({ value, onChange }) {
               onClick={handleConfirm}
             >
               {t('common:confirmLocation')}
+            </button>
+
+            <button
+              type="button"
+              className="loc-confirm-btn-secondary"
+              onClick={() => setMapOpen(true)}
+            >
+              {t('common:adjustOnMap')}
             </button>
 
             <button
@@ -176,39 +174,65 @@ export default function LocationCapture({ value, onChange }) {
         </div>
       )}
 
+      {mapOpen && (
+        <Suspense fallback={null}>
+          <LocationPickerMap
+            initialLat={effectiveCoords.lat}
+            initialLng={effectiveCoords.lng}
+            initialAccuracy={effectiveCoords.accuracy}
+            onConfirm={handleMapConfirm}
+            onCancel={() => setMapOpen(false)}
+          />
+        </Suspense>
+      )}
+
       <div className="loc-capture-field">
         <label>{t('common:village')}</label>
-        <input
-          value={value.village || ''}
-          onChange={(e) => setField('village', e.target.value)}
+        <LocationSuggestInput
+          value={value.village}
+          fetchOptions={() =>
+            getVillageSuggestions({
+              taluk: value.taluk,
+              district: value.district,
+              state: value.state || KARNATAKA,
+            })
+          }
+          onChange={(v) => setField('village', v)}
           placeholder="e.g. Keragodu"
+          label={t('common:village')}
         />
       </div>
 
       <div className="loc-capture-field">
         <label>{t('common:taluk')}</label>
-        <input
-          value={value.taluk || ''}
-          onChange={(e) => setField('taluk', e.target.value)}
+        <LocationSuggestInput
+          value={value.taluk}
+          options={getTaluksForDistrict(value.district)}
+          onChange={(v) => setField('taluk', v)}
           placeholder="e.g. Mandya"
+          label={t('common:taluk')}
         />
       </div>
 
       <div className="loc-capture-field">
         <label>{t('common:district')}</label>
-        <input
-          value={value.district || ''}
-          onChange={(e) => setField('district', e.target.value)}
+        <LocationSuggestInput
+          value={value.district}
+          options={KARNATAKA_DISTRICTS}
+          onChange={(v) => setField('district', v)}
           placeholder="e.g. Mandya"
+          label={t('common:district')}
         />
       </div>
 
       <div className="loc-capture-field">
         <label>{t('common:state')}</label>
-        <input
-          value={value.state || ''}
-          onChange={(e) => setField('state', e.target.value)}
+        <LocationSuggestInput
+          value={value.state || KARNATAKA}
+          options={[KARNATAKA]}
+          onChange={(v) => setField('state', v)}
           placeholder="e.g. Karnataka"
+          label={t('common:state')}
         />
       </div>
     </div>

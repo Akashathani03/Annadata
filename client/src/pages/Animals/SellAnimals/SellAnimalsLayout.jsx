@@ -1,10 +1,11 @@
 import { useEffect } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import AppShell from '../../../components/common/AppShell';
 import { useAuth } from '../../../context/AuthContext';
 import {
+  IconHome,
   IconListings,
   IconAdd,
 } from '../../../components/icons';
@@ -18,6 +19,7 @@ import {
 // 4. Redirects unauthenticated users back to Home after opening login.
 export default function SellAnimalsLayout() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const { t } = useTranslation([
     'common',
@@ -46,7 +48,15 @@ export default function SellAnimalsLayout() {
     openLoginModal,
   ]);
 
+  const activeSegment = location.pathname.split('/')[2] ?? 'dashboard';
+
   const navItems = [
+    {
+      key: 'dashboard',
+      icon: IconHome,
+      label: t('common:dashboard'),
+      route: '/sell-animal/dashboard',
+    },
     {
       key: 'create',
       icon: IconAdd,
@@ -70,6 +80,7 @@ export default function SellAnimalsLayout() {
       title={t('common:home')}
       onBack={() => navigate('/')}
       navItems={navItems}
+      activeNavKey={activeSegment}
     >
       <Outlet />
     </AppShell>

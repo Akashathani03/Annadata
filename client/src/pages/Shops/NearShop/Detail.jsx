@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { getShopDetail } from '../../../services/nearShopService';
 import { resolveImageUrl } from '../../../utils/resolveImageUrl';
 import { getBuyerLocation } from '../../../services/buyerLocationService';
+import { formatDistanceKm } from '../../../utils/geo';
 import { shopProductCategories } from '../../../config/shopProductCatalog';
 import { useAuth } from '../../../context/AuthContext';
 import { useUserLocation } from '../../../context/LocationContext';
@@ -17,13 +18,13 @@ export default function Detail() {
   const navigate = useNavigate();
   const { t } = useTranslation(['shops', 'common']);
   const { user } = useAuth();
-  const { liveLocation } = useUserLocation();
+  const { liveLocation, geocodedLocation } = useUserLocation();
   const [shop, setShop] = useState(undefined);
   const [activeCategory, setActiveCategory] = useState('seeds');
 
   useEffect(() => {
     let cancelled = false;
-    getBuyerLocation({ authenticatedUser: user, liveLocation }).then((loc) =>
+    getBuyerLocation({ authenticatedUser: user, liveLocation, geocodedLocation }).then((loc) =>
       getShopDetail(id, { buyerLat: loc.lat, buyerLng: loc.lng }).then((result) => {
         if (!cancelled) setShop(result);
       })
@@ -31,7 +32,7 @@ export default function Detail() {
     return () => {
       cancelled = true;
     };
-  }, [id, user, liveLocation]);
+  }, [id, user, liveLocation, geocodedLocation]);
 
   if (shop === undefined) {
     return (
@@ -82,7 +83,7 @@ export default function Detail() {
       <div className="shop-stats-row">
         <div className="shop-stat">
           <div className="si">📍</div>
-          <b>{shop.distanceKm != null ? `${shop.distanceKm.toFixed(1)} km` : '—'}</b>
+          <b>{shop.distanceKm != null ? `${formatDistanceKm(shop.distanceKm)} km` : '—'}</b>
           <span>{t('shops:detail.distance')}</span>
         </div>
         <div className="shop-stat">

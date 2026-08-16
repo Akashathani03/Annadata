@@ -3,16 +3,18 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import { getEquipmentListingDetail } from '../../../services/buyEquipmentService';
-import { resolveImageUrl } from '../../../utils/resolveImageUrl';
 import { formatRelativeTime } from '../../../utils/formatDate';
+import { formatDistanceKm } from '../../../utils/geo';
 import { getBuyerLocation } from '../../../services/buyerLocationService';
 
 import { useAuth } from '../../../context/AuthContext';
+import { useUserLocation } from '../../../context/LocationContext';
 
 import AppShell from '../../../components/common/AppShell';
 import SellerInfoCard from '../../../components/common/SellerInfoCard';
 import ContactButtons from '../../../components/common/ContactButtons';
 import ShareListing from '../../../components/common/ShareListing';
+import PhotoGallery from '../../../components/common/PhotoGallery';
 
 import '../../Crops/BuyCrops/BuyCrops.css';
 
@@ -28,6 +30,7 @@ export default function Detail() {
   ]);
 
   const { user } = useAuth();
+  const { liveLocation, geocodedLocation } = useUserLocation();
 
   const [listing, setListing] = useState(undefined);
 
@@ -41,6 +44,8 @@ export default function Detail() {
       try {
         const location = await getBuyerLocation({
           authenticatedUser: user,
+          liveLocation,
+          geocodedLocation,
         });
 
         const result = await getEquipmentListingDetail(id, {
@@ -70,7 +75,7 @@ export default function Detail() {
     return () => {
       cancelled = true;
     };
-  }, [id, user]);
+  }, [id, user, liveLocation, geocodedLocation]);
 
 
   /* ---------------- LOADING ---------------- */
@@ -177,18 +182,11 @@ export default function Detail() {
     >
 
       {/* Hero Image */}
-      <div className="bc-detail-hero">
-        {listing.photoUrl ? (
-          <img
-            src={resolveImageUrl(listing.photoUrl)}
-            alt={listing.itemName || 'Equipment'}
-          />
-        ) : (
-          <span>
-            {listing.equipmentIcon || '🚜'}
-          </span>
-        )}
-      </div>
+      <PhotoGallery
+        photoUrls={listing.photoUrls}
+        className="bc-detail-hero"
+        fallback={<span>{listing.equipmentIcon || '🚜'}</span>}
+      />
 
 
       {/* Title */}
@@ -330,7 +328,7 @@ export default function Detail() {
 
           <span>
             {listing.distanceKm != null
-              ? `${listing.distanceKm.toFixed(1)} km away`
+              ? `${formatDistanceKm(listing.distanceKm)} km away`
               : '—'}
           </span>
         </div>

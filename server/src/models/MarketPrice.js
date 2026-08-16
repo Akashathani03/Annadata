@@ -9,6 +9,13 @@ const marketPriceSchema = new mongoose.Schema(
   {
     apmcId: { type: String, ref: 'ApmcMarket', required: true, index: true },
     cropId: { type: String, ref: 'Crop', required: true, index: true },
+    // Which unit minPrice/modalPrice/maxPrice are quoted in - a crop's
+    // real-world quoted unit (Kg for vegetables, Quintal for grains)
+    // isn't uniform, and nothing can safely display or convert this
+    // record without knowing it explicitly. Defaults to 'Kg' only to
+    // keep this migration non-breaking for any pre-existing record;
+    // every record this app actually seeds sets it explicitly.
+    unit: { type: String, enum: ['Kg', 'Quintal', 'Ton'], required: true, default: 'Kg' },
     minPrice: { type: Number, required: true },
     modalPrice: { type: Number, required: true },
     maxPrice: { type: Number, required: true },

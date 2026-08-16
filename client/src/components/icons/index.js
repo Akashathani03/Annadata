@@ -47,4 +47,11 @@ export {
   SprayCan as IconSprayCan,
   RefreshCw as IconRefresh,
   Share2 as IconShare,
+  Mail as IconMail,
 } from 'lucide-react';
+
+// lucide-react dropped brand/trademarked logos (Instagram, Facebook,
+// YouTube, etc. all removed) - re-exported from a small hand-authored
+// set instead, so callers still only ever import icons from this one
+// file.
+export { IconInstagram, IconFacebook, IconYoutube } from './brandIcons';

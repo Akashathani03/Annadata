@@ -51,24 +51,29 @@ export async function getListingSeller(id) {
   return seller;
 }
 
-// A photoUrl that's already a real URL (editing an existing listing)
-// is sent through as a plain field, never re-uploaded. Only a fresh
-// data URL (captured by PhotoUpload's FileReader) gets converted to a
-// real file upload - same pattern as shopsService.saveShop.
+// Each entry in photoUrls that's already a real URL (editing an
+// existing listing) is sent through as-is, never re-uploaded. Fresh
+// data URLs (captured by MultiPhotoUpload's FileReader, one per
+// photo) get converted to real file uploads - same dual-shape
+// convention as before, just applied per-item across up to 4 photos
+// instead of once. A new listing's photos are always all-fresh
+// captures (there's nothing existing yet to edit), so this only ever
+// needs to actually branch on the update path.
 async function buildListingRequestBody(payload) {
-  const { ownerId, ownerType, photoUrl, ...rest } = payload;
-  const isNewPhoto = typeof photoUrl === 'string' && photoUrl.startsWith('data:');
+  const { ownerId, ownerType, photoUrls, ...rest } = payload;
+  const urls = photoUrls || [];
+  const newPhotos = urls.filter((url) => url.startsWith('data:'));
 
-  if (!isNewPhoto) {
-    return { isFormData: false, body: { ...rest, photoUrl } };
+  if (newPhotos.length === 0) {
+    return { isFormData: false, body: { ...rest, photoUrls: urls } };
   }
 
-  const blob = await (await fetch(photoUrl)).blob();
+  const blobs = await Promise.all(newPhotos.map((url) => fetch(url).then((r) => r.blob())));
   const formData = new FormData();
   Object.entries(rest).forEach(([key, value]) => {
     if (value != null) formData.append(key, value);
   });
-  formData.append('photo', blob, 'listing-photo.jpg');
+  blobs.forEach((blob, i) => formData.append('photos', blob, `listing-photo-${i}.jpg`));
   return { isFormData: true, body: formData };
 }
 

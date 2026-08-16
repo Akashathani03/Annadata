@@ -6,28 +6,24 @@ import {
   updateUserProfile,
   updateProfilePhoto,
 } from '../../services/usersService';
-import { reverseGeocode } from '../../services/geocodingService';
 import { resolveImageUrl } from '../../utils/resolveImageUrl';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
-import { IconCurrentLocation } from '../../components/icons';
 import AppShell from '../../components/common/AppShell';
 import BottomSheet from '../../components/common/BottomSheet';
+import LocationCapture from '../../components/common/LocationCapture';
+import { KARNATAKA } from '../../data/karnatakaLocations';
 import './Profile.css';
 
 const LANG_OPTIONS = [
-  { id: 'mix', labelKey: 'common:languageMix' },
-  { id: 'kn', labelKey: 'common:languageKn' },
   { id: 'en', labelKey: 'common:languageEn' },
+  { id: 'kn', labelKey: 'common:languageKn' },
+  { id: 'mix', labelKey: 'common:languageMix' },
 ];
 
 const EDIT_FIELDS = [
   ['name', 'listings:profileScreen.farmerName'],
   ['whatsapp', 'listings:profileScreen.whatsapp'],
-  ['village', 'listings:profileScreen.village'],
-  ['taluk', 'listings:profileScreen.taluk'],
-  ['district', 'listings:profileScreen.district'],
-  ['state', 'common:state'],
 ];
 
 export default function Profile() {
@@ -50,9 +46,6 @@ export default function Profile() {
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreviewUrl, setAvatarPreviewUrl] = useState(null);
 
-  const [locationStatus, setLocationStatus] = useState('idle');
-  // idle | capturing | geocoding | error
-
   useEffect(() => {
     setAvatarLoadFailed(false);
   }, [user?.profilePhotoUrl]);
@@ -69,8 +62,8 @@ export default function Profile() {
   function openEdit() {
     setForm({
       ...user,
+      state: user.state || KARNATAKA,
     });
-    setLocationStatus('idle');
     setEditing(true);
   }
 
@@ -107,74 +100,11 @@ export default function Profile() {
     }
   }
 
-  function handleUseCurrentLocation() {
-    if (!navigator.geolocation) {
-      setLocationStatus('error');
-      showToast(t('listings:create.gpsUnavailable'));
-      return;
-    }
-
-    setLocationStatus('capturing');
-
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
-
-        setLocationStatus('geocoding');
-
-        try {
-          const address = await reverseGeocode(lat, lng);
-
-          if (
-            !address ||
-            !(
-              address.village ||
-              address.taluk ||
-              address.district ||
-              address.state
-            )
-          ) {
-            setLocationStatus('error');
-            showToast(t('listings:create.gpsGeocodeError'));
-            return;
-          }
-
-          setForm((prev) => ({
-            ...prev,
-            village: address.village || prev.village || '',
-            taluk: address.taluk || prev.taluk || '',
-            district: address.district || prev.district || '',
-            state: address.state || prev.state || '',
-            lat,
-            lng,
-          }));
-
-          setLocationStatus('idle');
-          showToast(t('listings:create.gpsCaptured'));
-        } catch {
-          setLocationStatus('error');
-          showToast(t('listings:create.gpsGeocodeError'));
-        }
-      },
-      () => {
-        setLocationStatus('error');
-        showToast(t('listings:create.gpsError'));
-      },
-      {
-        enableHighAccuracy: true,
-        maximumAge: 0,
-        timeout: 15000,
-      }
-    );
-  }
-
   async function handleSave() {
     try {
       await updateUserProfile(user.id, form);
       await refreshUser();
       setEditing(false);
-      setLocationStatus('idle');
       showToast(t('listings:profileScreen.saved'));
     } catch {
       showToast(t('listings:profileScreen.saveFailed'));
@@ -295,10 +225,7 @@ export default function Profile() {
         {/* Edit Profile */}
         <BottomSheet
           open={editing}
-          onClose={() => {
-            setEditing(false);
-            setLocationStatus('idle');
-          }}
+          onClose={() => setEditing(false)}
         >
           <h3>✏️ {t('listings:profileScreen.editProfile')}</h3>
 
@@ -318,45 +245,13 @@ export default function Profile() {
             </div>
           ))}
 
-          {/* Current Location */}
-          <button
-            type="button"
-            className="cl-gps-btn"
-            onClick={handleUseCurrentLocation}
-            disabled={
-              locationStatus === 'capturing' ||
-              locationStatus === 'geocoding'
-            }
-          >
-            <IconCurrentLocation
-              size={18}
-              strokeWidth={2}
-              aria-hidden="true"
-            />
-
-            <span>
-              {locationStatus === 'capturing'
-                ? t('listings:create.gpsCapturing')
-                : locationStatus === 'geocoding'
-                  ? t('listings:create.gpsGeocoding')
-                  : t('common:useCurrentLocation')}
-            </span>
-          </button>
-
-          {locationStatus === 'error' && (
-            <div className="cl-gps-status cl-gps-error">
-              {t('listings:create.gpsError')}
-            </div>
-          )}
+          <LocationCapture value={form} onChange={setForm} />
 
           <div className="profile-sheet-actions">
             <button
               type="button"
               className="sticky-bar-secondary"
-              onClick={() => {
-                setEditing(false);
-                setLocationStatus('idle');
-              }}
+              onClick={() => setEditing(false)}
             >
               {t('listings:profileScreen.cancel')}
             </button>

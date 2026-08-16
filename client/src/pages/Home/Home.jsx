@@ -6,6 +6,7 @@ import { DEFAULT_LOCATION } from '../../config/constants';
 import { useAuth } from '../../context/AuthContext';
 import { useUserLocation } from '../../context/LocationContext';
 import WeatherCard from '../../components/weather/WeatherCard';
+import Footer from '../../components/common/Footer';
 import { IconProfile } from '../../components/icons';
 import { resolveImageUrl } from '../../utils/resolveImageUrl';
 import './Home.css';
@@ -127,6 +128,8 @@ export default function Home() {
           </div>
         ))}
       </div>
+
+      <Footer />
     </div>
   );
 }

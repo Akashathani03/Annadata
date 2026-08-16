@@ -9,13 +9,14 @@ import {
 } from '../../../services/listingsService';
 
 import { equipmentCatalog } from '../../../config/equipmentCatalog';
+import { KARNATAKA } from '../../../data/karnatakaLocations';
 
 import { useAuth } from '../../../context/AuthContext';
 import { useToast } from '../../../context/ToastContext';
 
 import AppShell from '../../../components/common/AppShell';
 import StepCard from '../../../components/common/StepCard';
-import PhotoUpload from '../../../components/common/PhotoUpload';
+import MultiPhotoUpload from '../../../components/common/MultiPhotoUpload';
 import GpsLocationSection from '../../../components/common/GpsLocationSection';
 import StickyActionBar from '../../../components/common/StickyActionBar';
 import BottomSheet from '../../../components/common/BottomSheet';
@@ -58,16 +59,20 @@ export default function CreateListing() {
   const [condition, setCondition] = useState('');
   const [price, setPrice] = useState('');
   const [description, setDescription] = useState('');
-  const [photo, setPhoto] = useState('');
+  const [photos, setPhotos] = useState([]);
 
   const [locationParts, setLocationParts] = useState({
-    village: '',
-    taluk: '',
-    district: '',
-    state: '',
+    village: user?.village || '',
+    taluk: user?.taluk || '',
+    district: user?.district || '',
+    state: user?.state || KARNATAKA,
   });
 
-  const [coords, setCoords] = useState(null);
+  const [coords, setCoords] = useState(
+    user?.lat != null && user?.lng != null
+      ? { lat: user.lat, lng: user.lng, accuracy: null }
+      : null
+  );
 
 
   // -----------------------------
@@ -106,7 +111,7 @@ export default function CreateListing() {
           village: user?.village || '',
           taluk: user?.taluk || '',
           district: user?.district || '',
-          state: user?.state || '',
+          state: user?.state || KARNATAKA,
         });
 
         return;
@@ -152,8 +157,8 @@ export default function CreateListing() {
           existing.description || ''
         );
 
-        setPhoto(
-          existing.photoUrl || ''
+        setPhotos(
+          existing.photoUrls || []
         );
 
 
@@ -176,7 +181,7 @@ export default function CreateListing() {
           state:
             existing.locationState ||
             user?.state ||
-            '',
+            KARNATAKA,
         });
 
 
@@ -226,7 +231,7 @@ export default function CreateListing() {
       condition.trim() !== '' ||
       price.trim() !== '' ||
       description.trim() !== '' ||
-      photo !== '';
+      photos.length > 0;
 
 
     if (
@@ -255,13 +260,13 @@ export default function CreateListing() {
     setCondition('');
     setPrice('');
     setDescription('');
-    setPhoto('');
+    setPhotos([]);
 
     setLocationParts({
       village: user?.village || '',
       taluk: user?.taluk || '',
       district: user?.district || '',
-      state: user?.state || '',
+      state: user?.state || KARNATAKA,
     });
 
     setCoords(null);
@@ -311,7 +316,7 @@ export default function CreateListing() {
 
 
     // Photo
-    if (!photo) {
+    if (photos.length === 0) {
       setPhotoError(
         t(
           'equipment:create.validationPhoto'
@@ -415,7 +420,7 @@ export default function CreateListing() {
       description:
         description.trim(),
 
-      photoUrl: photo,
+      photoUrls: photos,
 
       condition,
 
@@ -803,12 +808,13 @@ export default function CreateListing() {
               *
             </label>
 
-            <PhotoUpload
-              value={photo}
-              onChange={(value) => {
-                setPhoto(value);
+            <MultiPhotoUpload
+              values={photos}
+              onChange={(next) => {
+                setPhotos(next);
                 setPhotoError('');
               }}
+              max={4}
               label={t(
                 'equipment:create.uploadLabel'
               )}

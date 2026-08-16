@@ -9,13 +9,14 @@ import {
 } from '../../../services/listingsService';
 
 import { animalCatalog } from '../../../config/animalCatalog';
+import { KARNATAKA } from '../../../data/karnatakaLocations';
 
 import { useAuth } from '../../../context/AuthContext';
 import { useToast } from '../../../context/ToastContext';
 
 import AppShell from '../../../components/common/AppShell';
 import StepCard from '../../../components/common/StepCard';
-import PhotoUpload from '../../../components/common/PhotoUpload';
+import MultiPhotoUpload from '../../../components/common/MultiPhotoUpload';
 import GpsLocationSection from '../../../components/common/GpsLocationSection';
 import StickyActionBar from '../../../components/common/StickyActionBar';
 import BottomSheet from '../../../components/common/BottomSheet';
@@ -46,18 +47,27 @@ export default function CreateListing() {
 
   const [itemId, setItemId] = useState('');
   const [title, setTitle] = useState('');
+  // How many animals this one listing covers - always priced per
+  // animal (see priceLabel), never a single blended total for the
+  // group, so a buyer never has to guess whether the price they see
+  // is for one animal or the whole lot.
+  const [quantity, setQuantity] = useState('1');
   const [price, setPrice] = useState('');
   const [description, setDescription] = useState('');
-  const [photo, setPhoto] = useState('');
+  const [photos, setPhotos] = useState([]);
 
   const [locationParts, setLocationParts] = useState({
-    village: '',
-    taluk: '',
-    district: '',
-    state: '',
+    village: user?.village || '',
+    taluk: user?.taluk || '',
+    district: user?.district || '',
+    state: user?.state || KARNATAKA,
   });
 
-  const [coords, setCoords] = useState(null);
+  const [coords, setCoords] = useState(
+    user?.lat != null && user?.lng != null
+      ? { lat: user.lat, lng: user.lng, accuracy: null }
+      : null
+  );
 
   // --------------------------------------------------
   // UI STATE
@@ -76,6 +86,7 @@ export default function CreateListing() {
   const [itemError, setItemError] = useState('');
   const [photoError, setPhotoError] = useState('');
   const [titleError, setTitleError] = useState('');
+  const [quantityError, setQuantityError] = useState('');
   const [priceError, setPriceError] = useState('');
 
   // --------------------------------------------------
@@ -95,9 +106,10 @@ export default function CreateListing() {
     const hasUnsavedChanges =
       itemId.trim() !== '' ||
       title.trim() !== '' ||
+      quantity.trim() !== '1' ||
       price.trim() !== '' ||
       description.trim() !== '' ||
-      photo !== '';
+      photos.length > 0;
 
     if (
       hasUnsavedChanges &&
@@ -132,7 +144,7 @@ export default function CreateListing() {
         village: user.village || '',
         taluk: user.taluk || '',
         district: user.district || '',
-        state: user.state || '',
+        state: user.state || KARNATAKA,
       });
 
       return;
@@ -167,6 +179,12 @@ export default function CreateListing() {
 
         setTitle(existing.itemName || '');
 
+        setQuantity(
+          existing.quantity != null
+            ? String(existing.quantity)
+            : '1'
+        );
+
         setPrice(
           existing.price != null
             ? String(existing.price)
@@ -175,7 +193,7 @@ export default function CreateListing() {
 
         setDescription(existing.description || '');
 
-        setPhoto(existing.photoUrl || '');
+        setPhotos(existing.photoUrls || []);
 
         setLocationParts({
           village:
@@ -196,7 +214,7 @@ export default function CreateListing() {
           state:
             existing.locationState ||
             user.state ||
-            '',
+            KARNATAKA,
         });
 
         if (
@@ -252,13 +270,15 @@ export default function CreateListing() {
   function resetForm() {
     setItemId('');
     setTitle('');
+    setQuantity('1');
     setPrice('');
     setDescription('');
-    setPhoto('');
+    setPhotos([]);
 
     setItemError('');
     setPhotoError('');
     setTitleError('');
+    setQuantityError('');
     setPriceError('');
 
     setCoords(null);
@@ -267,7 +287,7 @@ export default function CreateListing() {
       village: user?.village || '',
       taluk: user?.taluk || '',
       district: user?.district || '',
-      state: user?.state || '',
+      state: user?.state || KARNATAKA,
     });
   }
 
@@ -279,6 +299,7 @@ export default function CreateListing() {
     setItemError('');
     setPhotoError('');
     setTitleError('');
+    setQuantityError('');
     setPriceError('');
   }
 
@@ -298,7 +319,7 @@ export default function CreateListing() {
       setItemError('');
     }
 
-    if (!photo) {
+    if (photos.length === 0) {
       setPhotoError(
         t('animals:create.validationPhoto')
       );
@@ -314,6 +335,22 @@ export default function CreateListing() {
       valid = false;
     } else {
       setTitleError('');
+    }
+
+    const numericQuantity = Number(quantity);
+
+    if (
+      !quantity ||
+      !Number.isInteger(numericQuantity) ||
+      numericQuantity <= 0 ||
+      numericQuantity > 100
+    ) {
+      setQuantityError(
+        t('animals:create.validationQuantity')
+      );
+      valid = false;
+    } else {
+      setQuantityError('');
     }
 
     const numericPrice = Number(price);
@@ -410,8 +447,12 @@ export default function CreateListing() {
           selectedItem?.name ||
           '',
 
-        // Animal MVP = one animal per listing.
-        quantity: 1,
+        // Always priced per animal (see priceLabel) - quantity is how
+        // many the listing covers, never a multiplier baked into price.
+        quantity:
+          Number.isInteger(Number(quantity)) && Number(quantity) > 0
+            ? Number(quantity)
+            : 1,
 
         unit:
           selectedItem?.defaultUnit ||
@@ -426,7 +467,7 @@ export default function CreateListing() {
         description:
           description.trim(),
 
-        photoUrl: photo || '',
+        photoUrls: photos,
 
         location,
 
@@ -629,6 +670,43 @@ export default function CreateListing() {
             )}
           </div>
 
+          {/* Quantity */}
+
+          <div
+            className={`cl-field${
+              quantityError ? ' has-error' : ''
+            }`}
+          >
+            <label>
+              {t(
+                'animals:create.quantity'
+              )}{' '}
+              *
+            </label>
+
+            <input
+              type="number"
+              min="1"
+              max="100"
+              step="1"
+              inputMode="numeric"
+              placeholder={t(
+                'animals:create.quantityPlaceholder'
+              )}
+              value={quantity}
+              onChange={(e) => {
+                setQuantity(e.target.value);
+                setQuantityError('');
+              }}
+            />
+
+            {quantityError && (
+              <span className="cl-field-error">
+                {quantityError}
+              </span>
+            )}
+          </div>
+
           {/* Price */}
 
           <div
@@ -706,12 +784,13 @@ export default function CreateListing() {
               *
             </label>
 
-            <PhotoUpload
-              value={photo}
-              onChange={(value) => {
-                setPhoto(value);
+            <MultiPhotoUpload
+              values={photos}
+              onChange={(next) => {
+                setPhotos(next);
                 setPhotoError('');
               }}
+              max={4}
               label={t(
                 'animals:create.uploadLabel'
               )}

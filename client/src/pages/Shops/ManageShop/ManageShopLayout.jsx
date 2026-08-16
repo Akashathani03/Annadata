@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import AppShell from '../../../components/common/AppShell';
 import { useAuth } from '../../../context/AuthContext';
 import { resolveBackRoute } from '../../../utils/navigationPolicy';
-import { IconHome, IconShop, IconPackage, IconProfile } from '../../../components/icons';
+import { IconHome, IconShop, IconPackage } from '../../../components/icons';
 
 const TITLE_KEY_BY_PATH = {
   dashboard: 'shops:manage.dashboard',
@@ -46,7 +46,6 @@ export default function ManageShopLayout() {
     { key: 'dashboard', icon: IconHome, label: t('shops:manage.dashboard'), route: '/shop-owner/dashboard' },
     { key: 'myshop', icon: IconShop, label: t('shops:manage.myShop'), route: '/shop-owner/myshop' },
     { key: 'products', icon: IconPackage, label: t('shops:manage.products'), route: '/shop-owner/products' },
-    { key: 'profile', icon: IconProfile, label: t('common:profile'), route: '/profile' },
   ];
 
   if (!user) return null;

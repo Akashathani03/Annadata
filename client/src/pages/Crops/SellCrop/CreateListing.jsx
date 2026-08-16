@@ -11,7 +11,9 @@ import {
   getListingById,
   updateListing,
 } from '../../../services/listingsService';
-import { distanceKm, findNearest } from '../../../utils/geo';
+import { distanceKm, findNearest, formatDistanceKm } from '../../../utils/geo';
+import { formatDisplayDate } from '../../../utils/formatDate';
+import { KARNATAKA } from '../../../data/karnatakaLocations';
 import {
   getListingFieldConfig,
   unitMeta,
@@ -21,14 +23,37 @@ import { useUserLocation } from '../../../context/LocationContext';
 import { useToast } from '../../../context/ToastContext';
 import AppShell from '../../../components/common/AppShell';
 import StepCard from '../../../components/common/StepCard';
-import PhotoUpload from '../../../components/common/PhotoUpload';
+import MultiPhotoUpload from '../../../components/common/MultiPhotoUpload';
 import GpsLocationSection from '../../../components/common/GpsLocationSection';
+import LocationSuggestInput from '../../../components/common/LocationSuggestInput';
 import { PriceGrid, PriceBox } from '../../../components/common/PriceBox';
 import StickyActionBar from '../../../components/common/StickyActionBar';
 import BottomSheet from '../../../components/common/BottomSheet';
 import './CreateListing.css';
 
 const CATEGORY = 'crop';
+
+// Kg/Quintal/Ton are an exact linear system (fixed definitions, not a
+// regional convention), so converting a market price quoted in one of
+// them into whatever unit the farmer is currently selling in is safe.
+// Bag is deliberately excluded - its real weight varies by crop and
+// region, so guessing a converted price for it would be worse than
+// suggesting none at all.
+const WEIGHT_UNIT_TO_KG = { Kg: 1, Quintal: 100, Ton: 1000 };
+
+function convertPricePerUnit(price, fromUnit, toUnit) {
+  if (price == null || fromUnit === toUnit) return price;
+  const fromKg = WEIGHT_UNIT_TO_KG[fromUnit];
+  const toKg = WEIGHT_UNIT_TO_KG[toUnit];
+  if (!fromKg || !toKg) return null;
+  return (price / fromKg) * toKg;
+}
+
+const UNIT_PRICE_LABEL_KEY = {
+  Kg: 'marketPrices:perKg',
+  Quintal: 'marketPrices:perQuintal',
+  Ton: 'marketPrices:perTon',
+};
 
 export default function CreateListing() {
   const navigate = useNavigate();
@@ -55,6 +80,10 @@ export default function CreateListing() {
   const [apmcs, setApmcs] = useState([]);
 
   const [itemId, setItemId] = useState('');
+  // Set only when the farmer typed a crop that isn't in the catalog -
+  // itemId stays '' in that case, and this becomes the source of truth
+  // for itemName at submit time (see handleCropChange/handleSave).
+  const [customItemName, setCustomItemName] = useState('');
   const [quantity, setQuantity] = useState(
     config.defaultQuantity
   );
@@ -62,18 +91,23 @@ export default function CreateListing() {
   const [price, setPrice] = useState('');
   const [priceTouched, setPriceTouched] = useState(false);
   const [description, setDescription] = useState('');
-  const [photo, setPhoto] = useState('');
+  const [photos, setPhotos] = useState([]);
+  const [photoError, setPhotoError] = useState('');
 
   const [apmcId, setApmcId] = useState('');
 
   const [locationParts, setLocationParts] = useState({
-    village: '',
-    taluk: '',
-    district: '',
-    state: '',
+    village: user?.village || '',
+    taluk: user?.taluk || '',
+    district: user?.district || '',
+    state: user?.state || KARNATAKA,
   });
 
-  const [coords, setCoords] = useState(null);
+  const [coords, setCoords] = useState(
+    user?.lat != null && user?.lng != null
+      ? { lat: user.lat, lng: user.lng, accuracy: null }
+      : null
+  );
 
   const [apmcManuallySelected, setApmcManuallySelected] =
     useState(false);
@@ -91,7 +125,7 @@ export default function CreateListing() {
     const hasUnsavedChanges =
       price.trim() !== '' ||
       description.trim() !== '' ||
-      photo !== '';
+      photos.length > 0;
 
     if (
       hasUnsavedChanges &&
@@ -173,7 +207,7 @@ export default function CreateListing() {
           village: user?.village || '',
           taluk: user?.taluk || '',
           district: user?.district || '',
-          state: user?.state || '',
+          state: user?.state || KARNATAKA,
         });
 
         return;
@@ -185,13 +219,22 @@ export default function CreateListing() {
 
         if (cancelled || !existingListing) return;
 
-        setItemId(existingListing.itemId);
+        if (existingListing.itemId) {
+          setItemId(existingListing.itemId);
+          setCustomItemName('');
+        } else {
+          // Was published with a crop typed outside the catalog -
+          // itemName is the only record of what it actually was.
+          setItemId('');
+          setCustomItemName(existingListing.itemName || '');
+        }
+
         setQuantity(existingListing.quantity);
         setUnit(existingListing.unit);
         setPrice(String(existingListing.price));
         setPriceTouched(true);
         setDescription(existingListing.description || '');
-        setPhoto(existingListing.photoUrl || '');
+        setPhotos(existingListing.photoUrls || []);
         setApmcId(existingListing.apmcId);
 
         setLocationParts({
@@ -210,7 +253,7 @@ export default function CreateListing() {
           state:
             existingListing.locationState ||
             user?.state ||
-            '',
+            KARNATAKA,
         });
 
         /*
@@ -312,26 +355,71 @@ export default function CreateListing() {
     getCropPriceDetail(apmcId, itemId)
       .then((detail) => {
         if (cancelled) return;
-
         setMarketPrice(detail);
-
-        if (detail && !priceTouched) {
-          setPrice(String(detail.modalPrice));
-        }
       })
       .catch(() => {
         if (cancelled) return;
-
         setMarketPrice(null);
       });
 
     return () => {
       cancelled = true;
     };
-  }, [itemId, apmcId, priceTouched]);
+  }, [itemId, apmcId]);
+
+  /*
+   * Suggest a starting price from the loaded market price, converted
+   * into whatever unit the farmer currently has selected - runs again
+   * (without a new network request) whenever the unit changes, so
+   * switching Quintal -> Kg re-suggests a correctly-scaled number
+   * instead of leaving a stale one behind. Never overrides a price the
+   * farmer has actually typed (priceTouched), and never guesses for
+   * Bag, since there's no safe conversion for it (see WEIGHT_UNIT_TO_KG).
+   */
+  useEffect(() => {
+    if (!marketPrice || priceTouched) return;
+    if (unit === 'Bag') return;
+
+    const converted = convertPricePerUnit(marketPrice.modalPrice, marketPrice.unit, unit);
+    if (converted != null) {
+      setPrice(String(Math.round(converted)));
+    }
+  }, [marketPrice, unit, priceTouched]);
 
   function handleLocationPartsChange(next) {
     setLocationParts(next);
+  }
+
+  // A price typed against one unit is meaningless under another
+  // (₹2200 meant as "per Quintal" silently becomes "₹2200/kg" if left
+  // untouched) - clearing it and re-arming the market-price suggestion
+  // is the safe response, never an attempt to auto-rescale a number
+  // the farmer typed.
+  function handleUnitChange(nextUnit) {
+    setUnit(nextUnit);
+    setPrice('');
+    setPriceTouched(false);
+    setPriceError('');
+  }
+
+  function cropOptionLabel(crop) {
+    return `${crop.icon} ${crop.name} / ${crop.kannadaName}`;
+  }
+
+  // A farmer growing something outside the catalog (a local/uncommon
+  // variety) can still list it - typing a value that doesn't match any
+  // catalog crop is treated as that crop's name directly, with no
+  // itemId (and therefore no market-price lookup, since there's
+  // nothing to look up).
+  function handleCropChange(newValue) {
+    const matched = catalog.find((c) => cropOptionLabel(c) === newValue);
+    if (matched) {
+      setItemId(matched.id);
+      setCustomItemName('');
+    } else {
+      setItemId('');
+      setCustomItemName(newValue);
+    }
   }
 
   /*
@@ -353,12 +441,14 @@ export default function CreateListing() {
 
   function resetForm() {
     setItemId(catalog[0]?.id ?? '');
+    setCustomItemName('');
     setQuantity(config.defaultQuantity);
     setUnit(catalog[0]?.defaultUnit ?? '');
     setPrice('');
     setPriceTouched(false);
     setDescription('');
-    setPhoto('');
+    setPhotos([]);
+    setPhotoError('');
     setQuantityError('');
     setPriceError('');
 
@@ -392,6 +482,33 @@ export default function CreateListing() {
       setPriceError('');
     }
 
+    // Previously unchecked: an emptied unit dropdown (its own blank
+    // placeholder option) or a cleared crop/APMC passed this function
+    // silently, then failed obscurely server-side with a generic
+    // "could not load listings" toast instead of a clear inline error.
+    if (!unit) {
+      valid = false;
+    }
+
+    if (!itemId && !customItemName.trim()) {
+      valid = false;
+    }
+
+    if (!apmcId) {
+      valid = false;
+    }
+
+    if (photos.length === 0) {
+      setPhotoError(t('listings:create.validationPhotos'));
+      valid = false;
+    } else {
+      setPhotoError('');
+    }
+
+    if (!valid) {
+      showToast(t('listings:create.validationIncomplete'));
+    }
+
     return valid;
   }
 
@@ -413,15 +530,15 @@ export default function CreateListing() {
         ownerType: 'farmer',
         category: CATEGORY,
 
-        itemId,
-        itemName: selectedItem?.name ?? '',
+        itemId: itemId || null,
+        itemName: selectedItem?.name ?? customItemName.trim(),
 
         quantity: Number(quantity),
         unit,
         price: Number(price),
 
         description,
-        photoUrl: photo,
+        photoUrls: photos,
 
         apmcId,
         apmcName: selectedApmc?.name ?? '',
@@ -492,19 +609,17 @@ export default function CreateListing() {
               {t('listings:create.cropName')} *
             </label>
 
-            <select
-              value={itemId}
-              onChange={(e) => setItemId(e.target.value)}
-            >
-              {catalog.map((c) => (
-                <option
-                  key={c.id}
-                  value={c.id}
-                >
-                  {c.icon} {c.name} / {c.kannadaName}
-                </option>
-              ))}
-            </select>
+            <LocationSuggestInput
+              value={
+                selectedItem
+                  ? cropOptionLabel(selectedItem)
+                  : customItemName
+              }
+              options={catalog.map(cropOptionLabel)}
+              onChange={handleCropChange}
+              placeholder={t('listings:create.cropName')}
+              label={t('listings:create.cropName')}
+            />
           </div>
 
           <div className="cl-row2">
@@ -542,7 +657,7 @@ export default function CreateListing() {
               <select
                 value={unit}
                 onChange={(e) =>
-                  setUnit(e.target.value)
+                  handleUnitChange(e.target.value)
                 }
               >
                 <option value="">
@@ -616,14 +731,22 @@ export default function CreateListing() {
             </span>
           </div>
 
-          <div className="cl-field">
+          <div
+            className={`cl-field${
+              photoError ? ' has-error' : ''
+            }`}
+          >
             <label>
-              {t('listings:create.uploadImage')}
+              {t('listings:create.uploadImage')} *
             </label>
 
-            <PhotoUpload
-              value={photo}
-              onChange={setPhoto}
+            <MultiPhotoUpload
+              values={photos}
+              onChange={(next) => {
+                setPhotos(next);
+                setPhotoError('');
+              }}
+              max={4}
               label={t(
                 'listings:create.uploadLabel'
               )}
@@ -631,6 +754,12 @@ export default function CreateListing() {
                 'listings:create.uploadHint'
               )}
             />
+
+            {photoError && (
+              <span className="cl-field-error">
+                {photoError}
+              </span>
+            )}
           </div>
         </StepCard>
 
@@ -671,15 +800,16 @@ export default function CreateListing() {
 
             {selectedApmc && (
               <div className="cl-dist">
-                {(coords &&
-                selectedApmc.location
-                  ? distanceKm(
-                      coords.lat,
-                      coords.lng,
-                      selectedApmc.location.lat,
-                      selectedApmc.location.lng
-                    )?.toFixed(1)
-                  : selectedApmc.distanceKm)}{' '}
+                {formatDistanceKm(
+                  coords && selectedApmc.location
+                    ? distanceKm(
+                        coords.lat,
+                        coords.lng,
+                        selectedApmc.location.lat,
+                        selectedApmc.location.lng
+                      )
+                    : selectedApmc.distanceKm
+                )}{' '}
                 km away
               </div>
             )}
@@ -737,7 +867,7 @@ export default function CreateListing() {
                   )}
                   value={marketPrice.minPrice}
                   unitLabel={t(
-                    'marketPrices:perKg'
+                    UNIT_PRICE_LABEL_KEY[marketPrice.unit] || 'marketPrices:perKg'
                   )}
                   tone="red"
                 />
@@ -748,7 +878,7 @@ export default function CreateListing() {
                   )}
                   value={marketPrice.modalPrice}
                   unitLabel={t(
-                    'marketPrices:perKg'
+                    UNIT_PRICE_LABEL_KEY[marketPrice.unit] || 'marketPrices:perKg'
                   )}
                   tone="green"
                   highlight
@@ -763,7 +893,7 @@ export default function CreateListing() {
                   )}
                   value={marketPrice.maxPrice}
                   unitLabel={t(
-                    'marketPrices:perKg'
+                    UNIT_PRICE_LABEL_KEY[marketPrice.unit] || 'marketPrices:perKg'
                   )}
                   tone="orange"
                 />
@@ -771,18 +901,16 @@ export default function CreateListing() {
 
               <div className="cl-market-updated">
                 🕐{' '}
-                {t(
-                  'listings:create.updatedToday',
-                  {
-                    time: new Date().toLocaleTimeString(
-                      'en-IN',
-                      {
+                {marketPrice.priceDate === new Date().toISOString().slice(0, 10)
+                  ? t('listings:create.updatedToday', {
+                      time: new Date().toLocaleTimeString('en-IN', {
                         hour: '2-digit',
                         minute: '2-digit',
-                      }
-                    ),
-                  }
-                )}
+                      }),
+                    })
+                  : t('listings:create.updatedOn', {
+                      date: formatDisplayDate(marketPrice.priceDate),
+                    })}
               </div>
             </>
           ) : (

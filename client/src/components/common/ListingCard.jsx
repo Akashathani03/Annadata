@@ -11,7 +11,7 @@ export default function ListingCard({ listing, icon, statusLabel, detailsLabel, 
     <div className="listing-card">
       <div className="listing-card-top" onClick={onOpenDetail}>
         <div className="listing-card-thumb">
-          {listing.photoUrl ? <img src={resolveImageUrl(listing.photoUrl)} alt="" /> : icon}
+          {listing.photoUrls?.[0] ? <img src={resolveImageUrl(listing.photoUrls[0])} alt="" /> : icon}
         </div>
         <div className="listing-card-info">
           <b>{listing.itemName}</b>
