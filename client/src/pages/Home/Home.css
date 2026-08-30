@@ -70,6 +70,13 @@
   overflow: hidden;
 }
 
+/* Same optical-centering correction as SellerInfoCard's avatar - the
+   User icon's glyph isn't vertically symmetric in its own bounding
+   box, so a flex-centered box alone still looks slightly low. */
+.home-auth-btn svg {
+  transform: translateY(-1px);
+}
+
 .home-auth-avatar-img {
   width: 100%;
   height: 100%;

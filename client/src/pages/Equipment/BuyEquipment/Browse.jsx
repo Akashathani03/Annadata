@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { getBrowseEquipment } from '../../../services/buyEquipmentService';
 import { resolveImageUrl } from '../../../utils/resolveImageUrl';
 import { formatRelativeTime } from '../../../utils/formatDate';
-import { formatDistanceKm } from '../../../utils/geo';
 import {
   getBuyerLocation,
   updateBuyerLocation,
@@ -171,7 +170,7 @@ export default function Browse() {
 
   function handleClearFilters() {
     setQuery('');
-    setSort('price_low');
+    setSort('nearest');
     setDistance('All');
 
     showToast(t('filtersCleared'));
@@ -264,7 +263,7 @@ export default function Browse() {
   return (
     <AppShell
       title={t('equipment:buyBrowse.browseTitle')}
-      onBack={() => navigate('/')}
+      onBack={() => navigate('/category/equipment')}
     >
 
       {/* Location */}
@@ -326,12 +325,6 @@ export default function Browse() {
             'equipment:buyBrowse.equipmentNearYou'
           )}
         </h4>
-
-        <span>
-          {t('resultsCount', {
-            count: results.length,
-          })}
-        </span>
       </div>
 
 
@@ -408,9 +401,6 @@ export default function Browse() {
 
                   <span className="bc-loc">
                     📍 {listing.location || '—'}
-
-                    {listing.distanceKm != null &&
-                      ` · ${formatDistanceKm(listing.distanceKm)} km away`}
                   </span>
 
                   {listing.condition && (
@@ -432,9 +422,11 @@ export default function Browse() {
                 </div>
 
 
-                <span className="bc-avail-pill">
-                  {listing.equipmentTypeName || 'Equipment'}
-                </span>
+                {listing.equipmentTypeName && (
+                  <span className="bc-avail-pill">
+                    {listing.equipmentTypeName}
+                  </span>
+                )}
 
               </div>
 

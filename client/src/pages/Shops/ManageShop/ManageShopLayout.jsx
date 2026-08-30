@@ -17,7 +17,7 @@ const TITLE_KEY_BY_PATH = {
 // backs out to dashboard, but this stays consistent with Sell Crop
 // and Sell Animals rather than being a one-off inline expression.
 const BACK_POLICY = {
-  homeRoute: '/',
+  homeRoute: '/category/shops',
   defaultSegment: 'dashboard',
   parents: {
     myshop: '/shop-owner/dashboard',
@@ -50,11 +50,16 @@ export default function ManageShopLayout() {
 
   if (!user) return null;
 
+  // My Shop shows its own floating "Save Shop Details" action instead of
+  // the Dashboard/My Shop/Products switcher - Dashboard and Products keep
+  // the shared nav unchanged.
+  const showNav = activeSegment !== 'myshop';
+
   return (
     <AppShell
       title={t(TITLE_KEY_BY_PATH[activeSegment] ?? 'shops:manage.dashboard')}
       onBack={() => navigate(resolveBackRoute(location.pathname, BACK_POLICY))}
-      navItems={navItems}
+      navItems={showNav ? navItems : undefined}
       activeNavKey={activeSegment}
     >
       <Outlet />

@@ -20,6 +20,28 @@ const marketPriceSchema = new mongoose.Schema(
     modalPrice: { type: Number, required: true },
     maxPrice: { type: Number, required: true },
     priceDate: { type: String, required: true }, // YYYY-MM-DD, matches the frontend's existing string format
+    // 'seed' until a real sync overwrites it - lets every layer above
+    // this (API responses, future UI) tell a genuinely-synced record
+    // apart from a placeholder one, rather than presenting both with
+    // equal confidence. See agmarknetSync.service.js.
+    source: { type: String, enum: ['seed', 'agmarknet'], default: 'seed' },
+    // Real recent daily prices for this market+crop, newest first -
+    // only populated for agmarknet-sourced records (each sync adds
+    // that day's entry if it's a new date, capped to a handful of most
+    // recent). Replaces marketPrices.service.js's old synthetic
+    // buildRecentHistory() for anything that actually has this.
+    history: {
+      type: [
+        {
+          _id: false,
+          date: { type: String, required: true },
+          minPrice: { type: Number, required: true },
+          modalPrice: { type: Number, required: true },
+          maxPrice: { type: Number, required: true },
+        },
+      ],
+      default: [],
+    },
   },
   { timestamps: true }
 );

@@ -1,11 +1,20 @@
 import { Listing } from '../models/Listing.js';
 import { distanceKm } from '../utils/geo.js';
 
+// query now reaches here from farmer free-text (Agro AI's
+// search_marketplace_listings, via a Gemini-extracted phrase) as well
+// as any future direct caller - escaping is required so a stray
+// regex-special character in what someone typed can't throw or be
+// misinterpreted as a pattern.
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 export async function findAll({ category, status, query, itemId, priceMax, condition, lat, lng, radiusKm, page = 1, limit = 20 } = {}) {
   const dbQuery = {};
   if (category) dbQuery.category = category;
   if (status) dbQuery.status = status;
-  if (query) dbQuery.itemName = new RegExp(query.trim(), 'i');
+  if (query) dbQuery.itemName = new RegExp(escapeRegExp(query.trim()), 'i');
   if (itemId) dbQuery.itemId = itemId;
   if (priceMax != null) dbQuery.price = { $lte: priceMax };
   if (condition) dbQuery.condition = condition;

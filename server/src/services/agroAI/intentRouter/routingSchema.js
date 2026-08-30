@@ -13,7 +13,7 @@ import { VALID_DESTINATIONS } from './destinations.js';
 export const ROUTING_RESPONSE_SCHEMA = {
   type: 'OBJECT',
   properties: {
-    intent: { type: 'STRING', enum: ['lookup', 'diagnosis', 'conversation', 'navigate', 'out_of_scope'] },
+    intent: { type: 'STRING', enum: ['lookup', 'diagnosis', 'conversation', 'navigate', 'out_of_scope', 'about_ai'] },
     targetTool: { type: 'STRING', description: 'The exact tool name to call, if intent is lookup. Empty string otherwise.' },
     toolArgs: {
       type: 'OBJECT',
@@ -43,7 +43,7 @@ export function buildToolsDescription() {
     .join('\n');
 }
 
-const VALID_INTENTS = ['lookup', 'diagnosis', 'conversation', 'navigate', 'out_of_scope'];
+const VALID_INTENTS = ['lookup', 'diagnosis', 'conversation', 'navigate', 'out_of_scope', 'about_ai'];
 const VALID_CONFIDENCE = ['low', 'medium', 'high'];
 
 // Independent of Gemini's own schema constraint, same two-layer

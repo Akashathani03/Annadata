@@ -2,6 +2,15 @@
   padding-bottom: 8px;
 }
 
+/* GpsLocationSection is shared with the Sell Crop/Animal/Equipment forms,
+   where its "Current Location" card title makes sense next to their own
+   page heading. My Shop already has its own "Shop Location *" label right
+   above it, so the card's internal title is redundant here - hidden via
+   this scoped selector rather than changing the shared component itself. */
+.som-page .cl-loc-title {
+  display: none;
+}
+
 .som-sec-title {
   font-size: 13px;
   font-weight: 800;
@@ -132,6 +141,33 @@
 .som-save-btn:disabled {
   opacity: 0.6;
   cursor: default;
+}
+
+/* Scoped overrides for the My Shop "Save Shop Details" bar only - .som-
+   sticky-bar/.som-save-btn are also reused by Products' add-flow (Next /
+   Save Products), so overriding those base classes directly would have
+   restyled those buttons too. These compound selectors (both classes
+   required) only match the bar rendered in MyShop.jsx. My Shop hides the
+   Dashboard/My Shop/Products bottom nav (see ManageShopLayout.jsx), so
+   this floats alone just above the screen edge - same light-green
+   language as the Sell section's Publish button. */
+.som-sticky-bar.som-sticky-bar-shopdetails {
+  left: 16px;
+  right: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  background: #fff;
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 24px;
+  box-shadow: 0 14px 32px rgba(31, 43, 35, 0.16);
+  backdrop-filter: none;
+  max-width: 448px;
+}
+
+.som-save-btn.som-save-btn-shopdetails {
+  background: var(--green-light);
+  color: var(--green-dark);
+  border: 1px solid #cfe4d4;
 }
 
 .som-selected-count {

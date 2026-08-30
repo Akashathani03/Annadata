@@ -76,7 +76,7 @@ export default function MyListings() {
     return (
       equipmentCatalog.find(
         (equipment) => equipment.id === listing.itemId
-      )?.icon ?? '🚜'
+      )?.icon ?? '🔧'
     );
   }
 
@@ -93,11 +93,11 @@ export default function MyListings() {
           tabs={[
             {
               key: 'active',
-              label: `${t('equipment:myListings.active')} (${active.length})`,
+              label: t('equipment:myListings.active'),
             },
             {
               key: 'sold',
-              label: `${t('equipment:myListings.sold')} (${sold.length})`,
+              label: t('equipment:myListings.sold'),
             },
           ]}
           activeKey={tab}

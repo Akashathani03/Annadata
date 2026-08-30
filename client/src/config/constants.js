@@ -5,9 +5,9 @@
 // (AuthContext) wherever one exists - this is only the anonymous
 // default.
 export const DEFAULT_LOCATION = {
-  lat: 12.5242,
-  lng: 76.8958,
-  label: 'Mandya, Karnataka',
+  lat: 15.8497,
+  lng: 74.4977,
+  label: 'Belagavi, Karnataka',
 };
 
 // How long a captured live-GPS location is trusted before Home

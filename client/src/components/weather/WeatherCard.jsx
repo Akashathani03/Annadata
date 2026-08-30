@@ -8,7 +8,7 @@ import './WeatherCard.css';
 // a second, smaller line. On failure, shows a brief message rather than
 // the full card - distinguishing "no location to ask about" from "the
 // weather service itself failed" - so a farmer isn't left guessing.
-export default function WeatherCard({ lat, lon, locationLabel }) {
+export default function WeatherCard({ lat, lon }) {
   const { t } = useTranslation('weather');
   const [weather, setWeather] = useState(null);
   const [status, setStatus] = useState('loading'); // loading | ready | error | no-location
@@ -104,12 +104,6 @@ export default function WeatherCard({ lat, lon, locationLabel }) {
           {t('humidity')} {weather.humidity}%
         </span>
       </div>
-
-      {locationLabel && (
-        <span className="weather-location">
-          {locationLabel}
-        </span>
-      )}
     </div>
   );
 }

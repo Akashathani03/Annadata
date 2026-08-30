@@ -2,6 +2,21 @@ import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { useAuth } from './AuthContext';
 import { DEFAULT_LOCATION, GPS_STALE_THRESHOLD_MS } from '../config/constants';
 import { forwardGeocode } from '../services/geocodingService';
+import { KARNATAKA, getVillageLocation } from '../data/karnatakaLocations';
+
+// Tries the bundled Census dataset first (instant, offline, no
+// Nominatim usage-policy/rate-limit exposure) before ever falling back
+// to a live geocode - see karnatakaLocations.js's getVillageLocation.
+// Only Karnataka is covered; anything else (or a village not in the
+// bundled ~28k) falls through to the network exactly as before this
+// dataset existed.
+async function resolveAddressLocation({ village, taluk, district, state }) {
+  if ((state || KARNATAKA) === KARNATAKA) {
+    const local = getVillageLocation(district, taluk, village);
+    if (local) return local;
+  }
+  return forwardGeocode({ village, taluk, district, state });
+}
 
 const LocationContext = createContext(null);
 
@@ -127,7 +142,7 @@ export function LocationProvider({ children }) {
     // genuinely skipped, not just harmlessly wasted.
     const timer = setTimeout(async () => {
       if (cancelled || liveLocationRef.current) return;
-      const result = await forwardGeocode({
+      const result = await resolveAddressLocation({
         village: user.village,
         taluk: user.taluk,
         district: user.district,
@@ -169,7 +184,7 @@ export function LocationProvider({ children }) {
     let cancelled = false;
     profileGeocodeAttemptedForUserRef.current = user.id;
 
-    forwardGeocode({
+    resolveAddressLocation({
       village: user.village,
       taluk: user.taluk,
       district: user.district,

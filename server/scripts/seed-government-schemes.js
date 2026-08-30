@@ -1,5 +1,15 @@
 // Seeds GovernmentScheme with the exact same 5 schemes that currently
 // live in the frontend's data/governmentSchemes.js.
+//
+// deadline/appliedCount are deliberately left unset ('') below except
+// where the value is genuinely, permanently true (KCC's "Ongoing") -
+// the original seed data here had fabricated deadlines and applied-
+// counts with no real source behind them, which is exactly the kind
+// of guessed data a farmer must never be shown as fact. A real value
+// only ever gets set by a human running
+// scripts/update-government-scheme.js after checking the scheme's own
+// officialUrl - see GovernmentScheme.js's source/lastVerifiedAt
+// fields.
 // Usage: node scripts/seed-government-schemes.js
 
 import dotenv from 'dotenv';
@@ -20,8 +30,8 @@ const schemes = [
     description: 'Income support of ₹6,000 per year, paid in three instalments, to all landholding farmer families.',
     detailDescription: 'Income support of ₹6,000/year, paid in three instalments, to all landholding farmer families.',
     amount: '₹6,000/year',
-    deadline: '31 Aug 2026',
-    appliedCount: '10K+',
+    deadline: '',
+    appliedCount: '',
     officialUrl: 'https://pmkisan.gov.in',
     eligibility: [
       'Own cultivable land in your name',
@@ -36,13 +46,19 @@ const schemes = [
     scope: 'central',
     iconBg: '#e6f0fb',
     icon: '🛡️',
-    status: 'closing',
+    // Was 'closing' with a fabricated near-term deadline - 'closing'
+    // is itself a claim that needs a real deadline behind it. PMFBY's
+    // real enrollment cutoffs are genuine and season-specific, but
+    // not something verifiable here right now; 'open' is the honest
+    // neutral status until a human verifies the current season's
+    // actual cutoff.
+    status: 'open',
     description: 'Affordable crop insurance covering losses from natural calamities, pests and diseases.',
     detailDescription: 'Affordable crop insurance covering losses from natural calamities, pests and diseases.',
     amount: 'Low premium',
     detailAmount: 'Low premium (1.5–5% of sum insured)',
-    deadline: '5 Aug 2026',
-    appliedCount: '6K+',
+    deadline: '',
+    appliedCount: '',
     officialUrl: 'https://pmfby.gov.in',
     eligibility: [
       'Farmer growing a notified crop in a notified area',
@@ -62,8 +78,8 @@ const schemes = [
     detailDescription: 'Subsidy support for drip and sprinkler irrigation systems to improve water-use efficiency.',
     amount: 'Up to 55% subsidy',
     detailAmount: 'Up to 55% subsidy on equipment cost',
-    deadline: '20 Sep 2026',
-    appliedCount: '3K+',
+    deadline: '',
+    appliedCount: '',
     officialUrl: 'https://pmksy.gov.in',
     eligibility: [
       'Own or lease agricultural land',
@@ -85,7 +101,7 @@ const schemes = [
     detailAmount: 'Up to ₹3 lakh at subsidised interest',
     deadline: 'Ongoing',
     detailDeadline: 'Ongoing — no fixed deadline',
-    appliedCount: '8K+',
+    appliedCount: '',
     officialUrl: 'https://www.myscheme.gov.in/schemes/kcc',
     eligibility: [
       'Farmer, tenant farmer, or sharecropper',
@@ -105,8 +121,8 @@ const schemes = [
     detailDescription: 'Support for farm ponds, micro-irrigation and rainwater harvesting for dryland farmers in Karnataka.',
     amount: 'Up to 90% subsidy',
     detailAmount: 'Up to 90% subsidy for SC/ST, 80% for others',
-    deadline: '15 Sep 2026',
-    appliedCount: '2K+',
+    deadline: '',
+    appliedCount: '',
     officialUrl: 'https://raitamitra.karnataka.gov.in',
     eligibility: [
       'Farmer in a Karnataka dryland taluk',

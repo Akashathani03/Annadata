@@ -278,20 +278,37 @@
 
 .cl-sticky-bar {
   position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  left: 16px;
+  right: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom));
   z-index: 150;
-  background: rgba(255, 255, 255, 0.97);
-  border-top: 1px solid var(--border);
-  padding: 10px 14px 12px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  padding: 8px;
   display: grid;
   grid-template-columns: 1fr 1.4fr;
   gap: 10px;
-  box-shadow: 0 -12px 28px rgba(31, 43, 35, 0.1);
-  backdrop-filter: blur(14px);
-  max-width: 480px;
+  box-shadow: 0 14px 32px rgba(31, 43, 35, 0.16);
+  max-width: 448px;
   margin: 0 auto;
+}
+
+/* Scoped override, not a change to the shared .sticky-bar-primary class -
+   that class is reused by ~20 other buttons app-wide (Profile's Edit
+   Profile, every My Listings "Edit" button, Browse/Detail CTAs, etc.), so
+   editing it directly would have recolored all of those too. Targeting it
+   only inside .cl-sticky-bar keeps this to the Publish button in this one
+   sticky bar (Crop/Animal/Equipment Create Listing pages all share it). */
+.cl-sticky-bar .sticky-bar-primary {
+  background: var(--green-light);
+  color: var(--green-dark);
+  border: 1px solid #cfe4d4;
+}
+
+.cl-sticky-bar .sticky-bar-primary:disabled::before {
+  border-color: rgba(30, 91, 50, 0.25);
+  border-top-color: var(--green-dark);
 }
 
 .cl-success-icon {

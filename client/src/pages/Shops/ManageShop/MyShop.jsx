@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getMyShop, saveShop } from '../../../services/shopsService';
-import { reverseGeocode } from '../../../services/geocodingService';
+import { KARNATAKA } from '../../../data/karnatakaLocations';
 import { useAuth } from '../../../context/AuthContext';
 import { useToast } from '../../../context/ToastContext';
 import PhotoUpload from '../../../components/common/PhotoUpload';
-import { IconCurrentLocation } from '../../../components/icons';
+import GpsLocationSection from '../../../components/common/GpsLocationSection';
 import './ManageShop.css';
 
 export default function MyShop() {
@@ -14,15 +14,32 @@ export default function MyShop() {
   const { showToast } = useToast();
 
   const [form, setForm] = useState({
-    shopName: '', ownerName: '', phone: '', whatsapp: '', location: '', address: '', photoUrl: '',
+    shopName: '', ownerName: '', phone: '', whatsapp: '', address: '', photoUrl: '',
   });
-  const [gpsStatus, setGpsStatus] = useState('idle');
+  const [locationParts, setLocationParts] = useState({
+    village: '', area: '', taluk: '', district: '', state: KARNATAKA,
+  });
+  const [coords, setCoords] = useState(null);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     if (!user) return;
     getMyShop(user.id).then((shop) => {
-      if (shop) setForm({ ...form, ...shop });
+      if (shop) {
+        setForm((f) => ({ ...f, ...shop }));
+
+        setLocationParts({
+          village: shop.locationVillage || '',
+          area: shop.locationArea || '',
+          taluk: shop.locationTaluk || '',
+          district: shop.locationDistrict || '',
+          state: shop.locationState || KARNATAKA,
+        });
+
+        if (shop.lat != null && shop.lng != null) {
+          setCoords({ lat: shop.lat, lng: shop.lng, accuracy: null });
+        }
+      }
       setLoaded(true);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -32,43 +49,28 @@ export default function MyShop() {
     setForm((f) => ({ ...f, [field]: value }));
   }
 
-  function handleUseGps() {
-    if (!navigator.geolocation) {
-      setGpsStatus('error');
-      return;
-    }
-    setGpsStatus('capturing');
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
-        setGpsStatus('geocoding');
-
-        const address = await reverseGeocode(lat, lng);
-        const composedLocation = address
-          ? [address.village, address.taluk, address.district].filter(Boolean).join(', ')
-          : '';
-
-        setForm((f) => ({
-          ...f,
-          lat,
-          lng,
-          location: composedLocation || f.location,
-        }));
-        setGpsStatus(composedLocation ? 'captured' : 'error');
-      },
-      () => setGpsStatus('error'),
-      { enableHighAccuracy: true, maximumAge: 0, timeout: 15000 }
-    );
-  }
-
   async function handleSave() {
     if (!form.phone.trim()) {
       showToast(t('shops:manage.phoneRequired'));
       return;
     }
+
+    const location = [locationParts.village, locationParts.area, locationParts.taluk, locationParts.district]
+      .filter(Boolean)
+      .join(', ');
+
     try {
-      await saveShop(user.id, form);
+      await saveShop(user.id, {
+        ...form,
+        location,
+        locationVillage: locationParts.village,
+        locationArea: locationParts.area,
+        locationTaluk: locationParts.taluk,
+        locationDistrict: locationParts.district,
+        locationState: locationParts.state,
+        lat: coords?.lat ?? null,
+        lng: coords?.lng ?? null,
+      });
       showToast(t('shops:manage.shopSaved'));
     } catch {
       showToast(t('shops:manage.saveFailed'));
@@ -101,23 +103,16 @@ export default function MyShop() {
       <input className="som-input" type="tel" maxLength={10} value={form.whatsapp} onChange={(e) => setField('whatsapp', e.target.value.replace(/\D/g, ''))} placeholder="98765 43210" />
 
       <label className="som-label">{t('shops:manage.shopLocation')} *</label>
-      <input className="som-input" value={form.location} onChange={(e) => setField('location', e.target.value)} placeholder={t('shops:manage.shopLocationPlaceholder')} />
-      <button type="button" className="som-gps-btn" onClick={handleUseGps}>
-        <IconCurrentLocation size={16} strokeWidth={2} /> Use Current Location
-      </button>
-      <div className="som-sub" style={{ margin: '6px 0 0' }}>
-        {gpsStatus === 'capturing' && 'Getting location…'}
-        {gpsStatus === 'geocoding' && 'Fetching address…'}
-        {gpsStatus === 'captured' && '✓ Location captured'}
-        {gpsStatus === 'error' && '⚠️ Could not get location. Please enter manually.'}
-      </div>
-
-      <label className="som-label">{t('shops:manage.addressOptional')}</label>
-      <textarea className="som-input" rows={2} value={form.address} onChange={(e) => setField('address', e.target.value)} placeholder={t('shops:manage.addressPlaceholder')} />
+      <GpsLocationSection
+        locationParts={locationParts}
+        onLocationPartsChange={setLocationParts}
+        coords={coords}
+        onCoordsChange={setCoords}
+      />
 
       <div style={{ height: 70 }} />
-      <div className="som-sticky-bar">
-        <button className="som-save-btn" onClick={handleSave}>{t('shops:manage.saveShopDetails')}</button>
+      <div className="som-sticky-bar som-sticky-bar-shopdetails">
+        <button className="som-save-btn som-save-btn-shopdetails" onClick={handleSave}>{t('shops:manage.saveShopDetails')}</button>
       </div>
     </div>
   );

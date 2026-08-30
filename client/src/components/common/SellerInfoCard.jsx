@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { IconProfile } from '../icons';
 import './SellerInfoCard.css';
 
 // Info-only by design: the prototype has exactly one Call/WhatsApp
@@ -10,7 +11,9 @@ export default function SellerInfoCard({ name, location, phone }) {
     <div className="seller-info-card">
       <div className="seller-info-title">{t('detail.sellerInfo')}</div>
       <div className="seller-info-row">
-        <span className="seller-info-avatar">👨‍🌾</span>
+        <span className="seller-info-avatar">
+          <IconProfile size={24} strokeWidth={2.3} aria-hidden="true" />
+        </span>
         <div>
           <b>{name}</b>
           <span>📍 {location || '—'}</span>

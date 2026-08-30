@@ -74,7 +74,7 @@ export default function SellCropLayout() {
   return (
     <AppShell
       title={t('common:home')}
-      onBack={() => navigate('/')}
+      onBack={() => navigate('/category/crops')}
       navItems={navItems}
       activeNavKey={activeSegment}
     >

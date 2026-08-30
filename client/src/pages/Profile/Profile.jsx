@@ -12,6 +12,7 @@ import { useToast } from '../../context/ToastContext';
 import AppShell from '../../components/common/AppShell';
 import BottomSheet from '../../components/common/BottomSheet';
 import LocationCapture from '../../components/common/LocationCapture';
+import { IconBack, IconCamera, IconPhoto, IconClose, IconProfile } from '../../components/icons';
 import { KARNATAKA } from '../../data/karnatakaLocations';
 import './Profile.css';
 
@@ -148,7 +149,7 @@ export default function Profile() {
                 onError={() => setAvatarLoadFailed(true)}
               />
             ) : (
-              '👨‍🌾'
+              <IconProfile size={34} strokeWidth={2.2} aria-hidden="true" />
             )}
           </button>
 
@@ -211,7 +212,7 @@ export default function Profile() {
           className="sticky-bar-primary profile-full-btn"
           onClick={openEdit}
         >
-          ✏️ {t('listings:profileScreen.editProfile')}
+          {t('listings:profileScreen.editProfile')}
         </button>
 
         <button
@@ -219,7 +220,7 @@ export default function Profile() {
           className="sticky-bar-secondary profile-full-btn"
           onClick={handleLogout}
         >
-          ↩️ {t('listings:profileScreen.logout')}
+          {t('listings:profileScreen.logout')}
         </button>
 
         {/* Edit Profile */}
@@ -227,7 +228,18 @@ export default function Profile() {
           open={editing}
           onClose={() => setEditing(false)}
         >
-          <h3>✏️ {t('listings:profileScreen.editProfile')}</h3>
+          <div className="profile-edit-header">
+            <button
+              type="button"
+              className="profile-edit-back"
+              onClick={() => setEditing(false)}
+              aria-label={t('common:back')}
+            >
+              <IconBack size={22} strokeWidth={3} aria-hidden="true" />
+            </button>
+
+            <h3>{t('listings:profileScreen.editProfile')}</h3>
+          </div>
 
           {EDIT_FIELDS.map(([field, labelKey]) => (
             <div className="profile-field" key={field}>
@@ -271,7 +283,18 @@ export default function Profile() {
           open={avatarStage === 'chooser'}
           onClose={closeAvatarSheet}
         >
-          <h3>{t('listings:profileScreen.changePhoto')}</h3>
+          <div className="profile-sheet-header">
+            <h3>{t('listings:profileScreen.changePhoto')}</h3>
+
+            <button
+              type="button"
+              className="profile-sheet-close"
+              onClick={closeAvatarSheet}
+              aria-label={t('listings:profileScreen.cancel')}
+            >
+              <IconClose size={16} strokeWidth={2} aria-hidden="true" />
+            </button>
+          </div>
 
           <input
             id="avatar-camera-input"
@@ -297,34 +320,32 @@ export default function Profile() {
           <div className="profile-avatar-choice">
             <button
               type="button"
-              className="sticky-bar-secondary"
+              className="profile-avatar-choice-card"
               onClick={() =>
                 document
                   .getElementById('avatar-camera-input')
                   ?.click()
               }
             >
-              📷 {t('listings:profileScreen.takePhoto')}
+              <span className="profile-avatar-choice-icon">
+                <IconCamera size={26} strokeWidth={2} aria-hidden="true" />
+              </span>
+              {t('listings:profileScreen.takePhoto')}
             </button>
 
             <button
               type="button"
-              className="sticky-bar-secondary"
+              className="profile-avatar-choice-card"
               onClick={() =>
                 document
                   .getElementById('avatar-gallery-input')
                   ?.click()
               }
             >
-              🖼️ {t('listings:profileScreen.chooseFromGallery')}
-            </button>
-
-            <button
-              type="button"
-              className="sticky-bar-secondary"
-              onClick={closeAvatarSheet}
-            >
-              ❌ {t('listings:profileScreen.cancel')}
+              <span className="profile-avatar-choice-icon">
+                <IconPhoto size={26} strokeWidth={2} aria-hidden="true" />
+              </span>
+              {t('listings:profileScreen.chooseFromGallery')}
             </button>
           </div>
         </BottomSheet>

@@ -22,6 +22,12 @@ export function distanceKm(lat1, lng1, lat2, lng2) {
 // closer, just no longer presented as more exact than it is.
 export function formatDistanceKm(km) {
   if (km == null || Number.isNaN(km)) return null;
+  // Round-to-zero for anything under 500m reads as "same location" -
+  // which is both misleadingly precise (this data was never accurate
+  // to the meter) and just looks broken to a farmer ("0 km away"?).
+  // "<1" is honest about the precision AND about there being a real,
+  // non-zero distance.
+  if (km < 0.5) return '<1';
   return String(Math.round(km));
 }
 

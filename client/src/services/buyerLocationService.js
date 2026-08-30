@@ -19,14 +19,14 @@ import { DEFAULT_LOCATION } from '../config/constants';
 export async function getBuyerLocation({ authenticatedUser, liveLocation, geocodedLocation } = {}) {
   const loc = await buyerLocationRepository.find();
   if (loc.lat != null && loc.lng != null) {
-    return { ...loc, label: loc.label || DEFAULT_LOCATION.label };
+    return { ...loc, label: loc.label || authenticatedUser?.location || DEFAULT_LOCATION.label };
   }
   if (liveLocation?.lat != null && liveLocation?.lng != null) {
     return {
       ...loc,
       lat: liveLocation.lat,
       lng: liveLocation.lng,
-      label: loc.label || DEFAULT_LOCATION.label,
+      label: loc.label || authenticatedUser?.location || DEFAULT_LOCATION.label,
     };
   }
   if (geocodedLocation?.lat != null && geocodedLocation?.lng != null) {
@@ -45,7 +45,7 @@ export async function getBuyerLocation({ authenticatedUser, liveLocation, geocod
       label: loc.label || authenticatedUser.location || DEFAULT_LOCATION.label,
     };
   }
-  return { ...loc, label: loc.label || DEFAULT_LOCATION.label };
+  return { ...loc, label: loc.label || authenticatedUser?.location || DEFAULT_LOCATION.label };
 }
 
 export async function updateBuyerLocation(patch) {

@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 
 import { getEquipmentListingDetail } from '../../../services/buyEquipmentService';
 import { formatRelativeTime } from '../../../utils/formatDate';
-import { formatDistanceKm } from '../../../utils/geo';
 import { getBuyerLocation } from '../../../services/buyerLocationService';
 
 import { useAuth } from '../../../context/AuthContext';
@@ -185,7 +184,7 @@ export default function Detail() {
       <PhotoGallery
         photoUrls={listing.photoUrls}
         className="bc-detail-hero"
-        fallback={<span>{listing.equipmentIcon || '🚜'}</span>}
+        fallback={<span>{listing.equipmentIcon || '🔧'}</span>}
       />
 
 
@@ -208,24 +207,12 @@ export default function Detail() {
           fontSize: 13,
         }}
       >
-        {listing.equipmentIcon || '🚜'}{' '}
-        {listing.equipmentTypeName || 'Equipment'}
+        {listing.equipmentIcon || '🔧'}{' '}
+        {listing.equipmentTypeName || '—'}
 
         {listing.equipmentKannadaName
           ? ` / ${listing.equipmentKannadaName}`
           : ''}
-      </p>
-
-
-      {/* Seller */}
-      <p
-        style={{
-          margin: '0 0 3px',
-          color: 'var(--muted)',
-          fontSize: 13,
-        }}
-      >
-        👨‍🌾 {listing.sellerName || 'Seller'}
       </p>
 
 
@@ -245,17 +232,11 @@ export default function Detail() {
       </p>
 
 
-      {/* Share */}
-      {listing.status === 'published' && (
-        <ShareListing
-          url={`${window.location.origin}/buy-equipment/${listing.id}`}
-          title={listing.itemName || 'Equipment'}
-        />
-      )}
-
-
       {/* Details Card */}
-      <div className="bc-detail-card">
+      <div
+        className="bc-detail-card"
+        style={{ marginBottom: 14 }}
+      >
 
         {/* Equipment Type */}
         <div
@@ -287,21 +268,6 @@ export default function Detail() {
         </div>
 
 
-        {/* Description */}
-        <div
-          className="bc-detail-row"
-          style={{ padding: '14px 16px' }}
-        >
-          <span>
-            {t('detail.description')}
-          </span>
-
-          <span>
-            {listing.description || '—'}
-          </span>
-        </div>
-
-
         {/* Location */}
         <div
           className="bc-detail-row"
@@ -313,23 +279,6 @@ export default function Detail() {
 
           <span>
             {listing.location || '—'}
-          </span>
-        </div>
-
-
-        {/* Distance */}
-        <div
-          className="bc-detail-row"
-          style={{ padding: '14px 16px' }}
-        >
-          <span>
-            {t('detail.distance')}
-          </span>
-
-          <span>
-            {listing.distanceKm != null
-              ? `${formatDistanceKm(listing.distanceKm)} km away`
-              : '—'}
           </span>
         </div>
 
@@ -352,7 +301,31 @@ export default function Detail() {
           </span>
         </div>
 
+
+        {/* Description */}
+        <div
+          className="bc-detail-row"
+          style={{ padding: '14px 16px' }}
+        >
+          <span>
+            {t('detail.description')}
+          </span>
+
+          <span>
+            {listing.description || '—'}
+          </span>
+        </div>
+
       </div>
+
+
+      {/* Share */}
+      {listing.status === 'published' && (
+        <ShareListing
+          url={`${window.location.origin}/buy-equipment/${listing.id}`}
+          title={listing.itemName || 'Equipment'}
+        />
+      )}
 
 
       {/* Seller Information */}

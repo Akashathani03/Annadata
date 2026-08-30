@@ -1,6 +1,5 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { getVillageSuggestions } from '../../services/geocodingService';
 import { updateUserProfile } from '../../services/usersService';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
@@ -9,9 +8,12 @@ import {
   KARNATAKA,
   KARNATAKA_DISTRICTS,
   getTaluksForDistrict,
+  getVillagesForTaluk,
+  getVillageLocation,
 } from '../../data/karnatakaLocations';
 import BottomSheet from './BottomSheet';
 import LocationSuggestInput from './LocationSuggestInput';
+import { IconCurrentLocation } from '../icons';
 import './LocationCapture.css';
 
 // Leaflet + react-leaflet is a real chunk of JS a farmer never needs
@@ -192,6 +194,27 @@ export default function GpsLocationSection({
     setMapOpen(false);
   }
 
+  // Village/Taluk/District/State are plain editable dropdowns,
+  // independent of GPS - a farmer can freely correct a wrong
+  // auto-detected village, or fill the whole address in by hand with
+  // no GPS at all. Without this, `coords` would silently keep
+  // whatever lat/lng GPS last produced (or stay null) while the
+  // address text changes underneath it - a listing then displays one
+  // village but is actually saved at a completely different point,
+  // which is exactly the kind of mismatch that made a nearby-seeming
+  // "<1 km away" listing turn out to genuinely be ~60km away. Once
+  // village+taluk+district all resolve to a real bundled coordinate,
+  // sync coords to match so distance math always agrees with what's
+  // displayed. A farmer who then taps "Adjust on map" or re-captures
+  // GPS still overrides this, same as any other coords update.
+  function updateLocationPart(field, value) {
+    const next = { ...locationParts, [field]: value };
+    onLocationPartsChange(() => next);
+
+    const local = getVillageLocation(next.district, next.taluk, next.village);
+    if (local) onCoordsChange({ lat: local.lat, lng: local.lng, accuracy: null });
+  }
+
   const isGpsBusy = status === 'capturing' || status === 'geocoding';
   const confirmingAddress = status === 'done' && !!address && !addressResolved;
   const effectiveCoords = override
@@ -204,41 +227,18 @@ export default function GpsLocationSection({
       <div className="cl-loc-card">
 
         <div className="cl-loc-title">
-          📍 {t(
+          {t(
             'listings:create.currentLocationTitle'
           )}
         </div>
 
-        <div className="cl-loc-row">
-          <label>{t('listings:create.village')}</label>
-
-          <LocationSuggestInput
-            value={locationParts?.village}
-            fetchOptions={() =>
-              getVillageSuggestions({
-                taluk: locationParts?.taluk,
-                district: locationParts?.district,
-                state: locationParts?.state || KARNATAKA,
-              })
-            }
-            placeholder="—"
-            label={t('listings:create.village')}
-            onChange={(newValue) =>
-              onLocationPartsChange((prev) => ({
-                ...prev,
-                village: newValue,
-              }))
-            }
-          />
-        </div>
-
         {[
+          { field: 'state', options: [KARNATAKA] },
+          { field: 'district', options: KARNATAKA_DISTRICTS },
           {
             field: 'taluk',
             options: getTaluksForDistrict(locationParts?.district),
           },
-          { field: 'district', options: KARNATAKA_DISTRICTS },
-          { field: 'state', options: [KARNATAKA] },
         ].map(({ field, options }) => {
           const fieldLabel = t(`listings:create.${field}`);
 
@@ -254,18 +254,46 @@ export default function GpsLocationSection({
                 options={options}
                 placeholder="—"
                 label={fieldLabel}
-                onChange={(newValue) =>
-                  onLocationPartsChange(
-                    (prev) => ({
-                      ...prev,
-                      [field]: newValue,
-                    })
-                  )
-                }
+                onChange={(newValue) => updateLocationPart(field, newValue)}
               />
             </div>
           );
         })}
+
+        <div className="cl-loc-row">
+          <label>{t('listings:create.village')}</label>
+
+          <LocationSuggestInput
+            value={locationParts?.village}
+            options={getVillagesForTaluk(locationParts?.district, locationParts?.taluk)}
+            placeholder="—"
+            label={t('listings:create.village')}
+            onChange={(newValue) => updateLocationPart('village', newValue)}
+          />
+        </div>
+
+        <div className="cl-loc-row">
+          <label>{t('listings:create.area')}</label>
+
+          {/* Manual-only, unlike the fields above - a specific
+              locality/landmark within the village isn't something any
+              bundled dataset (Census or OSM) tracks, so there's no
+              suggestion list to offer here, only free text. Optional:
+              most villages don't need this extra level of detail. */}
+          <input
+            type="text"
+            className="loc-suggest-search"
+            style={{ marginBottom: 0 }}
+            value={locationParts?.area || ''}
+            placeholder={t('listings:create.areaPlaceholder')}
+            onChange={(e) =>
+              onLocationPartsChange((prev) => ({
+                ...prev,
+                area: e.target.value,
+              }))
+            }
+          />
+        </div>
 
         <button
           type="button"
@@ -273,7 +301,7 @@ export default function GpsLocationSection({
           onClick={handleUseGpsClick}
           disabled={isGpsBusy}
         >
-          📍{' '}
+          <IconCurrentLocation size={14} strokeWidth={2} />{' '}
           {isGpsBusy
             ? t(
                 'listings:create.gpsGettingLocation'
@@ -414,7 +442,7 @@ export default function GpsLocationSection({
         }
       >
         <div className="cl-permission-icon">
-          📍
+          <IconCurrentLocation size={36} strokeWidth={1.5} />
         </div>
 
         <h3 className="cl-permission-title">

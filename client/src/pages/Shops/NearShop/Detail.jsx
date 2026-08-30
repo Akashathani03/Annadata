@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { getShopDetail } from '../../../services/nearShopService';
 import { resolveImageUrl } from '../../../utils/resolveImageUrl';
 import { getBuyerLocation } from '../../../services/buyerLocationService';
-import { formatDistanceKm } from '../../../utils/geo';
 import { shopProductCategories } from '../../../config/shopProductCatalog';
 import { useAuth } from '../../../context/AuthContext';
 import { useUserLocation } from '../../../context/LocationContext';
@@ -65,7 +64,7 @@ export default function Detail() {
           <ContactButtons
             phone={shop.phone}
             message={`Hello, I found ${shop.shopName} on Annadata.`}
-            callLabel={`📞 ${t('shops:detail.call')}`}
+            callLabel={t('shops:detail.call')}
             whatsappLabel={`💬 ${t('shops:detail.chatWhatsapp')}`}
             size="large"
           />
@@ -81,11 +80,6 @@ export default function Detail() {
       {shop.address && <p style={{ margin: '0 0 14px', color: 'var(--muted)', fontSize: 12.5 }}>{shop.address}</p>}
 
       <div className="shop-stats-row">
-        <div className="shop-stat">
-          <div className="si">📍</div>
-          <b>{shop.distanceKm != null ? `${formatDistanceKm(shop.distanceKm)} km` : '—'}</b>
-          <span>{t('shops:detail.distance')}</span>
-        </div>
         <div className="shop-stat">
           <div className="si">🛍️</div>
           <b>{shop.products.length}</b>

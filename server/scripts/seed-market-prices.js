@@ -47,6 +47,32 @@ const crops = [
   { _id: 'turmeric', category: 'crop', group: 'spice', name: 'Turmeric', kannadaName: 'ಅರಿಶಿನ', icon: '🟡', defaultUnit: 'Quintal' },
   { _id: 'coconut', category: 'crop', group: 'plantation', name: 'Coconut', kannadaName: 'ತೆಂಗಿನಕಾಯಿ', icon: '🥥', defaultUnit: 'Quintal' },
   { _id: 'sugarcane', category: 'crop', group: 'cash', name: 'Sugarcane', kannadaName: 'ಕಬ್ಬು', icon: '🎋', defaultUnit: 'Ton' },
+
+  // Added to round out real Karnataka crops the picker was missing -
+  // in particular 'pulse' and 'fruit' had zero crops despite both
+  // having their own filter chip in buyCropsConfig.js (dead-end
+  // filters until now). No price data is seeded for any of these -
+  // they start with none (never a fabricated number) and only gain
+  // real prices once agmarknetSync.service.js's CROP_ALIASES is
+  // extended to match them against a real Agmarknet commodity name.
+  { _id: 'wheat', category: 'crop', group: 'cereal', name: 'Wheat', kannadaName: 'ಗೋಧಿ', icon: '🌾', defaultUnit: 'Quintal' },
+  { _id: 'tur', category: 'crop', group: 'pulse', name: 'Tur (Pigeon Pea)', kannadaName: 'ತೊಗರಿ', icon: '🫘', defaultUnit: 'Quintal' },
+  { _id: 'moong', category: 'crop', group: 'pulse', name: 'Green Gram (Moong)', kannadaName: 'ಹೆಸರುಕಾಳು', icon: '🫘', defaultUnit: 'Quintal' },
+  { _id: 'urad', category: 'crop', group: 'pulse', name: 'Black Gram (Urad)', kannadaName: 'ಉದ್ದಿನಕಾಳು', icon: '🫘', defaultUnit: 'Quintal' },
+  { _id: 'chana', category: 'crop', group: 'pulse', name: 'Bengal Gram (Chana)', kannadaName: 'ಕಡಲೆ', icon: '🫘', defaultUnit: 'Quintal' },
+  { _id: 'sunflower', category: 'crop', group: 'oilseed', name: 'Sunflower', kannadaName: 'ಸೂರ್ಯಕಾಂತಿ', icon: '🌻', defaultUnit: 'Quintal' },
+  { _id: 'soybean', category: 'crop', group: 'oilseed', name: 'Soybean', kannadaName: 'ಸೋಯಾಬೀನ್', icon: '🌱', defaultUnit: 'Quintal' },
+  { _id: 'cabbage', category: 'crop', group: 'veg', name: 'Cabbage', kannadaName: 'ಎಲೆಕೋಸು', icon: '🥬', defaultUnit: 'Kg' },
+  { _id: 'cauliflower', category: 'crop', group: 'veg', name: 'Cauliflower', kannadaName: 'ಹೂಕೋಸು', icon: '🥦', defaultUnit: 'Kg' },
+  { _id: 'carrot', category: 'crop', group: 'veg', name: 'Carrot', kannadaName: 'ಕ್ಯಾರೆಟ್', icon: '🥕', defaultUnit: 'Kg' },
+  { _id: 'cucumber', category: 'crop', group: 'veg', name: 'Cucumber', kannadaName: 'ಸೌತೆಕಾಯಿ', icon: '🥒', defaultUnit: 'Kg' },
+  { _id: 'ladyfinger', category: 'crop', group: 'veg', name: "Ladies Finger (Okra)", kannadaName: 'ಬೆಂಡೆಕಾಯಿ', icon: '🫛', defaultUnit: 'Kg' },
+  { _id: 'banana', category: 'crop', group: 'fruit', name: 'Banana', kannadaName: 'ಬಾಳೆಹಣ್ಣು', icon: '🍌', defaultUnit: 'Kg' },
+  { _id: 'mango', category: 'crop', group: 'fruit', name: 'Mango', kannadaName: 'ಮಾವಿನಹಣ್ಣು', icon: '🥭', defaultUnit: 'Kg' },
+  { _id: 'watermelon', category: 'crop', group: 'fruit', name: 'Watermelon', kannadaName: 'ಕಲ್ಲಂಗಡಿ', icon: '🍉', defaultUnit: 'Kg' },
+  { _id: 'grapes', category: 'crop', group: 'fruit', name: 'Grapes', kannadaName: 'ದ್ರಾಕ್ಷಿ', icon: '🍇', defaultUnit: 'Kg' },
+  { _id: 'coriander', category: 'crop', group: 'spice', name: 'Coriander', kannadaName: 'ಕೊತ್ತಂಬರಿ', icon: '🌿', defaultUnit: 'Kg' },
+  { _id: 'ginger', category: 'crop', group: 'spice', name: 'Ginger', kannadaName: 'ಶುಂಠಿ', icon: '🫚', defaultUnit: 'Kg' },
 ];
 
 const today = new Date().toISOString().slice(0, 10);
@@ -145,6 +171,29 @@ const BASE_PRICES = {
   turmeric: { minPrice: 7200, modalPrice: 7800, maxPrice: 8500 },
   coconut: { minPrice: 3600, modalPrice: 4000, maxPrice: 4400 },
   sugarcane: { minPrice: 3050, modalPrice: 3200, maxPrice: 3350 },
+
+  // Base prices for the crops added alongside this comment - same
+  // seed-only status as everything above (source: 'seed' until a real
+  // Agmarknet sync match overwrites it), order-of-magnitude realistic
+  // for their unit, not claimed as verified/current.
+  wheat: { minPrice: 2150, modalPrice: 2280, maxPrice: 2420 },
+  tur: { minPrice: 8800, modalPrice: 9300, maxPrice: 9800 },
+  moong: { minPrice: 7600, modalPrice: 8000, maxPrice: 8500 },
+  urad: { minPrice: 7200, modalPrice: 7600, maxPrice: 8000 },
+  chana: { minPrice: 5000, modalPrice: 5300, maxPrice: 5600 },
+  sunflower: { minPrice: 6000, modalPrice: 6300, maxPrice: 6700 },
+  soybean: { minPrice: 4200, modalPrice: 4450, maxPrice: 4700 },
+  cabbage: { minPrice: 8, modalPrice: 11, maxPrice: 14 },
+  cauliflower: { minPrice: 15, modalPrice: 19, maxPrice: 24 },
+  carrot: { minPrice: 20, modalPrice: 24, maxPrice: 29 },
+  cucumber: { minPrice: 10, modalPrice: 13, maxPrice: 17 },
+  ladyfinger: { minPrice: 20, modalPrice: 25, maxPrice: 30 },
+  banana: { minPrice: 15, modalPrice: 19, maxPrice: 24 },
+  mango: { minPrice: 40, modalPrice: 50, maxPrice: 62 },
+  watermelon: { minPrice: 8, modalPrice: 11, maxPrice: 15 },
+  grapes: { minPrice: 45, modalPrice: 55, maxPrice: 68 },
+  coriander: { minPrice: 15, modalPrice: 20, maxPrice: 26 },
+  ginger: { minPrice: 30, modalPrice: 38, maxPrice: 46 },
 };
 
 function hashVariation(key) {

@@ -95,17 +95,15 @@ export default function CropList() {
 
       {apmc && (
         <>
-          <div className="mp-market-bar">
-            <div className="mp-market-left">
-              📍 <b>{apmc.name}</b>
-
-              {apmc.isNearest && (
+          {apmc.isNearest && (
+            <div className="mp-market-bar">
+              <div className="mp-market-left">
                 <span className="mp-tag-pill">
                   {t('nearest')}
                 </span>
-              )}
+              </div>
             </div>
-          </div>
+          )}
 
           <SearchInput
             value={query}

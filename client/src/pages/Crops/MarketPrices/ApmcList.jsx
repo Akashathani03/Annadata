@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getApmcMarkets } from '../../../services/marketPricesService';
 import { useUserLocation } from '../../../context/LocationContext';
-import { formatDistanceKm } from '../../../utils/geo';
 import AppShell from '../../../components/common/AppShell';
 import './MarketPrices.css';
 
@@ -53,9 +52,12 @@ export default function ApmcList() {
   return (
     <AppShell
       title={t('title')}
-      subtitle={t('subtitle')}
-      onBack={() => navigate('/')}
+      onBack={() => navigate('/category/crops')}
     >
+      <div className="mp-note">
+        {t('subtitle')}
+      </div>
+
       <div className="mp-apmc-list">
         {visibleApmcs.map((apmc) => (
           <button
@@ -72,10 +74,6 @@ export default function ApmcList() {
 
               <div>
                 <b>{apmc.name}</b>
-
-                <span className="mp-dist">
-                  {formatDistanceKm(apmc.distanceKm)} km away
-                </span>
               </div>
             </div>
 

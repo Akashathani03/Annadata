@@ -15,6 +15,7 @@ import {
   buildTextReply,
   buildNavigateReply,
   buildOutOfScopeReply,
+  buildAboutAiReply,
 } from './replyBuilder.js';
 import { CONTEXT_WINDOW_MESSAGES, buildConversationSummary } from './conversationContext.js';
 import {
@@ -204,7 +205,7 @@ export async function generateReply({ userId, messageId, lat, lng }) {
     const result = await generateStructuredCompletion({
       taskType: 'generation',
       systemPrompt:
-        `You are an agriculture assistant diagnosing a crop problem for an Indian farmer, based on their message and/or an attached photo. Only produce a real diagnosis when there is an actual symptom described or an image to analyze - if neither is present, ask plainly for a photo or a description rather than fabricating a diagnosis.${conversationSummary ? `\n\n${conversationSummary}` : ''}`,
+        `You are an agriculture assistant diagnosing a crop problem for an Indian farmer, based on their message and/or an attached photo. Only produce a real diagnosis when there is an actual symptom described or an image to analyze - if neither is present, ask plainly for a photo or a description rather than fabricating a diagnosis. Every text field must be plain text only - no markdown (no **bold**, no bullet points with - or *, no headings) - the app displays these fields exactly as written, with no formatting applied.${conversationSummary ? `\n\n${conversationSummary}` : ''}`,
       userPrompt: userMessage.text || 'Please diagnose the issue shown in the attached photo.',
       imageBase64,
       imageMimeType,
@@ -217,12 +218,14 @@ export async function generateReply({ userId, messageId, lat, lng }) {
     const result = await generateCompletion({
       taskType: 'generation',
       systemPrompt:
-        `You are Agro AI, a friendly agricultural assistant helping farmers. Continue the conversation naturally using the recent conversation context. Speak simply, warmly, and clearly. If the farmer asks to explain, summarize, translate, or continue a previous answer, do so naturally. Do not generate diagnosis cards or structured lookup responses from this conversational prompt.${conversationSummary ? `\n\n${conversationSummary}` : ''}`,
+        `You are Agro AI, a friendly agricultural assistant helping farmers. Continue the conversation naturally using the recent conversation context. Speak simply, warmly, and clearly. If the farmer asks to explain, summarize, translate, or continue a previous answer, do so naturally. Do not generate diagnosis cards or structured lookup responses from this conversational prompt. Reply in plain text only - no markdown (no **bold**, no bullet points with - or *, no headings) - the chat UI displays this text exactly as written, with no formatting applied.${conversationSummary ? `\n\n${conversationSummary}` : ''}`,
       userPrompt: userMessage.text || '',
     });
     reply = buildTextReply(result.text);
   } else if (decision.intent === 'navigate') {
     reply = buildNavigateReply(decision.destination);
+  } else if (decision.intent === 'about_ai') {
+    reply = buildAboutAiReply();
   } else {
     reply = buildOutOfScopeReply();
   }

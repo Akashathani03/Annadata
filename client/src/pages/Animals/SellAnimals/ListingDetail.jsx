@@ -35,7 +35,7 @@ export default function ListingDetail() {
   const icon =
     animalCatalog.find((animal) => animal.id === listing?.itemId)?.icon ??
     listing?.animalIcon ??
-    '🐄';
+    '🐾';
 
   async function reload() {
     try {

@@ -12,6 +12,16 @@ export const equipmentCatalog = [
   { id: 'cultivator', category: 'equipment', group: 'equipment', name: 'Cultivator', kannadaName: 'ಕಲ್ಟಿವೇಟರ್', icon: '🚜', defaultUnit: 'Unit' },
   { id: 'harvester', category: 'equipment', group: 'equipment', name: 'Harvester', kannadaName: 'ಹಾರ್ವೆಸ್ಟರ್', icon: '🌾', defaultUnit: 'Unit' },
   { id: 'other_equipment', category: 'equipment', group: 'equipment', name: 'Other Equipment', kannadaName: 'ಇತರೆ ಉಪಕರಣ', icon: '🔧', defaultUnit: 'Unit' },
+
+  // Kept identical (same ids) to server/scripts/seed-equipment-catalog.js.
+  { id: 'rotavator', category: 'equipment', group: 'equipment', name: 'Rotavator', kannadaName: 'ರೋಟವೇಟರ್', icon: '🚜', defaultUnit: 'Unit' },
+  { id: 'plough', category: 'equipment', group: 'equipment', name: 'Plough', kannadaName: 'ನೇಗಿಲು', icon: '🚜', defaultUnit: 'Unit' },
+  { id: 'seed_drill', category: 'equipment', group: 'equipment', name: 'Seed Drill', kannadaName: 'ಬಿತ್ತನೆ ಯಂತ್ರ', icon: '🌱', defaultUnit: 'Unit' },
+  { id: 'chaff_cutter', category: 'equipment', group: 'equipment', name: 'Chaff Cutter', kannadaName: 'ಮೇವು ಕತ್ತರಿಸುವ ಯಂತ್ರ', icon: '✂️', defaultUnit: 'Unit' },
+  { id: 'trolley', category: 'equipment', group: 'equipment', name: 'Tractor Trolley', kannadaName: 'ಟ್ರ್ಯಾಕ್ಟರ್ ಟ್ರಾಲಿ', icon: '🚛', defaultUnit: 'Unit' },
+  { id: 'generator', category: 'equipment', group: 'equipment', name: 'Generator', kannadaName: 'ಜನರೇಟರ್', icon: '🔌', defaultUnit: 'Unit' },
+  { id: 'solar_pump', category: 'equipment', group: 'equipment', name: 'Solar Water Pump', kannadaName: 'ಸೌರ ನೀರಿನ ಪಂಪ್', icon: '☀️', defaultUnit: 'Unit' },
+  { id: 'weeder', category: 'equipment', group: 'equipment', name: 'Weeder', kannadaName: 'ಕಳೆ ತೆಗೆಯುವ ಯಂತ್ರ', icon: '🌿', defaultUnit: 'Unit' },
 ];
 
 export function getEquipmentById(equipmentId) {

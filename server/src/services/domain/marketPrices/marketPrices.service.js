@@ -115,6 +115,11 @@ export async function getCropPriceDetail(apmcId, cropId) {
     modalPrice: entry.modalPrice,
     maxPrice: entry.maxPrice,
     priceDate: entry.priceDate,
-    recentHistory: buildRecentHistory(entry),
+    source: entry.source,
+    // Real history (from an Agmarknet sync) wins when it exists;
+    // synthetic drift is only ever a stand-in for a record that has
+    // never actually been synced, never a substitute once real
+    // history is available.
+    recentHistory: entry.history?.length > 0 ? entry.history : buildRecentHistory(entry),
   };
 }

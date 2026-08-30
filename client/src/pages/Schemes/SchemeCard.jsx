@@ -18,10 +18,13 @@ export default function SchemeCard({ scheme, onViewDetails, onApply }) {
       </div>
       <p className="scheme-desc">{scheme.description}</p>
       <div className="scheme-meta">
-        <span>💵 <b>{scheme.amount}</b></span>
-        <span>📅 {t('govSchemes:deadlineLabel')}: <b>{scheme.deadline}</b></span>
-        <span>👥 <b>{scheme.appliedCount}</b> {t('govSchemes:appliedSuffix')}</span>
+        {scheme.amount && <span>💵 <b>{scheme.amount}</b></span>}
+        {scheme.deadline && <span>📅 {t('govSchemes:deadlineLabel')}: <b>{scheme.deadline}</b></span>}
+        {scheme.appliedCount && <span>👥 <b>{scheme.appliedCount}</b> {t('govSchemes:appliedSuffix')}</span>}
       </div>
+      {scheme.source !== 'verified' && (
+        <p className="scheme-unverified-note">{t('govSchemes:unverifiedNote')}</p>
+      )}
       <div className="scheme-actions">
         <button className="btn-apply" onClick={() => onApply(scheme)}>{t('govSchemes:applyNow')}</button>
         <button className="btn-details" onClick={() => onViewDetails(scheme)}>{t('govSchemes:viewDetails')}</button>

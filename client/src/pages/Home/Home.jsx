@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { marketplaceCategories } from '../../config/marketplaceCategories';
-import { DEFAULT_LOCATION } from '../../config/constants';
 import { useAuth } from '../../context/AuthContext';
 import { useUserLocation } from '../../context/LocationContext';
 import WeatherCard from '../../components/weather/WeatherCard';
@@ -36,13 +35,8 @@ export default function Home() {
   const {
     lat: weatherLat,
     lng: weatherLng,
-    liveLocation,
     refreshIfStale,
   } = useUserLocation();
-
-  const weatherLocationLabel = liveLocation
-    ? t('common:currentLocationLabel')
-    : user?.location || DEFAULT_LOCATION.label;
 
   // Home becoming active is the trigger point for a staleness check -
   // reuses the current session location if still fresh, silently
@@ -106,7 +100,6 @@ export default function Home() {
       <WeatherCard
         lat={weatherLat}
         lon={weatherLng}
-        locationLabel={weatherLocationLabel}
       />
 
       <div className="home-grid">

@@ -82,7 +82,7 @@ export default function Dashboard() {
 
       <div className="dash-hero">
         <div className="dash-hero-label">
-          📋 {t('listings:dashboard.myListingsCard')}
+          {t('listings:dashboard.myListingsCard')}
         </div>
 
         <div className="dash-hero-row">

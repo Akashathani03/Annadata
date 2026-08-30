@@ -32,7 +32,7 @@ export default function SellEquipmentLayout() {
   if (!user) return null;
 
   return (
-    <AppShell title={t('common:home')} onBack={() => navigate('/')} navItems={navItems} activeNavKey={activeSegment}>
+    <AppShell title={t('common:home')} onBack={() => navigate('/category/equipment')} navItems={navItems} activeNavKey={activeSegment}>
       <Outlet />
     </AppShell>
   );

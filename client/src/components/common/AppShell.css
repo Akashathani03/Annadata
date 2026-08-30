@@ -6,6 +6,14 @@
   position: relative;
 }
 
+/* The bottom-nav bar (below) floats inset from the viewport edge and is
+   taller than the default reserve accounts for - pages using it need more
+   bottom clearance than the sticky-action-bar reserve. Scoped via :has() so
+   pages using stickyBar, or no fixed bottom UI at all, are unaffected. */
+.app-shell:has(.app-shell-bottomnav) {
+  padding-bottom: 136px;
+}
+
 .app-shell-bar {
   position: sticky;
   top: 0;
@@ -79,6 +87,13 @@
   padding: 0;
 }
 
+/* Same optical-centering correction as SellerInfoCard's avatar - the
+   User icon's glyph isn't vertically symmetric in its own bounding
+   box, so a flex-centered box alone still looks slightly low. */
+.app-shell-avatar-btn svg {
+  transform: translateY(-1px);
+}
+
 .app-shell-avatar-img {
   width: 100%;
   height: 100%;
@@ -106,17 +121,19 @@
 
 .app-shell-bottomnav {
   position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  left: 26px;
+  right: 26px;
+  bottom: calc(16px + env(safe-area-inset-bottom));
   z-index: 150;
   background: #fff;
-  border-top: 1px solid var(--border);
+  border: 1px solid var(--border);
+  border-radius: 28px;
   display: flex;
+  align-items: center;
   justify-content: space-around;
-  padding: 7px 4px calc(7px + env(safe-area-inset-bottom));
-  box-shadow: 0 -10px 24px rgba(31, 43, 35, 0.08);
-  max-width: 480px;
+  padding: 8px;
+  box-shadow: 0 14px 32px rgba(31, 43, 35, 0.16);
+  max-width: 428px;
   margin: 0 auto;
 }
 
@@ -124,21 +141,35 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  font-size: 9.5px;
+  justify-content: center;
+  gap: 4px;
+  min-height: 56px;
+  font-size: 11.5px;
   font-weight: 700;
   color: var(--muted);
   flex: 1;
-  padding: 4px 2px;
+  padding: 9px 8px;
+  border-radius: 20px;
   cursor: pointer;
   text-align: center;
   line-height: 1.15;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 .app-shell-bottomnav a .ic {
+  display: flex;
   font-size: 18px;
 }
 
+/* Lucide icons set their own width/height attributes via the `size` prop -
+   bump the rendered SVG box directly here rather than in JS, so this stays
+   a CSS-only visual change. */
+.app-shell-bottomnav a .ic svg {
+  width: 22px;
+  height: 22px;
+}
+
 .app-shell-bottomnav a.active {
+  background: var(--green-light);
   color: var(--green-dark);
 }

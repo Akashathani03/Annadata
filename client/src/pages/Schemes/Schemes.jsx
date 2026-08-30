@@ -128,9 +128,16 @@ export default function Schemes() {
             <p className="msub">{detailScheme.dept}</p>
             <p className="scheme-detail-desc">{detailScheme.detailDescription || detailScheme.description}</p>
             <div className="scheme-meta" style={{ margin: '14px 0' }}>
-              <span>💵 <b>{detailScheme.detailAmount || detailScheme.amount}</b></span>
-              <span>📅 {t('govSchemes:deadlineLabel')}: <b>{detailScheme.detailDeadline || detailScheme.deadline}</b></span>
+              {(detailScheme.detailAmount || detailScheme.amount) && (
+                <span>💵 <b>{detailScheme.detailAmount || detailScheme.amount}</b></span>
+              )}
+              {(detailScheme.detailDeadline || detailScheme.deadline) && (
+                <span>📅 {t('govSchemes:deadlineLabel')}: <b>{detailScheme.detailDeadline || detailScheme.deadline}</b></span>
+              )}
             </div>
+            {detailScheme.source !== 'verified' && (
+              <p className="scheme-unverified-note">{t('govSchemes:unverifiedNote')}</p>
+            )}
             <div className="scheme-detail-elig-label">{t('govSchemes:detail.eligibility')}</div>
             <ul className="scheme-detail-elig-list">
               {detailScheme.eligibility.map((e) => (

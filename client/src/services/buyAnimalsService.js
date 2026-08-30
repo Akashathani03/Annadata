@@ -11,10 +11,13 @@ async function enrichListing(listing) {
 
   return {
     ...listing,
-    animalIcon: meta?.icon ?? '🐄',
+    animalIcon: meta?.icon ?? '🐾',
     animalTypeName: meta?.name ?? '',
     animalKannadaName: meta?.kannadaName ?? '',
-    animalGroup: meta?.group ?? 'cattle',
+    // null (not a guessed group like 'cattle') for a farmer-typed animal
+    // outside the catalog - it will show under "All" but won't be
+    // silently mis-filed into a category chip it doesn't belong to.
+    animalGroup: meta?.group ?? null,
     sellerName: seller?.name || 'Farmer',
   };
 }

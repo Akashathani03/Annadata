@@ -1,8 +1,9 @@
 {
   "input": {
-    "placeholder": "Ask anything...",
+    "placeholder": "Ask about crops, weather, prices...",
     "cameraAriaLabel": "Add a photo",
-    "sendAriaLabel": "Send message"
+    "sendAriaLabel": "Send message",
+    "disclaimer": "AgroAI is an AI assistant and can make mistakes. Please verify important information."
   },
   "emptyState": {
     "greetingMorning": "Good morning",
@@ -57,6 +58,7 @@
     "alternativeFertilizer": "Alternative Fertilizer"
   },
   "imageUpload": {
+    "title": "Upload crop photo",
     "camera": "Camera",
     "gallery": "Gallery",
     "captionPlaceholder": "Add details (optional)",

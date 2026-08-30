@@ -1,8 +1,12 @@
 .chat-input {
   display: flex;
   align-items: flex-end;
-  gap: 8px;
-  padding: 8px 10px;
+  gap: 6px;
+  margin: 8px 10px;
+  padding: 4px 4px 4px 10px;
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-radius: 24px;
 }
 
 .chat-input-camera-btn,
@@ -21,19 +25,16 @@
 }
 
 .chat-input-camera-btn:hover:not(:disabled) {
-  background: var(--cream);
-}
-
-.chat-input-send-btn {
-  color: var(--muted);
+  background: var(--border);
 }
 
 .chat-input-send-btn:not(:disabled) {
-  color: var(--green-dark);
+  background: var(--green-dark);
+  color: #fff;
 }
 
 .chat-input-send-btn:not(:disabled):hover {
-  background: var(--green-light);
+  background: var(--green);
 }
 
 .chat-input-camera-btn:disabled,
@@ -80,6 +81,6 @@
    satisfies the accessibility requirement without adding a border to
    every child individually. */
 .chat-input:focus-within {
-  box-shadow: 0 0 0 2px rgba(46, 125, 70, 0.15);
-  border-radius: 12px;
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(46, 125, 70, 0.15);
 }

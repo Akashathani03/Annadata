@@ -18,6 +18,7 @@ import AppShell from '../../../components/common/AppShell';
 import StepCard from '../../../components/common/StepCard';
 import MultiPhotoUpload from '../../../components/common/MultiPhotoUpload';
 import GpsLocationSection from '../../../components/common/GpsLocationSection';
+import LocationSuggestInput from '../../../components/common/LocationSuggestInput';
 import StickyActionBar from '../../../components/common/StickyActionBar';
 import BottomSheet from '../../../components/common/BottomSheet';
 
@@ -46,6 +47,10 @@ export default function CreateListing() {
   // --------------------------------------------------
 
   const [itemId, setItemId] = useState('');
+  // Set only when the farmer typed an animal type that isn't in the
+  // catalog - itemId stays '' in that case, same fallback pattern as
+  // the crop listing form's customItemName.
+  const [customAnimalType, setCustomAnimalType] = useState('');
   const [title, setTitle] = useState('');
   // How many animals this one listing covers - always priced per
   // animal (see priceLabel), never a single blended total for the
@@ -58,6 +63,7 @@ export default function CreateListing() {
 
   const [locationParts, setLocationParts] = useState({
     village: user?.village || '',
+    area: '',
     taluk: user?.taluk || '',
     district: user?.district || '',
     state: user?.state || KARNATAKA,
@@ -98,6 +104,27 @@ export default function CreateListing() {
     [itemId]
   );
 
+  function animalOptionLabel(animal) {
+    return `${animal.icon} ${animal.name} / ${animal.kannadaName}`;
+  }
+
+  // A farmer with an animal type outside the catalog can still list it -
+  // typing a value that doesn't match any catalog animal is treated as
+  // that type's name directly, with no itemId (so it won't carry a
+  // catalog defaultUnit or be matched by AgroAI's catalog search).
+  function handleAnimalChange(newValue) {
+    const matched = animalCatalog.find(
+      (a) => animalOptionLabel(a) === newValue
+    );
+    if (matched) {
+      setItemId(matched.id);
+      setCustomAnimalType('');
+    } else {
+      setItemId('');
+      setCustomAnimalType(newValue);
+    }
+  }
+
   // --------------------------------------------------
   // BACK
   // --------------------------------------------------
@@ -105,6 +132,7 @@ export default function CreateListing() {
   function handleBack() {
     const hasUnsavedChanges =
       itemId.trim() !== '' ||
+      customAnimalType.trim() !== '' ||
       title.trim() !== '' ||
       quantity.trim() !== '1' ||
       price.trim() !== '' ||
@@ -142,6 +170,7 @@ export default function CreateListing() {
 
       setLocationParts({
         village: user.village || '',
+        area: '',
         taluk: user.taluk || '',
         district: user.district || '',
         state: user.state || KARNATAKA,
@@ -175,7 +204,13 @@ export default function CreateListing() {
           return;
         }
 
-        setItemId(existing.itemId || '');
+        if (existing.itemId) {
+          setItemId(existing.itemId);
+          setCustomAnimalType('');
+        } else {
+          setItemId('');
+          setCustomAnimalType('');
+        }
 
         setTitle(existing.itemName || '');
 
@@ -200,6 +235,8 @@ export default function CreateListing() {
             existing.locationVillage ||
             user.village ||
             '',
+
+          area: existing.locationArea || '',
 
           taluk:
             existing.locationTaluk ||
@@ -269,6 +306,7 @@ export default function CreateListing() {
 
   function resetForm() {
     setItemId('');
+    setCustomAnimalType('');
     setTitle('');
     setQuantity('1');
     setPrice('');
@@ -285,6 +323,7 @@ export default function CreateListing() {
 
     setLocationParts({
       village: user?.village || '',
+      area: '',
       taluk: user?.taluk || '',
       district: user?.district || '',
       state: user?.state || KARNATAKA,
@@ -310,7 +349,7 @@ export default function CreateListing() {
   function validateForPublish() {
     let valid = true;
 
-    if (!itemId) {
+    if (!itemId && !customAnimalType.trim()) {
       setItemError(
         t('animals:create.validationCategory')
       );
@@ -398,7 +437,7 @@ export default function CreateListing() {
     if (status === 'draft') {
       clearErrors();
 
-      if (!itemId && !title.trim()) {
+      if (!itemId && !customAnimalType.trim() && !title.trim()) {
         setItemError(
           t('animals:create.validationCategory')
         );
@@ -428,6 +467,7 @@ export default function CreateListing() {
 
       const location = [
         locationParts.village,
+        locationParts.area,
         locationParts.taluk,
         locationParts.district,
       ]
@@ -445,6 +485,7 @@ export default function CreateListing() {
         itemName:
           title.trim() ||
           selectedItem?.name ||
+          customAnimalType.trim() ||
           '',
 
         // Always priced per animal (see priceLabel) - quantity is how
@@ -473,6 +514,9 @@ export default function CreateListing() {
 
         locationVillage:
           locationParts.village || '',
+
+        locationArea:
+          locationParts.area || '',
 
         locationTaluk:
           locationParts.taluk || '',
@@ -520,6 +564,7 @@ export default function CreateListing() {
         listing?.itemName ||
           title.trim() ||
           selectedItem?.name ||
+          customAnimalType.trim() ||
           ''
       );
 
@@ -601,33 +646,24 @@ export default function CreateListing() {
               *
             </label>
 
-            <select
-              value={itemId}
-              onChange={(e) => {
-                setItemId(e.target.value);
+            <LocationSuggestInput
+              value={
+                selectedItem
+                  ? animalOptionLabel(selectedItem)
+                  : customAnimalType
+              }
+              options={animalCatalog.map(animalOptionLabel)}
+              onChange={(newValue) => {
+                handleAnimalChange(newValue);
                 setItemError('');
               }}
-            >
-              <option value="">
-                {t(
-                  'animals:create.animalType'
-                )}
-              </option>
-
-              {animalCatalog.map(
-                (animal) => (
-                  <option
-                    key={animal.id}
-                    value={animal.id}
-                  >
-                    {animal.icon}{' '}
-                    {animal.name}
-                    {' / '}
-                    {animal.kannadaName}
-                  </option>
-                )
+              placeholder={t(
+                'animals:create.animalType'
               )}
-            </select>
+              label={t(
+                'animals:create.animalType'
+              )}
+            />
 
             {itemError && (
               <span className="cl-field-error">
@@ -791,6 +827,9 @@ export default function CreateListing() {
                 setPhotoError('');
               }}
               max={4}
+              title={t(
+                'animals:create.uploadPhotoTitle'
+              )}
               label={t(
                 'animals:create.uploadLabel'
               )}
@@ -829,7 +868,7 @@ export default function CreateListing() {
 
         {/* Space for sticky bar */}
 
-        <div style={{ height: 80 }} />
+        <div style={{ height: 128 }} />
 
         {/* ==========================================
             STICKY ACTION BAR

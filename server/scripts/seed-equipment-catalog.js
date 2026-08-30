@@ -22,6 +22,18 @@ const equipment = [
   { _id: 'cultivator', category: 'equipment', group: 'equipment', name: 'Cultivator', kannadaName: 'ಕಲ್ಟಿವೇಟರ್', icon: '🚜', defaultUnit: 'Unit' },
   { _id: 'harvester', category: 'equipment', group: 'equipment', name: 'Harvester', kannadaName: 'ಹಾರ್ವೆಸ್ಟರ್', icon: '🌾', defaultUnit: 'Unit' },
   { _id: 'other_equipment', category: 'equipment', group: 'equipment', name: 'Other Equipment', kannadaName: 'ಇತರೆ ಉಪಕರಣ', icon: '🔧', defaultUnit: 'Unit' },
+
+  // Added to round out common farm equipment beyond the original 8 -
+  // must be kept identical (same ids) to client/src/config/
+  // equipmentCatalog.js, per this file's own header comment.
+  { _id: 'rotavator', category: 'equipment', group: 'equipment', name: 'Rotavator', kannadaName: 'ರೋಟವೇಟರ್', icon: '🚜', defaultUnit: 'Unit' },
+  { _id: 'plough', category: 'equipment', group: 'equipment', name: 'Plough', kannadaName: 'ನೇಗಿಲು', icon: '🚜', defaultUnit: 'Unit' },
+  { _id: 'seed_drill', category: 'equipment', group: 'equipment', name: 'Seed Drill', kannadaName: 'ಬಿತ್ತನೆ ಯಂತ್ರ', icon: '🌱', defaultUnit: 'Unit' },
+  { _id: 'chaff_cutter', category: 'equipment', group: 'equipment', name: 'Chaff Cutter', kannadaName: 'ಮೇವು ಕತ್ತರಿಸುವ ಯಂತ್ರ', icon: '✂️', defaultUnit: 'Unit' },
+  { _id: 'trolley', category: 'equipment', group: 'equipment', name: 'Tractor Trolley', kannadaName: 'ಟ್ರ್ಯಾಕ್ಟರ್ ಟ್ರಾಲಿ', icon: '🚛', defaultUnit: 'Unit' },
+  { _id: 'generator', category: 'equipment', group: 'equipment', name: 'Generator', kannadaName: 'ಜನರೇಟರ್', icon: '🔌', defaultUnit: 'Unit' },
+  { _id: 'solar_pump', category: 'equipment', group: 'equipment', name: 'Solar Water Pump', kannadaName: 'ಸೌರ ನೀರಿನ ಪಂಪ್', icon: '☀️', defaultUnit: 'Unit' },
+  { _id: 'weeder', category: 'equipment', group: 'equipment', name: 'Weeder', kannadaName: 'ಕಳೆ ತೆಗೆಯುವ ಯಂತ್ರ', icon: '🌿', defaultUnit: 'Unit' },
 ];
 
 async function seed() {

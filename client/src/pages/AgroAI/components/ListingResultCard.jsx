@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { resolveImageUrl } from '../../../utils/resolveImageUrl';
-import { formatDistanceKm } from '../../../utils/geo';
 import './ListingResultCard.css';
 
 // Maps each category to its existing, already-built Buy Detail route -
@@ -37,7 +36,7 @@ export default function ListingResultCard({ listings = [] }) {
                 {l.condition && <span className="listing-result-condition">{t(`equipment:condition.${l.condition}`)}</span>}
               </p>
               <p className="listing-result-location">
-                {l.distanceKm != null ? `${formatDistanceKm(l.distanceKm)} km away` : l.location || ''}
+                {l.location || ''}
               </p>
             </div>
             {routeFor && (

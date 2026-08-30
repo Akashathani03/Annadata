@@ -78,7 +78,7 @@ export default function SellAnimalsLayout() {
   return (
     <AppShell
       title={t('common:home')}
-      onBack={() => navigate('/')}
+      onBack={() => navigate('/category/animals')}
       navItems={navItems}
       activeNavKey={activeSegment}
     >

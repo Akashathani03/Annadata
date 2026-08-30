@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { getBrowseCrops } from '../../../services/buyCropsService';
 import { resolveImageUrl } from '../../../utils/resolveImageUrl';
 import { formatRelativeTime } from '../../../utils/formatDate';
-import { formatDistanceKm } from '../../../utils/geo';
 import {
   getBuyerLocation,
   updateBuyerLocation,
@@ -26,6 +25,14 @@ import SearchInput from '../../../components/common/SearchInput';
 import ChipScroller from '../../../components/common/ChipScroller';
 import OptionList from '../../../components/common/OptionList';
 import BottomSheet from '../../../components/common/BottomSheet';
+import LocationSuggestInput from '../../../components/common/LocationSuggestInput';
+import {
+  KARNATAKA,
+  KARNATAKA_DISTRICTS,
+  getTaluksForDistrict,
+  getVillagesForTaluk,
+  getVillageLocation,
+} from '../../../data/karnatakaLocations';
 
 import './BuyCrops.css';
 
@@ -225,7 +232,7 @@ export default function Browse() {
   function handleClearFilters() {
     setQuery('');
     setCategory('All');
-    setSort('price_low');
+    setSort('nearest');
     setDistance('All');
 
     showToast(
@@ -340,6 +347,24 @@ export default function Browse() {
     );
   }
 
+  // Manual Village/Taluk/District/State edits are independent of GPS -
+  // without this, pendingGps/buyerLoc's saved lat/lng would silently
+  // keep whatever coordinate GPS last produced (or stay null) while
+  // the address text changes underneath it, the same address/coordinate
+  // mismatch bug fixed in GpsLocationSection.jsx (a listing that
+  // displayed "Majalatti" but was saved ~60km away at Harugeri's real
+  // GPS point). Once village+taluk+district resolve to a real bundled
+  // coordinate, sync pendingGps to match so distance math always
+  // agrees with what's displayed.
+  function updateLocForm(field, value) {
+    const next = { ...locForm, [field]: value };
+    setLocForm(next);
+    setGpsStatus('geocoded');
+
+    const local = getVillageLocation(next.district, next.taluk, next.village);
+    if (local) setPendingGps({ lat: local.lat, lng: local.lng });
+  }
+
   async function handleSaveLocation() {
     const label =
       [
@@ -425,10 +450,9 @@ export default function Browse() {
   return (
     <AppShell
       title={t('title')}
-      onBack={() => navigate('/')}
+      onBack={() => navigate('/category/crops')}
     >
       <div className="bc-intro">
-        <h2>{t('title')}</h2>
         <p>{t('subtitle')}</p>
       </div>
 
@@ -477,12 +501,6 @@ export default function Browse() {
 
       <div className="bc-sec-head">
         <h4>{t('cropsNearYou')}</h4>
-
-        <span>
-          {t('resultsCount', {
-            count: results.length,
-          })}
-        </span>
       </div>
 
       {locationLoading ? (
@@ -565,9 +583,6 @@ export default function Browse() {
                   <span className="bc-loc">
                     📍{' '}
                     {listing.location || '—'}
-
-                    {listing.distanceKm != null &&
-                      ` · ${formatDistanceKm(listing.distanceKm)} km away`}
                   </span>
                 </div>
 
@@ -708,6 +723,62 @@ export default function Browse() {
           {t('locationSheet.subtitle')}
         </p>
 
+        <div className="profile-field">
+          <label>
+            {t('locationSheet.state')}
+          </label>
+
+          <LocationSuggestInput
+            value={locForm.state || KARNATAKA}
+            options={[KARNATAKA]}
+            placeholder="e.g. Karnataka"
+            label={t('locationSheet.state')}
+            onChange={(v) => updateLocForm('state', v)}
+          />
+        </div>
+
+        <div className="profile-field">
+          <label>
+            {t('locationSheet.district')}
+          </label>
+
+          <LocationSuggestInput
+            value={locForm.district}
+            options={KARNATAKA_DISTRICTS}
+            placeholder="e.g. Mandya"
+            label={t('locationSheet.district')}
+            onChange={(v) => updateLocForm('district', v)}
+          />
+        </div>
+
+        <div className="profile-field">
+          <label>
+            {t('locationSheet.taluk')}
+          </label>
+
+          <LocationSuggestInput
+            value={locForm.taluk}
+            options={getTaluksForDistrict(locForm.district)}
+            placeholder="e.g. Mandya"
+            label={t('locationSheet.taluk')}
+            onChange={(v) => updateLocForm('taluk', v)}
+          />
+        </div>
+
+        <div className="profile-field">
+          <label>
+            {t('locationSheet.village')}
+          </label>
+
+          <LocationSuggestInput
+            value={locForm.village}
+            options={getVillagesForTaluk(locForm.district, locForm.taluk)}
+            placeholder="e.g. Keragodu"
+            label={t('locationSheet.village')}
+            onChange={(v) => updateLocForm('village', v)}
+          />
+        </div>
+
         <button
           type="button"
           className="sticky-bar-secondary cl-gps-btn"
@@ -747,82 +818,6 @@ export default function Browse() {
             t(
               'locationSheet.gpsError'
             )}
-        </div>
-
-        <div className="profile-field">
-          <label>
-            {t('locationSheet.village')}
-          </label>
-
-          <input
-            type="text"
-            value={locForm.village}
-            onChange={(e) =>
-              setLocForm((form) => ({
-                ...form,
-                village:
-                  e.target.value,
-              }))
-            }
-            placeholder="e.g. Keragodu"
-          />
-        </div>
-
-        <div className="profile-field">
-          <label>
-            {t('locationSheet.taluk')}
-          </label>
-
-          <input
-            type="text"
-            value={locForm.taluk}
-            onChange={(e) =>
-              setLocForm((form) => ({
-                ...form,
-                taluk:
-                  e.target.value,
-              }))
-            }
-            placeholder="e.g. Mandya"
-          />
-        </div>
-
-        <div className="profile-field">
-          <label>
-            {t('locationSheet.district')}
-          </label>
-
-          <input
-            type="text"
-            value={locForm.district}
-            onChange={(e) =>
-              setLocForm((form) => ({
-                ...form,
-                district:
-                  e.target.value,
-              }))
-            }
-            placeholder="e.g. Mandya"
-          />
-        </div>
-
-        <div className="profile-field">
-          <label>
-            {t('locationSheet.state')}
-          </label>
-
-          <input
-            type="text"
-            value={locForm.state}
-            onChange={(e) =>
-              setLocForm((form) => ({
-                ...form,
-                state:
-                  e.target.value,
-              }))
-            }
-            placeholder="e.g. Karnataka"
-          />
         </div>
 
         <div className="profile-sheet-actions">

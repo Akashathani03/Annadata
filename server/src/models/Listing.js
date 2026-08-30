@@ -76,6 +76,7 @@ const listingSchema = new mongoose.Schema(
 
     location: { type: String, default: '' },
     locationVillage: { type: String, default: '' },
+    locationArea: { type: String, default: '' },
     locationTaluk: { type: String, default: '' },
     locationDistrict: { type: String, default: '' },
     locationState: { type: String, default: '' },

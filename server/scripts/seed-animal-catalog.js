@@ -22,6 +22,18 @@ const animals = [
   { _id: 'sheep', category: 'animal', group: 'sheep', name: 'Sheep', kannadaName: 'ಕುರಿ', icon: '🐑', defaultUnit: 'Head' },
   { _id: 'hen', category: 'animal', group: 'poultry', name: 'Hen', kannadaName: 'ಕೋಳಿ', icon: '🐔', defaultUnit: 'Head' },
   { _id: 'duck', category: 'animal', group: 'poultry', name: 'Duck', kannadaName: 'ಬಾತುಕೋಳಿ', icon: '🦆', defaultUnit: 'Head' },
+
+  // Added to round out each existing category (cattle/buffalo/goat/
+  // sheep/poultry) with the young/distinct animal types farmers
+  // actually list separately from the adult ones above - no new
+  // groups introduced, so every entry stays reachable through the
+  // filter chips animalCatalog.js already defines.
+  { _id: 'heifer', category: 'animal', group: 'cattle', name: 'Heifer', kannadaName: 'ಕಿರಿ ಹಸು', icon: '🐄', defaultUnit: 'Head' },
+  { _id: 'buffalo_calf', category: 'animal', group: 'buffalo', name: 'Buffalo Calf', kannadaName: 'ಎಮ್ಮೆ ಕರು', icon: '🐃', defaultUnit: 'Head' },
+  { _id: 'goat_kid', category: 'animal', group: 'goat', name: 'Goat Kid', kannadaName: 'ಮೇಕೆ ಮರಿ', icon: '🐐', defaultUnit: 'Head' },
+  { _id: 'lamb', category: 'animal', group: 'sheep', name: 'Lamb', kannadaName: 'ಕುರಿ ಮರಿ', icon: '🐑', defaultUnit: 'Head' },
+  { _id: 'rooster', category: 'animal', group: 'poultry', name: 'Rooster', kannadaName: 'ಹುಂಜ', icon: '🐓', defaultUnit: 'Head' },
+  { _id: 'turkey', category: 'animal', group: 'poultry', name: 'Turkey', kannadaName: 'ಟರ್ಕಿ ಕೋಳಿ', icon: '🦃', defaultUnit: 'Head' },
 ];
 
 async function seed() {

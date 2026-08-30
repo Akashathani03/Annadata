@@ -62,7 +62,7 @@ export default function MyListings() {
     return (
       animalCatalog.find(
         (animal) => animal.id === listing.itemId
-      )?.icon ?? '🐄'
+      )?.icon ?? '🐾'
     );
   }
 
@@ -82,15 +82,11 @@ export default function MyListings() {
           tabs={[
             {
               key: 'active',
-              label: `${t(
-                'animals:myListings.active'
-              )} (${active.length})`,
+              label: t('animals:myListings.active'),
             },
             {
               key: 'sold',
-              label: `${t(
-                'animals:myListings.sold'
-              )} (${sold.length})`,
+              label: t('animals:myListings.sold'),
             },
           ]}
           activeKey={tab}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -18,6 +18,7 @@ import AppShell from '../../../components/common/AppShell';
 import StepCard from '../../../components/common/StepCard';
 import MultiPhotoUpload from '../../../components/common/MultiPhotoUpload';
 import GpsLocationSection from '../../../components/common/GpsLocationSection';
+import LocationSuggestInput from '../../../components/common/LocationSuggestInput';
 import StickyActionBar from '../../../components/common/StickyActionBar';
 import BottomSheet from '../../../components/common/BottomSheet';
 
@@ -55,6 +56,10 @@ export default function CreateListing() {
   // -----------------------------
 
   const [itemId, setItemId] = useState('');
+  // Set only when the farmer typed an equipment type that isn't in the
+  // catalog - itemId stays '' in that case, same fallback pattern as
+  // the crop listing form's customItemName.
+  const [customEquipmentType, setCustomEquipmentType] = useState('');
   const [title, setTitle] = useState('');
   const [condition, setCondition] = useState('');
   const [price, setPrice] = useState('');
@@ -63,6 +68,7 @@ export default function CreateListing() {
 
   const [locationParts, setLocationParts] = useState({
     village: user?.village || '',
+    area: '',
     taluk: user?.taluk || '',
     district: user?.district || '',
     state: user?.state || KARNATAKA,
@@ -97,6 +103,34 @@ export default function CreateListing() {
   const [priceError, setPriceError] = useState('');
 
 
+  const selectedItem = useMemo(
+    () => equipmentCatalog.find((equipment) => equipment.id === itemId),
+    [itemId]
+  );
+
+  function equipmentOptionLabel(equipment) {
+    return `${equipment.icon} ${equipment.name}${
+      equipment.kannadaName ? ` / ${equipment.kannadaName}` : ''
+    }`;
+  }
+
+  // A farmer with an equipment type outside the catalog can still list
+  // it - typing a value that doesn't match any catalog entry is
+  // treated as that type's name directly, with no itemId.
+  function handleEquipmentChange(newValue) {
+    const matched = equipmentCatalog.find(
+      (e) => equipmentOptionLabel(e) === newValue
+    );
+    if (matched) {
+      setItemId(matched.id);
+      setCustomEquipmentType('');
+    } else {
+      setItemId('');
+      setCustomEquipmentType(newValue);
+    }
+  }
+
+
   // -----------------------------
   // Load user location / edit data
   // -----------------------------
@@ -109,6 +143,7 @@ export default function CreateListing() {
       if (!editId) {
         setLocationParts({
           village: user?.village || '',
+          area: '',
           taluk: user?.taluk || '',
           district: user?.district || '',
           state: user?.state || KARNATAKA,
@@ -141,7 +176,13 @@ export default function CreateListing() {
         }
 
 
-        setItemId(existing.itemId || '');
+        if (existing.itemId) {
+          setItemId(existing.itemId);
+          setCustomEquipmentType('');
+        } else {
+          setItemId('');
+          setCustomEquipmentType('');
+        }
 
         setTitle(existing.itemName || '');
 
@@ -167,6 +208,8 @@ export default function CreateListing() {
             existing.locationVillage ||
             user?.village ||
             '',
+
+          area: existing.locationArea || '',
 
           taluk:
             existing.locationTaluk ||
@@ -227,6 +270,7 @@ export default function CreateListing() {
   function handleBack() {
     const hasUnsavedChanges =
       itemId.trim() !== '' ||
+      customEquipmentType.trim() !== '' ||
       title.trim() !== '' ||
       condition.trim() !== '' ||
       price.trim() !== '' ||
@@ -256,6 +300,7 @@ export default function CreateListing() {
 
   function resetForm() {
     setItemId('');
+    setCustomEquipmentType('');
     setTitle('');
     setCondition('');
     setPrice('');
@@ -264,6 +309,7 @@ export default function CreateListing() {
 
     setLocationParts({
       village: user?.village || '',
+      area: '',
       taluk: user?.taluk || '',
       district: user?.district || '',
       state: user?.state || KARNATAKA,
@@ -288,7 +334,7 @@ export default function CreateListing() {
 
 
     // Equipment type
-    if (!itemId) {
+    if (!itemId && !customEquipmentType.trim()) {
       setItemError(
         t(
           'equipment:create.validationCategory'
@@ -394,6 +440,7 @@ export default function CreateListing() {
     const location =
       [
         locationParts.village,
+        locationParts.area,
         locationParts.taluk,
         locationParts.district,
       ]
@@ -407,7 +454,7 @@ export default function CreateListing() {
 
       category: CATEGORY,
 
-      itemId,
+      itemId: itemId || null,
 
       itemName: title.trim(),
 
@@ -428,6 +475,9 @@ export default function CreateListing() {
 
       locationVillage:
         locationParts.village,
+
+      locationArea:
+        locationParts.area,
 
       locationTaluk:
         locationParts.taluk,
@@ -593,37 +643,24 @@ export default function CreateListing() {
               *
             </label>
 
-            <select
-              value={itemId}
-              onChange={(e) => {
-                setItemId(
-                  e.target.value
-                );
-
+            <LocationSuggestInput
+              value={
+                selectedItem
+                  ? equipmentOptionLabel(selectedItem)
+                  : customEquipmentType
+              }
+              options={equipmentCatalog.map(equipmentOptionLabel)}
+              onChange={(newValue) => {
+                handleEquipmentChange(newValue);
                 setItemError('');
               }}
-            >
-              <option value="">
-                {t(
-                  'equipment:create.equipmentType'
-                )}
-              </option>
-
-              {equipmentCatalog.map(
-                (equipment) => (
-                  <option
-                    key={equipment.id}
-                    value={equipment.id}
-                  >
-                    {equipment.icon}{' '}
-                    {equipment.name}
-                    {equipment.kannadaName
-                      ? ` / ${equipment.kannadaName}`
-                      : ''}
-                  </option>
-                )
+              placeholder={t(
+                'equipment:create.equipmentType'
               )}
-            </select>
+              label={t(
+                'equipment:create.equipmentType'
+              )}
+            />
 
             {itemError && (
               <span className="cl-field-error">
@@ -815,6 +852,9 @@ export default function CreateListing() {
                 setPhotoError('');
               }}
               max={4}
+              title={t(
+                'equipment:create.uploadPhotoTitle'
+              )}
               label={t(
                 'equipment:create.uploadLabel'
               )}
@@ -858,7 +898,7 @@ export default function CreateListing() {
         {/* Bottom spacing */}
         <div
           style={{
-            height: 80,
+            height: 128,
           }}
         />
 

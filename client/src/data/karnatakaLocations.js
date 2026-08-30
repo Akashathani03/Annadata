@@ -1,9 +1,9 @@
 // Karnataka administrative divisions, used to offer district/taluk
 // dropdown suggestions (via <datalist>, so typing a value not in the
 // list still works - the app's user base spans every district, and
-// no bundled list is guaranteed 100% current). Villages aren't
-// included: Karnataka has ~29,000 of them, too many to bundle
-// reliably, so the village field stays manual-entry only.
+// no bundled list is guaranteed 100% current).
+import { KARNATAKA_VILLAGES_BY_TALUK } from './karnatakaVillages.js';
+
 export const KARNATAKA = 'Karnataka';
 
 export const KARNATAKA_DISTRICTS = [
@@ -43,7 +43,7 @@ export const KARNATAKA_DISTRICTS = [
 export const KARNATAKA_TALUKS_BY_DISTRICT = {
   Bagalkote: ['Bagalkote', 'Jamkhandi', 'Mudhola', 'Badami', 'Bilagi', 'Hunagunda', 'Ilkal', 'Rabkavi Banhatti', 'Guledgudda'],
   Ballari: ['Ballari', 'Kurugodu', 'Kampli', 'Sanduru', 'Siraguppa'],
-  Belagavi: ['Belagavi', 'Athani', 'Bailhongal', 'Chikkodi', 'Gokak', 'Khanapura', 'Mudalgi', 'Nippani', 'Rayabaga', 'Savadatti', 'Ramadurga', 'Kagawada', 'Hukkeri', 'Kitturu', 'Yargatti'],
+  Belagavi: ['Belagavi', 'Athani', 'Bailhongal', 'Chikkodi', 'Gokak', 'Khanapura', 'Mudalgi', 'Nippani', 'Raybag', 'Savadatti', 'Ramadurga', 'Kagawada', 'Hukkeri', 'Kitturu', 'Yargatti'],
   'Bengaluru Urban': ['Bengaluru', 'Kengeri', 'Krishnarajapura', 'Anekal', 'Yelahanka'],
   'Bengaluru Rural': ['Nelamangala', 'Doddaballapura', 'Devanahalli', 'Hosakote'],
   Bidar: ['Aurad', 'Basavakalyana', 'Bhalki', 'Bidar', 'Chitgoppa', 'Hulsuru', 'Humnabad', 'Kamalanagara'],
@@ -79,4 +79,35 @@ export const KARNATAKA_TALUKS_BY_DISTRICT = {
 // every taluk in the state before a district's been picked.
 export function getTaluksForDistrict(district) {
   return KARNATAKA_TALUKS_BY_DISTRICT[district?.trim()] || [];
+}
+
+function villagesForTaluk(district, taluk) {
+  return KARNATAKA_VILLAGES_BY_TALUK[district?.trim()]?.[taluk?.trim()] || [];
+}
+
+// Village name suggestions for a given district+taluk, from the
+// bundled Census 2011 dataset (see karnatakaVillages.js) - a
+// synchronous local lookup, not a network call. Empty when the
+// district/taluk is blank, unrecognized, or genuinely has no bundled
+// data (mainly taluks created after the 2011 census - see the
+// generation script's match report) - callers must always still let
+// the farmer type their own village in that case, same as before this
+// dataset existed. Plain name strings, matching every other picker
+// here (getTaluksForDistrict, KARNATAKA_DISTRICTS) - use
+// getVillageLocation for a specific village's coordinates.
+export function getVillagesForTaluk(district, taluk) {
+  return villagesForTaluk(district, taluk).map((v) => v.name);
+}
+
+// A specific village's approximate coordinates (its Census boundary
+// polygon's centroid), for distance-to-shop/market/listing
+// calculations - null when the village/taluk/district combination
+// isn't in the bundled dataset, or centroid computation failed for
+// that one village. Never returns a guessed/default coordinate -
+// callers must fall back to another location source (live GPS, saved
+// profile lat/lng, or the anonymous default) rather than treat a null
+// here as (0, 0) or the district/taluk's own location.
+export function getVillageLocation(district, taluk, village) {
+  const match = villagesForTaluk(district, taluk).find((v) => v.name === village?.trim());
+  return match?.lat != null && match?.lng != null ? { lat: match.lat, lng: match.lng } : null;
 }

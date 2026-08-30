@@ -8,7 +8,6 @@ import { getCropPriceDetail } from '../../../services/marketPricesService';
 import { useAuth } from '../../../context/AuthContext';
 import { useUserLocation } from '../../../context/LocationContext';
 import { formatRelativeTime } from '../../../utils/formatDate';
-import { formatDistanceKm } from '../../../utils/geo';
 
 import AppShell from '../../../components/common/AppShell';
 import SellerInfoCard from '../../../components/common/SellerInfoCard';
@@ -183,11 +182,6 @@ export default function Detail() {
     listing.location ||
     '—';
 
-  const distanceText =
-    listing.distanceKm != null
-      ? `${formatDistanceKm(listing.distanceKm)} km away`
-      : '—';
-
   return (
     <AppShell
       title={t('detailTitle')}
@@ -234,16 +228,6 @@ export default function Detail() {
 
       <p
         style={{
-          margin: '0 0 3px',
-          color: 'var(--muted)',
-          fontSize: 13,
-        }}
-      >
-        👨‍🌾 {listing.farmerName || 'Farmer'}
-      </p>
-
-      <p
-        style={{
           margin: '0 0 4px',
           fontSize: 15,
           fontWeight: 800,
@@ -265,17 +249,6 @@ export default function Detail() {
       >
         ₹{listing.price} / {listing.unit}
       </p>
-
-      {/* =========================
-          SHARE
-      ========================= */}
-
-      {listing.status === 'published' && (
-        <ShareListing
-          url={`${window.location.origin}/buy/${listing.id}`}
-          title={listing.itemName}
-        />
-      )}
 
       {/* =========================
           MARKET PRICE REFERENCE
@@ -347,22 +320,10 @@ export default function Detail() {
           LISTING DETAILS
       ========================= */}
 
-      <div className="bc-detail-card">
-        <div
-          className="bc-detail-row"
-          style={{
-            padding: '14px 16px',
-          }}
-        >
-          <span>
-            {t('detail.description')}
-          </span>
-
-          <span>
-            {listing.description || '—'}
-          </span>
-        </div>
-
+      <div
+        className="bc-detail-card"
+        style={{ marginBottom: 14 }}
+      >
         <div
           className="bc-detail-row"
           style={{
@@ -385,11 +346,13 @@ export default function Detail() {
           }}
         >
           <span>
-            {t('detail.distance')}
+            {t('detail.lastUpdated')}
           </span>
 
           <span>
-            {distanceText}
+            {formatRelativeTime(
+              listing.updatedAt
+            )}
           </span>
         </div>
 
@@ -400,16 +363,25 @@ export default function Detail() {
           }}
         >
           <span>
-            {t('detail.lastUpdated')}
+            {t('detail.description')}
           </span>
 
           <span>
-            {formatRelativeTime(
-              listing.updatedAt
-            )}
+            {listing.description || '—'}
           </span>
         </div>
       </div>
+
+      {/* =========================
+          SHARE
+      ========================= */}
+
+      {listing.status === 'published' && (
+        <ShareListing
+          url={`${window.location.origin}/buy/${listing.id}`}
+          title={listing.itemName}
+        />
+      )}
 
       {/* =========================
           SELLER

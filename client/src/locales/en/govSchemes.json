@@ -20,14 +20,15 @@
   "statusClosing": "Closing Soon",
   "appliedSuffix": "applied",
   "deadlineLabel": "Deadline",
-  "applyNow": "Apply on Official Site ↗",
+  "unverifiedNote": "Deadline/amount not yet confirmed against the official site - please verify before applying.",
+  "applyNow": "Apply on Official Site",
   "viewDetails": "View Details",
   "loadMore": "Load More ⌄",
   "loadMoreComingSoon": "More schemes coming soon.",
   "openingOfficialSite": "Opening official site for {{title}}…",
   "detail": {
     "eligibility": "Eligibility",
-    "applyOnOfficialSite": "Apply on Official Site ↗",
+    "applyOnOfficialSite": "Apply on Official Site",
     "note": "Opens the real government site in a new tab. Annadata doesn't process applications directly."
   },
   "myApplications": {

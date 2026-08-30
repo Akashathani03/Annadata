@@ -20,14 +20,15 @@
   "statusClosing": "ಬೇಗ ಮುಗಿಯುತ್ತದೆ",
   "appliedSuffix": "Apply ಮಾಡಿದ್ದಾರೆ",
   "deadlineLabel": "Deadline",
-  "applyNow": "Official Site ನಲ್ಲಿ Apply ಮಾಡಿ ↗",
+  "unverifiedNote": "Deadline/Amount ಅನ್ನು Official site ನಲ್ಲಿ ಇನ್ನೂ Confirm ಮಾಡಿಲ್ಲ - Apply ಮಾಡುವ ಮೊದಲು ದಯವಿಟ್ಟು Verify ಮಾಡಿ.",
+  "applyNow": "Official Site ನಲ್ಲಿ Apply ಮಾಡಿ",
   "viewDetails": "ವಿವರ ನೋಡಿ",
   "loadMore": "ಇನ್ನಷ್ಟು ನೋಡಿ ⌄",
   "loadMoreComingSoon": "ಇನ್ನಷ್ಟು ಯೋಜನೆಗಳು ಶೀಘ್ರದಲ್ಲೇ ಬರುತ್ತಿದೆ.",
   "openingOfficialSite": "{{title}} ನ Official Site ತೆರೆಯುತ್ತಿದ್ದೇವೆ…",
   "detail": {
     "eligibility": "ಅರ್ಹತೆ",
-    "applyOnOfficialSite": "Official Site ನಲ್ಲಿ Apply ಮಾಡಿ ↗",
+    "applyOnOfficialSite": "Official Site ನಲ್ಲಿ Apply ಮಾಡಿ",
     "note": "ನಿಜವಾದ ಸರ್ಕಾರಿ ಸೈಟ್ ಹೊಸ Tab ನಲ್ಲಿ ತೆರೆಯುತ್ತದೆ. Annadata ನೇರವಾಗಿ ಅರ್ಜಿ ಪ್ರಕ್ರಿಯೆ ಮಾಡುವುದಿಲ್ಲ."
   },
   "myApplications": {

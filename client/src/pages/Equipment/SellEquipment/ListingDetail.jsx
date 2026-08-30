@@ -41,7 +41,7 @@ export default function ListingDetail() {
   const icon =
     equipmentCatalog.find(
       (equipment) => equipment.id === listing?.itemId
-    )?.icon ?? '🚜';
+    )?.icon ?? '🔧';
 
 
   async function reload() {

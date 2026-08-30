@@ -20,7 +20,7 @@ const MAX_FILE_BYTES = 8 * 1024 * 1024; // matches the server's real limit (rout
 // already use elsewhere, so listingsService's existing
 // "data: URL means new, otherwise existing" upload logic needs no
 // new concept, just the same rule applied per-item instead of once.
-export default function MultiPhotoUpload({ values, onChange, max = 4, label, hint }) {
+export default function MultiPhotoUpload({ values, onChange, max = 4, label, hint, title }) {
   const { t } = useTranslation(['listings']);
   const { showToast } = useToast();
   const [chooserOpen, setChooserOpen] = useState(false);
@@ -113,9 +113,20 @@ export default function MultiPhotoUpload({ values, onChange, max = 4, label, hin
       </span>
 
       <BottomSheet open={chooserOpen} onClose={() => setChooserOpen(false)}>
-        <h3 className="multi-photo-sheet-title">
-          {t('listings:create.uploadImage')}
-        </h3>
+        <div className="multi-photo-sheet-header">
+          <h3 className="multi-photo-sheet-title">
+            {title || t('listings:create.uploadImage')}
+          </h3>
+
+          <button
+            type="button"
+            className="multi-photo-sheet-close"
+            onClick={() => setChooserOpen(false)}
+            aria-label={t('listings:profileScreen.cancel')}
+          >
+            <IconClose size={16} strokeWidth={2} aria-hidden="true" />
+          </button>
+        </div>
 
         <div className="multi-photo-chooser">
           <button
@@ -123,7 +134,9 @@ export default function MultiPhotoUpload({ values, onChange, max = 4, label, hin
             className="multi-photo-choice"
             onClick={() => cameraInputRef.current?.click()}
           >
-            <IconCamera size={22} strokeWidth={2} aria-hidden="true" />
+            <span className="multi-photo-choice-icon">
+              <IconCamera size={26} strokeWidth={2} aria-hidden="true" />
+            </span>
             <span>{t('listings:create.camera')}</span>
           </button>
 
@@ -132,7 +145,9 @@ export default function MultiPhotoUpload({ values, onChange, max = 4, label, hin
             className="multi-photo-choice"
             onClick={() => galleryInputRef.current?.click()}
           >
-            <IconPhoto size={22} strokeWidth={2} aria-hidden="true" />
+            <span className="multi-photo-choice-icon">
+              <IconPhoto size={26} strokeWidth={2} aria-hidden="true" />
+            </span>
             <span>{t('listings:create.gallery')}</span>
           </button>
         </div>

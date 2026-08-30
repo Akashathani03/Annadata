@@ -76,13 +76,30 @@ export default function ImageUploadSheet({ open, onClose, onSend }) {
             style={{ display: 'none' }}
             onChange={(e) => readFile(e.target.files?.[0])}
           />
+          <div className="image-upload-chooser-header">
+            <h3 className="image-upload-chooser-title">
+              {t('agroAI:imageUpload.title')}
+            </h3>
+
+            <button
+              type="button"
+              className="image-upload-chooser-close"
+              onClick={handleClose}
+              aria-label={t('agroAI:imageUpload.cancelAriaLabel')}
+            >
+              <IconClose size={16} strokeWidth={2} aria-hidden="true" />
+            </button>
+          </div>
+
           <div className="image-upload-chooser">
             <button
               type="button"
               className="image-upload-choice"
               onClick={() => cameraInputRef.current?.click()}
             >
-              <IconCamera size={22} strokeWidth={2} aria-hidden="true" />
+              <span className="image-upload-choice-icon">
+                <IconCamera size={26} strokeWidth={2} aria-hidden="true" />
+              </span>
               <span>{t('agroAI:imageUpload.camera')}</span>
             </button>
             <button
@@ -90,7 +107,9 @@ export default function ImageUploadSheet({ open, onClose, onSend }) {
               className="image-upload-choice"
               onClick={() => galleryInputRef.current?.click()}
             >
-              <IconPhoto size={22} strokeWidth={2} aria-hidden="true" />
+              <span className="image-upload-choice-icon">
+                <IconPhoto size={26} strokeWidth={2} aria-hidden="true" />
+              </span>
               <span>{t('agroAI:imageUpload.gallery')}</span>
             </button>
           </div>

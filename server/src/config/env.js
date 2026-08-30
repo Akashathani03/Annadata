@@ -31,4 +31,12 @@ export const env = {
   jwtSecret: process.env.JWT_SECRET,
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
   geminiApiKey: process.env.GEMINI_API_KEY,
+  geocodingContactEmail: process.env.GEOCODING_CONTACT_EMAIL || 'dev@example.com',
+  // data.gov.in's own public demo key, shared by every unregistered
+  // caller and rate-limited accordingly - fine to get real-market-price
+  // syncing working today, but swap in a real key (free, instant,
+  // register at https://data.gov.in/user/register) before relying on
+  // this in production, since the shared key can get throttled without
+  // warning under load from everyone using it at once.
+  agmarknetApiKey: process.env.AGMARKNET_API_KEY || '579b464db66ec23bdd000001cdc3b564546246a772a26393094f5645',
 };

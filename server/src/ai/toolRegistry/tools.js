@@ -152,18 +152,24 @@ async function executeMarketplaceSearch(args, context) {
   }
 
   let itemId;
+  let textQuery;
   if (args.itemQuery?.trim()) {
     itemId = await resolveItemId(args.itemQuery, args.category);
     if (!itemId) {
-      // The farmer named something the catalog doesn't recognize -
-      // never guess a nearby/unrelated item instead, per the approved
-      // "safe not-found over invented match" rule.
-      return { found: false, reason: 'item_not_recognized' };
+      // Not a fixed-catalog item - crop/animal/equipment listings can
+      // all legitimately be published with a farmer-typed name outside
+      // the catalog (see itemId: null handling in Create Listing), so
+      // this doesn't mean nothing exists. Fall back to the same
+      // itemName text search getListings already supports, rather
+      // than reporting "not recognized" for something that may
+      // genuinely be listed.
+      textQuery = args.itemQuery.trim();
     }
   }
 
   const searchParams = { category: args.category, page: 1, limit: 10 };
   if (itemId) searchParams.itemId = itemId;
+  if (textQuery) searchParams.query = textQuery;
   if (args.priceMax != null) searchParams.priceMax = args.priceMax;
   // Equipment-only, per the approved scope - a condition value
   // extracted for a crop/animal question is silently dropped rather

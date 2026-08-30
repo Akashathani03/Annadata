@@ -10,7 +10,7 @@ async function enrichListing(listing) {
 
   return {
     ...listing,
-    equipmentIcon: meta?.icon ?? '🚜',
+    equipmentIcon: meta?.icon ?? '🔧',
     equipmentTypeName: meta?.name ?? '',
     equipmentKannadaName: meta?.kannadaName ?? '',
     sellerName: seller?.name || 'Farmer',

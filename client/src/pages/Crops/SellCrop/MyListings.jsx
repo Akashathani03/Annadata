@@ -115,15 +115,11 @@ export default function MyListings() {
           tabs={[
             {
               key: 'active',
-              label: `${t(
-                'listings:myListings.active'
-              )} (${active.length})`,
+              label: t('listings:myListings.active'),
             },
             {
               key: 'sold',
-              label: `${t(
-                'listings:myListings.sold'
-              )} (${sold.length})`,
+              label: t('listings:myListings.sold'),
             },
           ]}
           activeKey={tab}

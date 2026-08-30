@@ -17,6 +17,7 @@ import nearShopsRoutes from './routes/nearShops.routes.js';
 import governmentSchemesRoutes from './routes/governmentSchemes.routes.js';
 import listingsRoutes from './routes/listings.routes.js';
 import agroAIMessageRoutes from './routes/agroAI/message.routes.js';
+import geocodingRoutes from './routes/geocoding.routes.js';
 
 const app = express();
 
@@ -46,12 +47,13 @@ app.use(
 // intent clear without depending on reading helmet's own defaults.
 app.disable('x-powered-by');
 
-// Restricted to the configured frontend origin rather than a wide-open
-// cors() with no options - the latter would allow any site to call
-// this API. env.corsOrigin is one value for now (single frontend
-// origin per environment); a multi-origin comma-separated list is a
-// trivial extension later if ever needed, not a redesign.
-app.use(cors({ origin: env.corsOrigin }));
+// Restricted to the configured frontend origin(s) rather than a
+// wide-open cors() with no options - the latter would allow any site
+// to call this API. CORS_ORIGIN accepts a comma-separated list (e.g.
+// local dev + a temporary tunnel URL) so testing through a tunnel
+// never requires silently dropping the normal localhost origin.
+const corsOrigins = env.corsOrigin.split(',').map((o) => o.trim()).filter(Boolean);
+app.use(cors({ origin: corsOrigins.length > 1 ? corsOrigins : corsOrigins[0] }));
 
 // Explicit, deliberate limits (Step 20) rather than relying on
 // Express's implicit 100kb default - generous enough for any real text
@@ -97,6 +99,7 @@ app.use('/api/v1/near-shops', nearShopsRoutes);
 app.use('/api/v1/schemes', governmentSchemesRoutes);
 app.use('/api/v1/listings', listingsRoutes);
 app.use('/api/v1/agro-ai', agroAIMessageRoutes);
+app.use('/api/v1/geocoding', geocodingRoutes);
 
 // Must be mounted after every route: an unmatched path falls through
 // to notFoundHandler, which hands a well-formed ApiError to

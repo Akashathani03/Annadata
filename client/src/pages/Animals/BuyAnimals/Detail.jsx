@@ -6,7 +6,6 @@ import { getAnimalListingDetail } from '../../../services/buyAnimalsService';
 import { getBuyerLocation } from '../../../services/buyerLocationService';
 
 import { formatRelativeTime } from '../../../utils/formatDate';
-import { formatDistanceKm } from '../../../utils/geo';
 
 import { useAuth } from '../../../context/AuthContext';
 import { useUserLocation } from '../../../context/LocationContext';
@@ -189,7 +188,7 @@ export default function Detail() {
           message={whatsappMessage}
           callLabel={t(
             'buyCrops:detail.callFarmer',
-            'Call Farmer'
+            'Call Seller'
           )}
           whatsappLabel={t(
             'buyCrops:detail.whatsapp',
@@ -203,7 +202,7 @@ export default function Detail() {
       <PhotoGallery
         photoUrls={listing.photoUrls}
         className="bc-detail-hero"
-        fallback={<span>{listing.animalIcon || '🐄'}</span>}
+        fallback={<span>{listing.animalIcon || '🐾'}</span>}
       />
 
 
@@ -226,24 +225,12 @@ export default function Detail() {
           fontSize: 13,
         }}
       >
-        {listing.animalIcon || '🐄'}{' '}
+        {listing.animalIcon || '🐾'}{' '}
         {listing.animalTypeName || '—'}
 
         {listing.animalKannadaName
           ? ` / ${listing.animalKannadaName}`
           : ''}
-      </p>
-
-
-      {/* Seller */}
-      <p
-        style={{
-          margin: '0 0 3px',
-          color: 'var(--muted)',
-          fontSize: 13,
-        }}
-      >
-        👨‍🌾 {listing.sellerName || 'Farmer'}
       </p>
 
 
@@ -263,33 +250,11 @@ export default function Detail() {
       </p>
 
 
-      {/* Share */}
-      {listing.status === 'published' && (
-        <ShareListing
-          url={`${window.location.origin}/buy-animal/${listing.id}`}
-          title={listing.itemName}
-        />
-      )}
-
-
       {/* Animal Details */}
-      <div className="bc-detail-card">
-
-        <div
-          className="bc-detail-row"
-          style={{ padding: '14px 16px' }}
-        >
-          <span>
-            {t(
-              'animals:detail.description'
-            )}
-          </span>
-
-          <span>
-            {listing.description || '—'}
-          </span>
-        </div>
-
+      <div
+        className="bc-detail-card"
+        style={{ marginBottom: 14 }}
+      >
 
         <div
           className="bc-detail-row"
@@ -313,25 +278,6 @@ export default function Detail() {
         >
           <span>
             {t(
-              'buyCrops:detail.distance',
-              'Distance'
-            )}
-          </span>
-
-          <span>
-            {listing.distanceKm != null
-              ? `${formatDistanceKm(listing.distanceKm)} km away`
-              : '—'}
-          </span>
-        </div>
-
-
-        <div
-          className="bc-detail-row"
-          style={{ padding: '14px 16px' }}
-        >
-          <span>
-            {t(
               'animals:detail.postedOn'
             )}
           </span>
@@ -345,7 +291,32 @@ export default function Detail() {
           </span>
         </div>
 
+
+        <div
+          className="bc-detail-row"
+          style={{ padding: '14px 16px' }}
+        >
+          <span>
+            {t(
+              'animals:detail.description'
+            )}
+          </span>
+
+          <span>
+            {listing.description || '—'}
+          </span>
+        </div>
+
       </div>
+
+
+      {/* Share */}
+      {listing.status === 'published' && (
+        <ShareListing
+          url={`${window.location.origin}/buy-animal/${listing.id}`}
+          title={listing.itemName}
+        />
+      )}
 
 
       {/* Seller Information */}

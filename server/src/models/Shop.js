@@ -17,7 +17,17 @@ const shopSchema = new mongoose.Schema(
     ownerName: { type: String, default: '' },
     phone: { type: String, required: true },
     whatsapp: { type: String, default: '' },
+    // `location` stays the flat display string (also used by
+    // determineStatus's completeness check) - the locationX fields below
+    // are additive, mirroring the Listing model's pattern, so the
+    // Village/Taluk/District/State picker can re-populate correctly on
+    // reload instead of guessing by splitting the display string.
     location: { type: String, default: '' },
+    locationVillage: { type: String, default: '' },
+    locationArea: { type: String, default: '' },
+    locationTaluk: { type: String, default: '' },
+    locationDistrict: { type: String, default: '' },
+    locationState: { type: String, default: '' },
     address: { type: String, default: '' },
     photoUrl: { type: String, default: '' },
     lat: { type: Number, default: null },

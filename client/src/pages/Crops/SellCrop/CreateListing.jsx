@@ -11,7 +11,7 @@ import {
   getListingById,
   updateListing,
 } from '../../../services/listingsService';
-import { distanceKm, findNearest, formatDistanceKm } from '../../../utils/geo';
+import { findNearest } from '../../../utils/geo';
 import { formatDisplayDate } from '../../../utils/formatDate';
 import { KARNATAKA } from '../../../data/karnatakaLocations';
 import {
@@ -98,6 +98,7 @@ export default function CreateListing() {
 
   const [locationParts, setLocationParts] = useState({
     village: user?.village || '',
+    area: '',
     taluk: user?.taluk || '',
     district: user?.district || '',
     state: user?.state || KARNATAKA,
@@ -205,6 +206,7 @@ export default function CreateListing() {
       if (!editId) {
         setLocationParts({
           village: user?.village || '',
+          area: '',
           taluk: user?.taluk || '',
           district: user?.district || '',
           state: user?.state || KARNATAKA,
@@ -242,6 +244,7 @@ export default function CreateListing() {
             existingListing.locationVillage ||
             user?.village ||
             '',
+          area: existingListing.locationArea || '',
           taluk:
             existingListing.locationTaluk ||
             user?.taluk ||
@@ -545,6 +548,7 @@ export default function CreateListing() {
 
         location: [
           locationParts.village,
+          locationParts.area,
           locationParts.taluk,
           locationParts.district,
         ]
@@ -552,6 +556,7 @@ export default function CreateListing() {
           .join(', '),
 
         locationVillage: locationParts.village,
+        locationArea: locationParts.area,
         locationTaluk: locationParts.taluk,
         locationDistrict: locationParts.district,
         locationState: locationParts.state,
@@ -747,6 +752,9 @@ export default function CreateListing() {
                 setPhotoError('');
               }}
               max={4}
+              title={t(
+                'listings:create.uploadPhotoTitle'
+              )}
               label={t(
                 'listings:create.uploadLabel'
               )}
@@ -798,21 +806,6 @@ export default function CreateListing() {
               ))}
             </select>
 
-            {selectedApmc && (
-              <div className="cl-dist">
-                {formatDistanceKm(
-                  coords && selectedApmc.location
-                    ? distanceKm(
-                        coords.lat,
-                        coords.lng,
-                        selectedApmc.location.lat,
-                        selectedApmc.location.lng
-                      )
-                    : selectedApmc.distanceKm
-                )}{' '}
-                km away
-              </div>
-            )}
           </div>
 
           <div className="cl-info-note">
@@ -920,7 +913,7 @@ export default function CreateListing() {
           )}
         </StepCard>
 
-        <div style={{ height: 80 }} />
+        <div style={{ height: 128 }} />
 
         <div className="cl-sticky-bar">
           <StickyActionBar

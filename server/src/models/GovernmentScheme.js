@@ -22,6 +22,18 @@ const governmentSchemeSchema = new mongoose.Schema(
     appliedCount: { type: String, default: '' },
     officialUrl: { type: String, required: true },
     eligibility: { type: [String], default: [] },
+    // 'seed' until a human actually checks this scheme's real page and
+    // updates it (scripts/update-government-scheme.js) - same honesty
+    // pattern as MarketPrice.source, so every layer above this can
+    // tell a genuinely-checked record apart from placeholder seed
+    // content instead of presenting both with equal confidence. No
+    // machine-readable government source exists for scheme
+    // eligibility/deadlines/amounts (checked directly against
+    // data.gov.in and myscheme.gov.in - neither offers one), so this
+    // is deliberately a manual-verification field, not an
+    // automated-sync one like Agmarknet's.
+    source: { type: String, enum: ['seed', 'verified'], default: 'seed' },
+    lastVerifiedAt: { type: Date, default: null },
   },
   { timestamps: true }
 );

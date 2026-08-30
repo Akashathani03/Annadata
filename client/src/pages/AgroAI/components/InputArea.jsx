@@ -21,6 +21,10 @@ export default function InputArea({ onSend, onSendImage }) {
         onCameraClick={() => setUploadSheetOpen(true)}
       />
 
+      <p className="agroai-input-disclaimer">
+        {t('agroAI:input.disclaimer')}
+      </p>
+
       <ImageUploadSheet
         open={uploadSheetOpen}
         onClose={() => setUploadSheetOpen(false)}

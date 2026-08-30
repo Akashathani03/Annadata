@@ -1,8 +1,9 @@
 {
   "input": {
-    "placeholder": "ಏನಾದರೂ ಕೇಳಿ...",
+    "placeholder": "Crops, Weather, Price ಬಗ್ಗೆ ಕೇಳಿ...",
     "cameraAriaLabel": "Photo ಸೇರಿಸಿ",
-    "sendAriaLabel": "Message Send ಮಾಡಿ"
+    "sendAriaLabel": "Message Send ಮಾಡಿ",
+    "disclaimer": "AgroAI ಒಂದು AI assistant, ಇದು mistakes ಮಾಡಬಹುದು. ಮುಖ್ಯ ಮಾಹಿತಿ verify ಮಾಡಿ."
   },
   "emptyState": {
     "greetingMorning": "ಶುಭೋದಯ",
@@ -57,6 +58,7 @@
     "alternativeFertilizer": "ಪರ್ಯಾಯ Fertilizer"
   },
   "imageUpload": {
+    "title": "ಬೆಳೆ ಫೋಟೋ ಹಾಕಿ",
     "camera": "Camera",
     "gallery": "Gallery",
     "captionPlaceholder": "ಇನ್ನಷ್ಟು ವಿವರ ಸೇರಿಸಿ (Optional)",

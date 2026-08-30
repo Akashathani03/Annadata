@@ -1,6 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { getVillageSuggestions } from '../../services/geocodingService';
 import { useGpsLocation } from '../../hooks/useGpsLocation';
 import { IconCurrentLocation } from '../icons';
 import LocationSuggestInput from './LocationSuggestInput';
@@ -8,6 +7,7 @@ import {
   KARNATAKA,
   KARNATAKA_DISTRICTS,
   getTaluksForDistrict,
+  getVillagesForTaluk,
 } from '../../data/karnatakaLocations';
 import './LocationCapture.css';
 
@@ -86,26 +86,63 @@ export default function LocationCapture({ value, onChange }) {
 
   return (
     <div className="loc-capture">
-      {!confirming && (
-        <button
-          type="button"
-          className="loc-capture-gps-btn"
-          onClick={capture}
-          disabled={status === 'capturing' || status === 'geocoding'}
-        >
-          <IconCurrentLocation size={16} strokeWidth={2} />
-          {t('common:useCurrentLocation')}
-        </button>
+      {mapOpen && (
+        <Suspense fallback={null}>
+          <LocationPickerMap
+            initialLat={effectiveCoords.lat}
+            initialLng={effectiveCoords.lng}
+            initialAccuracy={effectiveCoords.accuracy}
+            onConfirm={handleMapConfirm}
+            onCancel={() => setMapOpen(false)}
+          />
+        </Suspense>
       )}
 
-      <div className="loc-capture-status">
-        {status === 'capturing' && t('common:gpsCapturing')}
-        {status === 'geocoding' && t('common:gpsGeocoding')}
-        {status === 'error' &&
-          t(ERROR_MESSAGE_KEY[errorCode] || 'common:gpsError')}
+      <div className="loc-capture-field">
+        <label>{t('common:state')}</label>
+        <LocationSuggestInput
+          value={value.state || KARNATAKA}
+          options={[KARNATAKA]}
+          onChange={(v) => setField('state', v)}
+          placeholder="e.g. Karnataka"
+          label={t('common:state')}
+        />
       </div>
 
-      {confirming && (
+      <div className="loc-capture-field">
+        <label>{t('common:district')}</label>
+        <LocationSuggestInput
+          value={value.district}
+          options={KARNATAKA_DISTRICTS}
+          onChange={(v) => setField('district', v)}
+          placeholder="e.g. Mandya"
+          label={t('common:district')}
+        />
+      </div>
+
+      <div className="loc-capture-field">
+        <label>{t('common:taluk')}</label>
+        <LocationSuggestInput
+          value={value.taluk}
+          options={getTaluksForDistrict(value.district)}
+          onChange={(v) => setField('taluk', v)}
+          placeholder="e.g. Mandya"
+          label={t('common:taluk')}
+        />
+      </div>
+
+      <div className="loc-capture-field">
+        <label>{t('common:village')}</label>
+        <LocationSuggestInput
+          value={value.village}
+          options={getVillagesForTaluk(value.district, value.taluk)}
+          onChange={(v) => setField('village', v)}
+          placeholder="e.g. Keragodu"
+          label={t('common:village')}
+        />
+      </div>
+
+      {confirming ? (
         <div className="loc-confirm-card">
           <div className="loc-confirm-title">
             {t('common:confirmDetectedTitle')}
@@ -172,68 +209,23 @@ export default function LocationCapture({ value, onChange }) {
             </button>
           </div>
         </div>
+      ) : (
+        <button
+          type="button"
+          className="loc-capture-gps-btn"
+          onClick={capture}
+          disabled={status === 'capturing' || status === 'geocoding'}
+        >
+          <IconCurrentLocation size={16} strokeWidth={2} />
+          {t('common:useCurrentLocation')}
+        </button>
       )}
 
-      {mapOpen && (
-        <Suspense fallback={null}>
-          <LocationPickerMap
-            initialLat={effectiveCoords.lat}
-            initialLng={effectiveCoords.lng}
-            initialAccuracy={effectiveCoords.accuracy}
-            onConfirm={handleMapConfirm}
-            onCancel={() => setMapOpen(false)}
-          />
-        </Suspense>
-      )}
-
-      <div className="loc-capture-field">
-        <label>{t('common:village')}</label>
-        <LocationSuggestInput
-          value={value.village}
-          fetchOptions={() =>
-            getVillageSuggestions({
-              taluk: value.taluk,
-              district: value.district,
-              state: value.state || KARNATAKA,
-            })
-          }
-          onChange={(v) => setField('village', v)}
-          placeholder="e.g. Keragodu"
-          label={t('common:village')}
-        />
-      </div>
-
-      <div className="loc-capture-field">
-        <label>{t('common:taluk')}</label>
-        <LocationSuggestInput
-          value={value.taluk}
-          options={getTaluksForDistrict(value.district)}
-          onChange={(v) => setField('taluk', v)}
-          placeholder="e.g. Mandya"
-          label={t('common:taluk')}
-        />
-      </div>
-
-      <div className="loc-capture-field">
-        <label>{t('common:district')}</label>
-        <LocationSuggestInput
-          value={value.district}
-          options={KARNATAKA_DISTRICTS}
-          onChange={(v) => setField('district', v)}
-          placeholder="e.g. Mandya"
-          label={t('common:district')}
-        />
-      </div>
-
-      <div className="loc-capture-field">
-        <label>{t('common:state')}</label>
-        <LocationSuggestInput
-          value={value.state || KARNATAKA}
-          options={[KARNATAKA]}
-          onChange={(v) => setField('state', v)}
-          placeholder="e.g. Karnataka"
-          label={t('common:state')}
-        />
+      <div className="loc-capture-status">
+        {status === 'capturing' && t('common:gpsCapturing')}
+        {status === 'geocoding' && t('common:gpsGeocoding')}
+        {status === 'error' &&
+          t(ERROR_MESSAGE_KEY[errorCode] || 'common:gpsError')}
       </div>
     </div>
   );

@@ -10,7 +10,6 @@ import {
 
 import { resolveImageUrl } from '../../../utils/resolveImageUrl';
 import { formatRelativeTime } from '../../../utils/formatDate';
-import { formatDistanceKm } from '../../../utils/geo';
 
 import ListingSkeleton from '../../../components/common/ListingSkeleton';
 import { useAuth } from '../../../context/AuthContext';
@@ -189,7 +188,7 @@ export default function Browse() {
   function handleClearFilters() {
     setQuery('');
     setCategory('All');
-    setSort('price_low');
+    setSort('nearest');
     setDistance('All');
 
     showToast(t('filtersCleared'));
@@ -286,7 +285,7 @@ export default function Browse() {
       title={t(
         'animals:buyBrowse.browseTitle'
       )}
-      onBack={() => navigate('/')}
+      onBack={() => navigate('/category/animals')}
     >
       {/* Buyer Location */}
       <div className="bc-locrow">
@@ -353,12 +352,6 @@ export default function Browse() {
             'animals:buyBrowse.animalsNearYou'
           )}
         </h4>
-
-        <span>
-          {t('resultsCount', {
-            count: results.length,
-          })}
-        </span>
       </div>
 
       {/* Results */}
@@ -431,19 +424,14 @@ export default function Browse() {
                   <span className="bc-loc">
                     📍{' '}
                     {listing.location || '—'}
-
-                    {listing.distanceKm != null
-                      ? ` · ${formatDistanceKm(listing.distanceKm)} km away`
-                      : ''}
                   </span>
                 </div>
 
-                <span className="bc-avail-pill">
-                  {listing.animalTypeName ||
-                    t(
-                      'animals:buyBrowse.animalType'
-                    )}
-                </span>
+                {listing.animalTypeName && (
+                  <span className="bc-avail-pill">
+                    {listing.animalTypeName}
+                  </span>
+                )}
               </div>
 
               {/* Price / Posted */}

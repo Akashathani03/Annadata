@@ -18,6 +18,14 @@ export const animalCatalog = [
   { id: 'sheep', category: 'animal', group: 'sheep', name: 'Sheep', kannadaName: 'ಕುರಿ', icon: '🐑', defaultUnit: 'Head' },
   { id: 'hen', category: 'animal', group: 'poultry', name: 'Hen', kannadaName: 'ಕೋಳಿ', icon: '🐔', defaultUnit: 'Head' },
   { id: 'duck', category: 'animal', group: 'poultry', name: 'Duck', kannadaName: 'ಬಾತುಕೋಳಿ', icon: '🦆', defaultUnit: 'Head' },
+
+  // Kept identical (same ids) to server/scripts/seed-animal-catalog.js.
+  { id: 'heifer', category: 'animal', group: 'cattle', name: 'Heifer', kannadaName: 'ಕಿರಿ ಹಸು', icon: '🐄', defaultUnit: 'Head' },
+  { id: 'buffalo_calf', category: 'animal', group: 'buffalo', name: 'Buffalo Calf', kannadaName: 'ಎಮ್ಮೆ ಕರು', icon: '🐃', defaultUnit: 'Head' },
+  { id: 'goat_kid', category: 'animal', group: 'goat', name: 'Goat Kid', kannadaName: 'ಮೇಕೆ ಮರಿ', icon: '🐐', defaultUnit: 'Head' },
+  { id: 'lamb', category: 'animal', group: 'sheep', name: 'Lamb', kannadaName: 'ಕುರಿ ಮರಿ', icon: '🐑', defaultUnit: 'Head' },
+  { id: 'rooster', category: 'animal', group: 'poultry', name: 'Rooster', kannadaName: 'ಹುಂಜ', icon: '🐓', defaultUnit: 'Head' },
+  { id: 'turkey', category: 'animal', group: 'poultry', name: 'Turkey', kannadaName: 'ಟರ್ಕಿ ಕೋಳಿ', icon: '🦃', defaultUnit: 'Head' },
 ];
 
 export function getAnimalById(animalId) {

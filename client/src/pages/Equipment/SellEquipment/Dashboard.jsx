@@ -80,7 +80,7 @@ export default function Dashboard() {
 
       <div className="dash-hero">
         <div className="dash-hero-label">
-          🚜 {t('equipment:dashboard.myListingsCard')}
+          {t('equipment:dashboard.myListingsCard')}
         </div>
 
         <div className="dash-hero-row">

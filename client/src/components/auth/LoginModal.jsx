@@ -143,7 +143,7 @@ export default function LoginModal() {
               maxLength={10}
               value={phone}
               onChange={(e) => { setPhone(e.target.value.replace(/\D/g, '')); setPhoneError(''); }}
-              placeholder="98765 43210"
+              placeholder="8088039378"
             />
             {phoneError && <span className="modal-field-error">{phoneError}</span>}
           </div>

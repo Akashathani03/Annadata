@@ -150,6 +150,16 @@
   margin-bottom: 14px;
 }
 
+/* Same amber tone as .status-closing - informative, not alarming, but
+   distinct from the plain muted description text above it. Shown
+   whenever a scheme's deadline/amount hasn't been checked by a human
+   against its real official page (source !== 'verified'). */
+.scheme-unverified-note {
+  font-size: 11px;
+  color: #a67a00;
+  margin: 0 0 12px;
+}
+
 .scheme-meta b {
   color: var(--text);
 }

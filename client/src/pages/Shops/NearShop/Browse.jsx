@@ -6,7 +6,7 @@ import { resolveImageUrl } from '../../../utils/resolveImageUrl';
 import { getBuyerLocation } from '../../../services/buyerLocationService';
 import { useAuth } from '../../../context/AuthContext';
 import { useUserLocation } from '../../../context/LocationContext';
-import { formatDistanceKm } from '../../../utils/geo';
+import { useToast } from '../../../context/ToastContext';
 import { shopProductCategories, getShopCatalogByCategory } from '../../../config/shopProductCatalog';
 import AppShell from '../../../components/common/AppShell';
 import SearchInput from '../../../components/common/SearchInput';
@@ -18,6 +18,7 @@ export default function Browse() {
   const { t } = useTranslation(['shops']);
   const { user } = useAuth();
   const { liveLocation, geocodedLocation } = useUserLocation();
+  const { showToast } = useToast();
 
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('seeds');
@@ -40,17 +41,30 @@ export default function Browse() {
 
   useEffect(() => {
     let cancelled = false;
-    getBuyerLocation({ authenticatedUser: user, liveLocation, geocodedLocation }).then((loc) =>
-      getNearbyShops({ query, buyerLat: loc.lat, buyerLng: loc.lng }).then((result) => {
+
+    async function loadShops() {
+      setLoading(true);
+
+      try {
+        const loc = await getBuyerLocation({ authenticatedUser: user, liveLocation, geocodedLocation });
+        const result = await getNearbyShops({ query, buyerLat: loc.lat, buyerLng: loc.lng });
         if (cancelled) return;
         setShops(result);
-        setLoading(false);
-      })
-    );
+      } catch {
+        if (cancelled) return;
+        setShops([]);
+        showToast(t('shops:nearShop.loadFailed', { defaultValue: 'Unable to load nearby shops.' }));
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    loadShops();
+
     return () => {
       cancelled = true;
     };
-  }, [query, user, liveLocation, geocodedLocation]);
+  }, [query, user, liveLocation, geocodedLocation, showToast, t]);
 
   useEffect(() => {
     let cancelled = false;
@@ -70,7 +84,7 @@ export default function Browse() {
   }, [selectedItem?.id]);
 
   return (
-    <AppShell title={t('shops:nearShop.title')} onBack={() => navigate('/')}>
+    <AppShell title={t('shops:nearShop.title')} onBack={() => navigate('/category/shops')}>
       <div className="shop-intro">
         <p>{t('shops:nearShop.subtitle')}</p>
       </div>
@@ -126,7 +140,6 @@ export default function Browse() {
               <div className="shop-card-info">
                 <b>{shop.shopName}</b>
                 <span>📍 {shop.location}</span>
-                {shop.distanceKm != null && <span>{t('shops:nearShop.distanceAway', { km: formatDistanceKm(shop.distanceKm) })}</span>}
                 {itemPrices[shop.id] != null && <span className="shop-item-price">₹{itemPrices[shop.id]}</span>}
               </div>
               <div className="shop-card-actions">

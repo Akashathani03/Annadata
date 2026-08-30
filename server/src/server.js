@@ -1,10 +1,40 @@
+import dns from 'node:dns';
 import app from './app.js';
 import { env } from './config/env.js';
 import { connectDatabase, disconnectDatabase } from './config/database.js';
 import { logger } from './config/logger.js';
+import { syncAgmarknetPrices } from './services/domain/marketPrices/agmarknetSync.service.js';
+
+// Node 18+'s fetch (undici) tries IPv6 first by default. On hosts where
+// outbound IPv6 is present in DNS but not actually routable (common on
+// WSL2 and some cloud/container networks) that first attempt hangs for
+// the full connect timeout before ever falling back to IPv4 - observed
+// directly here as every geocoding.service.js call to Nominatim/Overpass
+// timing out via fetch while `curl` on the same host succeeded instantly.
+// Preferring IPv4 first sidesteps the hang; it's a one-line, low-risk
+// default that only matters for this process's own outbound HTTP calls.
+dns.setDefaultResultOrder('ipv4first');
 
 let server;
 let shuttingDown = false;
+let priceSyncTimer;
+
+const PRICE_SYNC_INTERVAL_MS = 24 * 60 * 60 * 1000; // daily
+
+// Runs once at boot and then every 24h for as long as this process
+// stays up - deliberately not awaited from start() (a slow/unreachable
+// data.gov.in must never delay this server accepting requests) and
+// deliberately never lets a failed run crash the process: a farmer
+// still needs market-price screens to work even on a day Agmarknet is
+// down, just with whatever the last successful sync (or the original
+// seed data) left behind.
+function schedulePriceSync() {
+  syncAgmarknetPrices().catch((err) => logger.warn({ err }, 'Agmarknet price sync run failed'));
+  priceSyncTimer = setInterval(() => {
+    syncAgmarknetPrices().catch((err) => logger.warn({ err }, 'Agmarknet price sync run failed'));
+  }, PRICE_SYNC_INTERVAL_MS);
+  priceSyncTimer.unref?.(); // never the reason this process stays alive
+}
 
 async function start() {
   try {
@@ -12,6 +42,7 @@ async function start() {
     server = app.listen(env.port, () => {
       console.log(`[server] Annadata backend listening on port ${env.port} (${env.nodeEnv})`);
     });
+    schedulePriceSync();
   } catch (err) {
     console.error('[server] failed to start:', err.message);
     process.exit(1);
@@ -30,6 +61,8 @@ async function gracefulShutdown(reason, exitCode) {
   shuttingDown = true;
 
   logger.info({ reason }, 'Shutting down');
+
+  if (priceSyncTimer) clearInterval(priceSyncTimer);
 
   if (server) {
     await new Promise((resolve) => server.close(resolve));
