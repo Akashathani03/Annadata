@@ -7,7 +7,7 @@ import { findOrCreateByPhone } from '../../repositories/user.repository.js';
 // on the frontend) - not a new value invented here. Real SMS/OTP
 // verification is out of scope for this step; only JWT issuance needs
 // to be real, per this step's explicit purpose.
-const MOCK_OTP = '4821';
+const MOCK_OTP = '0307';
 
 export async function sendOtp(phone) {
   if (!phone?.trim()) {

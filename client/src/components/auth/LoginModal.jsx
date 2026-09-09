@@ -13,7 +13,7 @@ export default function LoginModal() {
   const { t } = useTranslation(['auth', 'common']);
   const { loginModalOpen, closeLoginModal, refreshUser } = useAuth();
 
-  const [step, setStep] = useState('details'); // details | otp | location
+  const [step, setStep] = useState('details');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [phoneError, setPhoneError] = useState('');
@@ -21,7 +21,16 @@ export default function LoginModal() {
   const [otpError, setOtpError] = useState('');
   const [sending, setSending] = useState(false);
   const [newUserId, setNewUserId] = useState(null);
-  const [locationValue, setLocationValue] = useState({ village: '', taluk: '', district: '', state: '', lat: null, lng: null });
+
+  const [locationValue, setLocationValue] = useState({
+    village: '',
+    taluk: '',
+    district: '',
+    state: '',
+    lat: null,
+    lng: null,
+  });
+
   const [locationError, setLocationError] = useState('');
   const [savingLocation, setSavingLocation] = useState(false);
 
@@ -32,11 +41,8 @@ export default function LoginModal() {
   }, [step]);
 
   async function resetAndClose() {
-    // Whenever OTP has already succeeded, a real session exists even if
-    // the farmer closes out before finishing onboarding (e.g. tapping X
-    // on the Location step). Always resync so the app never shows a
-    // stale "logged out" state for someone who's actually logged in.
     await refreshUser();
+
     setStep('details');
     setName('');
     setPhone('');
@@ -44,7 +50,17 @@ export default function LoginModal() {
     setOtp(['', '', '', '']);
     setOtpError('');
     setNewUserId(null);
-    setLocationValue({ village: '', taluk: '', district: '', state: '', lat: null, lng: null });
+
+    setLocationValue({
+      village: '',
+      taluk: '',
+      district: '',
+      state: '',
+      lat: null,
+      lng: null,
+    });
+
+    setLocationError('');
     closeLoginModal();
   }
 
@@ -53,22 +69,29 @@ export default function LoginModal() {
       setPhoneError(t('auth:invalidPhone'));
       return;
     }
+
     setPhoneError('');
     setSending(true);
+
     const result = await authService.sendOtp(phone);
+
     setSending(false);
 
     if (!result.success) {
       setPhoneError(t('auth:sendOtpFailed'));
       return;
     }
+
     setStep('otp');
   }
 
   async function handleResend() {
     setSending(true);
+
     const result = await authService.sendOtp(phone);
+
     setSending(false);
+
     if (!result.success) {
       setOtpError(t('auth:sendOtpFailed'));
     }
@@ -76,22 +99,30 @@ export default function LoginModal() {
 
   function handleOtpDigit(index, digit) {
     const clean = digit.replace(/\D/g, '').slice(0, 1);
+
     const next = [...otp];
     next[index] = clean;
+
     setOtp(next);
     setOtpError('');
+
     if (clean && index < OTP_LENGTH - 1) {
-      document.getElementById(`login-otp-${index + 1}`)?.focus();
+      document
+        .getElementById(`login-otp-${index + 1}`)
+        ?.focus();
     }
   }
 
   async function handleVerify() {
     const code = otp.join('');
+
     if (code.length !== OTP_LENGTH) {
       setOtpError(t('auth:invalidOtp'));
       return;
     }
+
     const result = await authService.verifyOtp(phone, code);
+
     if (!result.success) {
       setOtpError(t('auth:invalidOtp'));
       return;
@@ -99,8 +130,11 @@ export default function LoginModal() {
 
     if (result.isNewUser) {
       if (name.trim()) {
-        await usersService.updateUserProfile(result.user.id, { name: name.trim() });
+        await usersService.updateUserProfile(result.user.id, {
+          name: name.trim(),
+        });
       }
+
       setNewUserId(result.user.id);
       setStep('location');
     } else {
@@ -111,13 +145,19 @@ export default function LoginModal() {
   async function handleLocationContinue() {
     setLocationError('');
     setSavingLocation(true);
-    const result = await usersService.saveOnboardingLocation(newUserId, locationValue);
+
+    const result = await usersService.saveOnboardingLocation(
+      newUserId,
+      locationValue
+    );
+
     setSavingLocation(false);
 
     if (!result.success) {
       setLocationError(t('auth:locationSaveFailed'));
       return;
     }
+
     resetAndClose();
   }
 
@@ -131,33 +171,70 @@ export default function LoginModal() {
       {step === 'details' && (
         <div>
           <h3>{t('auth:title')}</h3>
-          <p className="msub">{t('auth:subtitle')}</p>
+
+          <p className="msub">
+            {t('auth:subtitle')}
+          </p>
+
+          {/* Full Name */}
           <div className="modal-field">
             <label>{t('auth:nameLabel')}</label>
-            <input value={name} onChange={(e) => setName(e.target.value)} placeholder={t('auth:namePlaceholder')} />
+
+            <input
+              type="text"
+              name="annadata_full_name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              autoComplete="off"
+            />
           </div>
+
+          {/* Mobile Number */}
           <div className="modal-field">
             <label>{t('auth:mobileLabel')}</label>
+
             <input
               type="tel"
+              name="annadata_mobile_number"
               maxLength={10}
               value={phone}
-              onChange={(e) => { setPhone(e.target.value.replace(/\D/g, '')); setPhoneError(''); }}
-              placeholder="8088039378"
+              onChange={(e) => {
+                setPhone(e.target.value.replace(/\D/g, ''));
+                setPhoneError('');
+              }}
+              autoComplete="off"
             />
-            {phoneError && <span className="modal-field-error">{phoneError}</span>}
+
+            {phoneError && (
+              <span className="modal-field-error">
+                {phoneError}
+              </span>
+            )}
           </div>
-          <button className="btn-primary login-full-btn" onClick={handleSendOtp} disabled={sending}>
+
+          <button
+            className="btn-primary login-full-btn"
+            onClick={handleSendOtp}
+            disabled={sending}
+          >
             {t('auth:sendOtp')}
           </button>
-          <p className="modal-note">{t('auth:otpNote')}</p>
+
+          <p className="modal-note">
+            {t('auth:otpNote')}
+          </p>
         </div>
       )}
 
+      {/* OTP STEP */}
       {step === 'otp' && (
         <div>
           <h3>{t('auth:otpTitle')}</h3>
-          <p className="msub">{t('auth:otpSentTo')} <b>+91 {phone}</b></p>
+
+          <p className="msub">
+            {t('auth:otpSentTo')} <b>+91 {phone}</b>
+          </p>
+
           <div className="otp-boxes">
             {otp.map((digit, i) => (
               <input
@@ -165,32 +242,90 @@ export default function LoginModal() {
                 id={`login-otp-${i}`}
                 maxLength={1}
                 value={digit}
-                onChange={(e) => handleOtpDigit(i, e.target.value)}
+                onChange={(e) =>
+                  handleOtpDigit(i, e.target.value)
+                }
+                autoComplete="off"
               />
             ))}
           </div>
-          {otpError && <span className="modal-field-error" style={{ display: 'block', marginTop: -8, marginBottom: 12 }}>{otpError}</span>}
-          <button className="btn-primary login-full-btn" onClick={handleVerify}>
+
+          {otpError && (
+            <span
+              className="modal-field-error"
+              style={{
+                display: 'block',
+                marginTop: -8,
+                marginBottom: 12,
+              }}
+            >
+              {otpError}
+            </span>
+          )}
+
+          <button
+            className="btn-primary login-full-btn"
+            onClick={handleVerify}
+          >
             {t('auth:verify')}
           </button>
+
           <p className="modal-note">
-            <a href="#" onClick={(e) => { e.preventDefault(); handleResend(); }} className="login-resend-link">
-              {sending ? t('auth:resending') : t('auth:resend')}
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                handleResend();
+              }}
+              className="login-resend-link"
+            >
+              {sending
+                ? t('auth:resending')
+                : t('auth:resend')}
             </a>
           </p>
         </div>
       )}
 
+      {/* LOCATION STEP */}
       {step === 'location' && (
         <div>
           <h3>{t('auth:locationTitle')}</h3>
-          <p className="msub">{t('auth:locationSubtitle')}</p>
-          <LocationCapture value={locationValue} onChange={setLocationValue} />
-          {locationError && <span className="modal-field-error" style={{ display: 'block', marginTop: -8, marginBottom: 12 }}>{locationError}</span>}
-          <button className="btn-primary login-full-btn" onClick={handleLocationContinue} disabled={savingLocation}>
+
+          <p className="msub">
+            {t('auth:locationSubtitle')}
+          </p>
+
+          <LocationCapture
+            value={locationValue}
+            onChange={setLocationValue}
+          />
+
+          {locationError && (
+            <span
+              className="modal-field-error"
+              style={{
+                display: 'block',
+                marginTop: -8,
+                marginBottom: 12,
+              }}
+            >
+              {locationError}
+            </span>
+          )}
+
+          <button
+            className="btn-primary login-full-btn"
+            onClick={handleLocationContinue}
+            disabled={savingLocation}
+          >
             {t('auth:locationContinue')}
           </button>
-          <button className="login-skip-btn" onClick={handleLocationSkip}>
+
+          <button
+            className="login-skip-btn"
+            onClick={handleLocationSkip}
+          >
             {t('auth:locationSkip')}
           </button>
         </div>
