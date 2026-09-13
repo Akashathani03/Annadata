@@ -35,6 +35,7 @@ import ManageShopMyShop from './pages/Shops/ManageShop/MyShop';
 import ManageShopProducts from './pages/Shops/ManageShop/Products';
 import Schemes from './pages/Schemes/Schemes';
 import AgroAI from './pages/AgroAI/AgroAI';
+import PreviousChats from './pages/AgroAI/PreviousChats';
 import LoginModal from './components/auth/LoginModal';
 
 export default function App() {
@@ -95,6 +96,7 @@ export default function App() {
         </Route>
         <Route path="/schemes" element={<Schemes />} />
         <Route path="/agro-ai" element={<AgroAI />} />
+        <Route path="/agro-ai/history" element={<PreviousChats />} />
       </Routes>
 
       {/* Mounted globally (outside Routes) so it can be triggered from

@@ -9,6 +9,8 @@ export const DESTINATION_ROUTES = {
   BUY_CROP: '/buy',
   SELL_ANIMAL: '/sell-animal',
   BUY_ANIMAL: '/buy-animal',
+  SELL_EQUIPMENT: '/sell-equipment',
+  BUY_EQUIPMENT: '/buy-equipment',
   MARKET_PRICES: '/market-prices',
   NEAR_SHOPS: '/near-shop',
   SHOP_OWNER: '/shop-owner',

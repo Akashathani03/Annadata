@@ -6,6 +6,11 @@
 export {
   ArrowLeft as IconBack,
   Menu as IconMenu,
+  MoreVertical as IconMoreVertical,
+  Pin as IconPin,
+  Clock as IconClock,
+  Pencil as IconEdit,
+  Trash2 as IconDelete,
   Bell as IconNotifications,
   Navigation as IconCurrentLocation,
   MapPin as IconLocationPin,

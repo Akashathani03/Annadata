@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { logger } from '../../../config/logger.js';
 import { ApiError } from '../../../utils/ApiError.js';
 import { storageProvider } from '../../../storage/index.js';
 import { routeMessage } from '../intentRouter/index.js';
@@ -18,10 +19,15 @@ import {
   buildAboutAiReply,
 } from './replyBuilder.js';
 import { CONTEXT_WINDOW_MESSAGES, buildConversationSummary } from './conversationContext.js';
+import { generateRuleBasedTitle, FALLBACK_TITLE } from './titleGenerator.js';
 import {
   createSession,
   findSessionById,
+  findSessionsByUser,
   touchSessionActivity,
+  updateSession as updateSessionRecord,
+  setSessionTitleIfUnset,
+  deleteSession as deleteSessionRecord,
 } from '../../../repositories/session.repository.js';
 import {
   createMessage,
@@ -29,6 +35,7 @@ import {
   findMessagesBySession,
   findRecentMessagesBySession,
   updateMessageStatus,
+  deleteMessagesBySession,
 } from '../../../repositories/message.repository.js';
 
 // Shared with the route layer (message.routes.js configures multer's
@@ -116,6 +123,63 @@ export async function sendMessage({ userId, sessionId, text, imageFile }) {
   await touchSessionActivity(session._id);
 
   return { message, sessionId: session._id.toString() };
+}
+
+// Previous Chats' list - newest-active first (see the repository
+// function), scoped entirely by userId in the query itself, so there
+// is no id-based lookup here for a caller to spoof (unlike the
+// rename/delete functions below, there's no "not yours" case to guard
+// against at all).
+export async function listSessions({ userId }) {
+  assertValidObjectId(userId, 'userId (from the authenticated token)', 401);
+  return findSessionsByUser(userId);
+}
+
+const MAX_TITLE_LENGTH = 40;
+
+// Handles both rename (title) and pin/unpin (pinned) through the one
+// PATCH endpoint, per the approved "extend, don't add a new route"
+// decision - each field is independently optional, but at least one
+// must be present. Ownership is checked once, up front, regardless of
+// which field(s) are being patched.
+export async function updateSession({ userId, sessionId, title, pinned }) {
+  await getOwnedSessionOrThrow(sessionId, userId);
+
+  const patch = {};
+
+  if (title !== undefined) {
+    const trimmed = title?.trim();
+    if (!trimmed) {
+      throw new ApiError(400, 'VALIDATION_ERROR', 'A title is required.');
+    }
+    if (trimmed.length > MAX_TITLE_LENGTH) {
+      throw new ApiError(400, 'VALIDATION_ERROR', `Title must be ${MAX_TITLE_LENGTH} characters or fewer.`);
+    }
+    patch.title = trimmed;
+  }
+
+  if (pinned !== undefined) {
+    if (typeof pinned !== 'boolean') {
+      throw new ApiError(400, 'VALIDATION_ERROR', 'pinned must be true or false.');
+    }
+    patch.pinned = pinned;
+  }
+
+  if (Object.keys(patch).length === 0) {
+    throw new ApiError(400, 'VALIDATION_ERROR', 'Nothing to update.');
+  }
+
+  return updateSessionRecord(sessionId, patch);
+}
+
+// Cascade delete (messages first, then the session) - never the other
+// order, so a failure partway through never leaves a session pointing
+// at nothing while its messages still exist unreachable.
+export async function deleteSession({ userId, sessionId }) {
+  await getOwnedSessionOrThrow(sessionId, userId);
+  await deleteMessagesBySession(sessionId);
+  await deleteSessionRecord(sessionId);
+  return { deleted: true };
 }
 
 export async function getMessages({ userId, sessionId }) {
@@ -243,6 +307,21 @@ export async function generateReply({ userId, messageId, lat, lng }) {
   });
 
   await touchSessionActivity(session._id);
+
+  // Fire-and-forget, deliberately not awaited - must never delay the
+  // reply the farmer is waiting on. priorMessages.length === 0 means
+  // this is genuinely the session's first exchange (the true count in
+  // the database, not just "within the context window"), so the title
+  // reflects what the farmer actually first asked, not a later
+  // message. setSessionTitleIfUnset is the real safety net - its
+  // { title: null } filter means even a rare double-fire (two messages
+  // sent in very quick succession) can only ever write the title once.
+  if (priorMessages.length === 0) {
+    const title = generateRuleBasedTitle(userMessage.text) || FALLBACK_TITLE;
+    setSessionTitleIfUnset(session._id, title).catch((err) =>
+      logger.warn({ err, sessionId: session._id.toString() }, 'Session title generation failed')
+    );
+  }
 
   return assistantMessage;
 }

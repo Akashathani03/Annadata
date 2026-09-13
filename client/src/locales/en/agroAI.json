@@ -76,6 +76,31 @@
     "ariaLabel": "Agro AI is responding"
   },
   "listingResultCard": {
-    "viewListing": "View Listing"
+    "viewListing": "View Listing",
+    "viewAll": "View All"
+  },
+  "previousChats": {
+    "title": "Previous Chats",
+    "hamburgerAriaLabel": "Menu",
+    "menuAriaLabel": "Chat options",
+    "newChat": "New Chat",
+    "rename": "Rename",
+    "pin": "Pin",
+    "unpin": "Unpin",
+    "delete": "Delete",
+    "renameTitle": "Rename conversation",
+    "renamePlaceholder": "Conversation title",
+    "renameFailed": "Couldn't rename this chat. Please try again.",
+    "pinFailed": "Couldn't update this chat. Please try again.",
+    "deleteConfirmTitle": "Delete this conversation?",
+    "deleteConfirmBody": "This can't be undone.",
+    "deleteFailed": "Couldn't delete this chat. Please try again.",
+    "emptyTitle": "No conversations yet",
+    "emptyBody": "Start a new chat with Agro AI to see it here.",
+    "loadError": "Couldn't load your chats. Please try again.",
+    "retry": "Retry",
+    "untitled": "New Conversation",
+    "pinnedChats": "Pinned Chats",
+    "allChats": "All Chats"
   }
 }

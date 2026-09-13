@@ -30,3 +30,31 @@ export async function updateSessionContext(id, contextPatch) {
 export async function touchSessionActivity(id) {
   return Session.findByIdAndUpdate(id, { $set: { lastActivityAt: new Date() } }, { new: true });
 }
+
+// Previous Chats' list source - most-recently-active conversation
+// first, matching how a farmer expects a chat list to be ordered.
+export async function findSessionsByUser(userId) {
+  return Session.find({ userId }).sort({ lastActivityAt: -1 });
+}
+
+// Generic partial update - covers rename (title) and pin/unpin
+// (pinned), and any future single-field patch this same PATCH
+// endpoint takes on, without needing a new repository function per
+// field. patch is applied as-is via $set; the service layer is what
+// decides which fields are valid and pre-validates their values.
+export async function updateSession(id, patch) {
+  return Session.findByIdAndUpdate(id, { $set: patch }, { new: true });
+}
+
+// Filtered by { title: null } so this can never overwrite a title a
+// farmer already set (by hand, or from an earlier message in the same
+// session) - see conversation.service.js's generateReply, the only
+// caller. Returns the updated doc on success, null if a title already
+// existed (nothing written) - both are valid, non-error outcomes.
+export async function setSessionTitleIfUnset(id, title) {
+  return Session.findOneAndUpdate({ _id: id, title: null }, { $set: { title } }, { new: true });
+}
+
+export async function deleteSession(id) {
+  return Session.findByIdAndDelete(id);
+}

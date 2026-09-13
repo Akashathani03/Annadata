@@ -198,6 +198,7 @@ async function executeMarketplaceSearch(args, context) {
 
   return {
     found: result.listings.length > 0,
+    category: args.category,
     listings: result.listings.slice(0, 5).map((l) => ({
       ...l,
       distanceKm: context.lat != null && context.lng != null ? distanceKm(context.lat, context.lng, l.lat, l.lng) : null,

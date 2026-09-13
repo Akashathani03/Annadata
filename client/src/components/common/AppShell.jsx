@@ -5,7 +5,12 @@ import { useAuth } from '../../context/AuthContext';
 import { resolveImageUrl } from '../../utils/resolveImageUrl';
 import './AppShell.css';
 
-export default function AppShell({ title, subtitle, onBack, navItems, activeNavKey, stickyBar, children, hideAvatar }) {
+// menuAction is optional and additive (default undefined) - every
+// existing AppShell caller that doesn't pass it renders exactly as
+// before. { icon, onClick, ariaLabel } renders one extra header button
+// between the title and the avatar - used only by Agro AI, for its
+// Previous Chats hamburger entry point.
+export default function AppShell({ title, subtitle, onBack, navItems, activeNavKey, stickyBar, children, hideAvatar, menuAction }) {
   const navigate = useNavigate();
   const { user, isAuthenticated, openLoginModal } = useAuth();
   const [avatarLoadFailed, setAvatarLoadFailed] = useState(false);
@@ -32,6 +37,15 @@ export default function AppShell({ title, subtitle, onBack, navItems, activeNavK
           <b>{title}</b>
           {subtitle && <span>{subtitle}</span>}
         </div>
+        {menuAction && (
+          <button
+            className="app-shell-round-btn app-shell-menu-btn"
+            onClick={menuAction.onClick}
+            aria-label={menuAction.ariaLabel}
+          >
+            <menuAction.icon size={19} strokeWidth={2} />
+          </button>
+        )}
         {!hideAvatar && (
           <button className="app-shell-avatar-btn" onClick={handleAvatarClick} aria-label="Profile">
             {user?.profilePhotoUrl && !avatarLoadFailed ? (

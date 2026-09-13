@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import AppShell from '../../components/common/AppShell';
+import { IconMenu } from '../../components/icons';
 import { useAuth } from '../../context/AuthContext';
 import ChatArea from './components/ChatArea';
 import InputArea from './components/InputArea';
@@ -11,9 +12,12 @@ import './AgroAI.css';
 
 export default function AgroAI() {
   const navigate = useNavigate();
-  const { t } = useTranslation(['navigation']);
+  const [searchParams] = useSearchParams();
+  const sessionIdParam = searchParams.get('session');
+  const { t } = useTranslation(['navigation', 'agroAI', 'common']);
   const { user, loading, openLoginModal } = useAuth();
-  const { messages, sendMessage, sendImageMessage, retryMessage, isAiThinking } = useAgroAIChat();
+  const { messages, sendMessage, sendImageMessage, retryMessage, isAiThinking, isLoadingHistory } =
+    useAgroAIChat(sessionIdParam);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -38,16 +42,30 @@ export default function AgroAI() {
   }
 
   return (
-    <AppShell title={t('navigation:category.agroAI')} onBack={() => navigate('/')}>
+    <AppShell
+      title={t('navigation:category.agroAI')}
+      onBack={() => navigate('/')}
+      menuAction={{
+        icon: IconMenu,
+        ariaLabel: t('agroAI:previousChats.hamburgerAriaLabel'),
+        onClick: () => navigate('/agro-ai/history'),
+      }}
+    >
       <div className="agroai-page">
-        <ChatArea
-          messages={messages}
-          onSend={sendMessage}
-          isAiThinking={isAiThinking}
-          onRetry={retryMessage}
-          onAction={handleAction}
-        />
-        <InputArea onSend={sendMessage} onSendImage={sendImageMessage} />
+        {isLoadingHistory ? (
+          <p style={{ padding: 16, color: 'var(--muted)' }}>{t('common:loading')}</p>
+        ) : (
+          <>
+            <ChatArea
+              messages={messages}
+              onSend={sendMessage}
+              isAiThinking={isAiThinking}
+              onRetry={retryMessage}
+              onAction={handleAction}
+            />
+            <InputArea onSend={sendMessage} onSendImage={sendImageMessage} />
+          </>
+        )}
       </div>
     </AppShell>
   );

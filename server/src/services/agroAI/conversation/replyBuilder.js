@@ -14,6 +14,7 @@ function buildMarketPriceReply(toolResult) {
       cardType: null,
       cardData: null,
       text: "I couldn't find today's price for that crop. Please check Market Prices directly, or try a different crop name.",
+      action: { type: 'navigate', destination: 'MARKET_PRICES' },
     };
   }
 
@@ -138,6 +139,7 @@ function buildShopsReply(toolResult) {
       cardType: null,
       cardData: null,
       text: "I couldn't find any nearby shops for that. Try browsing Near Shop directly.",
+      action: { type: 'navigate', destination: 'NEAR_SHOPS' },
     };
   }
 
@@ -192,6 +194,22 @@ function buildSchemesReply(toolResult) {
 // cardData deliberately carries only the same safe fields the earlier
 // text-only version referenced - phone and ownerId are present on the
 // underlying listing objects but never included here.
+// Category is on toolResult itself (tools.js's executeMarketplaceSearch
+// echoes back args.category) - never re-derived or guessed here, since
+// a wrong destination would send a farmer looking for a tractor to the
+// crop marketplace.
+const BUY_DESTINATION_BY_CATEGORY = {
+  crop: 'BUY_CROP',
+  animal: 'BUY_ANIMAL',
+  equipment: 'BUY_EQUIPMENT',
+};
+
+const NOT_FOUND_TEXT_BY_CATEGORY = {
+  crop: 'No matching crop listings were found near your location right now.',
+  animal: 'No matching animal listings were found near your location right now.',
+  equipment: 'No matching equipment listings were found near your location right now.',
+};
+
 function buildMarketplaceSearchReply(toolResult) {
   if (toolResult?.reason === 'location_unavailable') {
     return {
@@ -207,7 +225,10 @@ function buildMarketplaceSearchReply(toolResult) {
       type: 'text',
       cardType: null,
       cardData: null,
-      text: 'No matching listings were found near your location right now.',
+      text: NOT_FOUND_TEXT_BY_CATEGORY[toolResult?.category] || 'No matching listings were found near your location right now.',
+      action: BUY_DESTINATION_BY_CATEGORY[toolResult?.category]
+        ? { type: 'navigate', destination: BUY_DESTINATION_BY_CATEGORY[toolResult.category] }
+        : null,
     };
   }
 
@@ -215,7 +236,7 @@ function buildMarketplaceSearchReply(toolResult) {
     type: 'card',
     cardType: 'marketplaceListing',
     cardData: {
-      listings: toolResult.listings.slice(0, 5).map((l) => ({
+      listings: toolResult.listings.slice(0, 3).map((l) => ({
         id: l.id,
         category: l.category,
         itemName: l.itemName,

@@ -30,3 +30,11 @@ export async function findRecentMessagesBySession(sessionId, limit) {
 export async function updateMessageStatus(id, status) {
   return Message.findByIdAndUpdate(id, { $set: { status } }, { new: true });
 }
+
+// Cascade half of session deletion (see conversation.service.js's
+// deleteSession) - a deleted Session must never leave orphaned Message
+// documents behind, since nothing else ever queries Messages except by
+// sessionId.
+export async function deleteMessagesBySession(sessionId) {
+  return Message.deleteMany({ sessionId });
+}

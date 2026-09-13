@@ -1,7 +1,7 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import { useUserLocation } from '../../../context/LocationContext';
-import { sendUserMessage, getAssistantReply } from '../../../services/agroAIService';
+import { sendUserMessage, getAssistantReply, getChatHistory, resumeSession } from '../../../services/agroAIService';
 
 // Step 15: real reply pipeline now exists, so the old
 // runAiThinkingThenMockDiagnosis/runAiThinkingThenMockTextReply split
@@ -15,11 +15,41 @@ import { sendUserMessage, getAssistantReply } from '../../../services/agroAIServ
 // The hook's exported shape below is unchanged: { messages,
 // sendMessage, sendImageMessage, retryMessage, isAiThinking }. No
 // component (AgroAI.jsx, ChatArea.jsx, InputArea.jsx) needs to change.
-export default function useAgroAIChat() {
+// initialSessionId is optional - omitted (undefined), this hook
+// behaves exactly as before (fresh, empty chat). Passed (from Previous
+// Chats opening a row), it loads that session's full history once on
+// mount rather than starting blank - the one new capability this hook
+// needed for Previous Chats, added without changing sendMessage/
+// sendImageMessage/retryMessage/attemptSend at all.
+export default function useAgroAIChat(initialSessionId) {
   const { user } = useAuth();
   const { lat, lng } = useUserLocation();
   const [messages, setMessages] = useState([]);
   const [isAiThinking, setIsAiThinking] = useState(false);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(Boolean(initialSessionId));
+
+  useEffect(() => {
+    if (!initialSessionId) return;
+
+    let cancelled = false;
+    resumeSession(initialSessionId);
+
+    getChatHistory(initialSessionId)
+      .then((history) => {
+        if (!cancelled) setMessages(history);
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoadingHistory(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+    // Intentionally only re-runs if the session id itself changes (a
+    // farmer opening a different past conversation) - not on every
+    // render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialSessionId]);
 
   const runAiThinkingThenRealReply = useCallback(
     async (userMessageId) => {
@@ -145,5 +175,5 @@ export default function useAgroAIChat() {
     [messages, attemptSend, runAiThinkingThenRealReply]
   );
 
-  return { messages, sendMessage, sendImageMessage, retryMessage, isAiThinking };
+  return { messages, sendMessage, sendImageMessage, retryMessage, isAiThinking, isLoadingHistory };
 }

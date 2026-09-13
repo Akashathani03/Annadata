@@ -76,6 +76,31 @@
     "ariaLabel": "Agro AI ಉತ್ತರಿಸುತ್ತಿದೆ"
   },
   "listingResultCard": {
-    "viewListing": "Listing ನೋಡಿ"
+    "viewListing": "Listing ನೋಡಿ",
+    "viewAll": "All ನೋಡಿ"
+  },
+  "previousChats": {
+    "title": "Previous ಚಾಟ್‌ಗಳು",
+    "hamburgerAriaLabel": "Menu",
+    "menuAriaLabel": "Chat Options",
+    "newChat": "ಹೊಸ Chat",
+    "rename": "Rename ಮಾಡಿ",
+    "pin": "Pin ಮಾಡಿ",
+    "unpin": "Pin ತೆಗೆಯಿರಿ",
+    "delete": "Delete ಮಾಡಿ",
+    "renameTitle": "Chat Rename ಮಾಡಿ",
+    "renamePlaceholder": "Chat ಹೆಸರು",
+    "renameFailed": "Rename ಆಗಲಿಲ್ಲ. ಮತ್ತೆ Try ಮಾಡಿ.",
+    "pinFailed": "Chat Update ಆಗಲಿಲ್ಲ. ಮತ್ತೆ Try ಮಾಡಿ.",
+    "deleteConfirmTitle": "ಈ Chat Delete ಮಾಡಬೇಕೆ?",
+    "deleteConfirmBody": "ಇದನ್ನು ಹಿಂತಿರುಗಿಸಲು ಆಗಲ್ಲ.",
+    "deleteFailed": "Delete ಆಗಲಿಲ್ಲ. ಮತ್ತೆ Try ಮಾಡಿ.",
+    "emptyTitle": "ಇನ್ನೂ Chat ಇಲ್ಲ",
+    "emptyBody": "ಇಲ್ಲಿ ನೋಡಕ್ಕೆ Agro AI ಜೊತೆ ಹೊಸ Chat Start ಮಾಡಿ.",
+    "loadError": "ನಿಮ್ಮ Chats Load ಆಗಲಿಲ್ಲ. ಮತ್ತೆ Try ಮಾಡಿ.",
+    "retry": "ಮತ್ತೆ Try ಮಾಡಿ",
+    "untitled": "ಹೊಸ Conversation",
+    "pinnedChats": "Pin ಮಾಡಿದ Chats",
+    "allChats": "All Chats"
   }
 }

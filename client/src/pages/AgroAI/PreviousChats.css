@@ -1,0 +1,234 @@
+.previous-chats-page {
+  /* Bottom clearance for the floating .previous-chats-new-btn, so the
+     last chat row can always scroll fully above it - derived from the
+     button's own box model, same approach as CreateListing.css's
+     .create-listing-page and AppShell.css's bottomnav padding:
+       16px button's own bottom offset
+     + 52px button min-height
+     + 16px breathing room above the button
+     = 84px, plus env(safe-area-inset-bottom) for devices with a
+     home-indicator/gesture-bar inset (see index.html's
+     viewport-fit=cover). Update this if the button's own min-height
+     ever changes. */
+  padding-bottom: calc(84px + env(safe-area-inset-bottom));
+}
+
+/* Compact, bottom-right floating action - content-width, not a
+   full-width bar, and no separate wrapper: this button is fixed-
+   positioned directly, the single visible surface. Colors/shadow
+   reuse .sticky-bar-primary's exact "dark primary, white text,
+   elevated" treatment (StickyActionBar.css) - Annadata's own existing
+   dark-primary button style, not a new one-off invented for this
+   screen. */
+.previous-chats-new-btn {
+  position: fixed;
+  right: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  z-index: 150;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 0 20px;
+  border: none;
+  border-radius: 26px;
+  background: var(--green-dark);
+  color: #fff;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 12px 22px rgba(30, 91, 50, 0.2);
+}
+
+.previous-chats-status {
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+  padding: 24px 0;
+}
+
+.previous-chats-retry-btn {
+  margin-top: 8px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--green-dark);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.previous-chats-empty {
+  text-align: center;
+  padding: 40px 16px;
+}
+
+.previous-chats-empty-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0 0 6px;
+}
+
+.previous-chats-empty-body {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0;
+}
+
+.previous-chats-section + .previous-chats-section {
+  margin-top: 20px;
+}
+
+/* Lightweight by design - an icon + label, no card/border/background,
+   per "should feel like part of the app UI, not large cards." The one
+   divider for the whole section lives here now, not on every row
+   below - see .previous-chats-row, which is deliberately borderless. */
+.previous-chats-section-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 4px 8px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.previous-chats-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* No per-row border - rows belong to their section visually (the
+   header's divider above is the only line), separated from each
+   other by spacing alone. A small margin, on top of each row's own
+   16px vertical padding (see .previous-chats-row-title), keeps rows
+   from reading as glued together now that the border is gone. */
+.previous-chats-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.previous-chats-row-title {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 16px 4px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.previous-chats-row-title-text {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.previous-chats-row-menu {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+.previous-chats-sheet-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  min-height: 52px;
+  padding: 0 8px;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  cursor: pointer;
+  border-bottom: 1px solid var(--border);
+}
+
+.previous-chats-sheet-option:last-child {
+  border-bottom: none;
+}
+
+.previous-chats-sheet-option svg {
+  flex-shrink: 0;
+}
+
+/* Recolors both the label and its icon - lucide icons stroke with
+   currentColor by default, so this one rule already covers the icon
+   too, no separate icon-specific color override needed. */
+.previous-chats-sheet-danger {
+  color: #bc3327;
+}
+
+.previous-chats-sheet-title {
+  margin: 0 0 12px;
+  font-size: 16px;
+}
+
+.previous-chats-sheet-body {
+  margin: 0 0 16px;
+  font-size: 13.5px;
+  color: var(--muted);
+}
+
+.previous-chats-rename-input {
+  width: 100%;
+  min-height: 50px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 14px;
+  font: inherit;
+  font-size: 15px;
+  color: var(--text);
+  margin-bottom: 16px;
+  outline: none;
+}
+
+.previous-chats-rename-input:focus {
+  border-color: #2e7d46;
+  box-shadow: 0 0 0 4px rgba(46, 125, 70, 0.1);
+}
+
+.previous-chats-error {
+  color: #c0392b;
+  font-size: 12.5px;
+  font-weight: 700;
+  margin: -8px 0 12px;
+}
+
+.previous-chats-sheet-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}

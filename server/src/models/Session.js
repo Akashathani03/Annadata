@@ -38,6 +38,25 @@ const sessionSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
+    // Null until the Previous Chats list has something to show for this
+    // conversation - set once, automatically, from the farmer's first
+    // message (see conversation.service.js's generateReply), or later
+    // by hand via the rename endpoint. Never required: an old session
+    // from before this field existed simply has no title, which the
+    // Previous Chats UI treats as "untitled," not an error.
+    title: {
+      type: String,
+      default: null,
+    },
+    // Previous Chats' Pinned Chats section. Plain per-session flag on
+    // the same document - no separate collection, per the approved
+    // approach. A pinned session still appears in "All Chats" too;
+    // this field only ever affects which sections the frontend shows
+    // it in, never ownership/visibility rules.
+    pinned: {
+      type: Boolean,
+      default: false,
+    },
     context: {
       recentCropName: { type: String, default: null },
       recentDiagnosisSummary: { type: String, default: null },

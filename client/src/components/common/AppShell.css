@@ -43,6 +43,16 @@
   flex-shrink: 0;
 }
 
+/* Lighter than the back button's solid green treatment - a secondary
+   header action (Agro AI's Previous Chats entry point) shouldn't
+   visually compete with Back for primary attention. */
+.app-shell-menu-btn {
+  background: var(--cream);
+  border: 1px solid var(--border);
+  color: var(--text);
+  box-shadow: none;
+}
+
 .app-shell-titleblock {
   min-width: 0;
   flex: 1;

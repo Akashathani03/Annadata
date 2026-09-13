@@ -16,6 +16,19 @@ import * as agroAIRepository from '../repositories/agroAIRepository';
 // the same visit reuses it automatically.
 let currentSessionId = null;
 
+// Previous Chats' two entry points into this module-scoped session
+// state - New Chat clears it (the next send creates a fresh session,
+// same as a first-ever visit), opening a past conversation points it
+// at that session so the next send in this visit continues it instead
+// of starting another one.
+export function resetSession() {
+  currentSessionId = null;
+}
+
+export function resumeSession(sessionId) {
+  currentSessionId = sessionId;
+}
+
 // The backend document uses _id; every consumer of a message object
 // in this app (MessageBubble's key, retry lookups, etc.) reads .id.
 function normalizeMessage(raw) {
