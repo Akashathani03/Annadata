@@ -164,16 +164,19 @@ export async function getListingSeller(id, viewerId) {
 }
 
 async function assertValidItemForCategory(itemId, category) {
-  if (!itemId) {
-    // A crop listing may legitimately name something outside the
-    // catalog (a local/uncommon variety) - itemName is the required,
-    // trustworthy field in that case (see Listing.js), and there's
-    // simply no market-price lookup possible for it. Animal/equipment
-    // listings stay catalog-only - no signal they need this escape
-    // hatch, and loosening them isn't part of this fix.
-    if (category === 'crop') return;
-    throw new ApiError(400, 'VALIDATION_ERROR', `itemId is required for ${category} listings.`);
-  }
+  // A listing may legitimately name something outside the catalog - a
+  // local/uncommon crop variety, or an animal/equipment type not in
+  // the seeded catalog - itemName is the required, trustworthy field
+  // in that case (see Listing.js), and there's simply no catalog/
+  // market-price lookup possible for it. Applies uniformly to crop,
+  // animal, and equipment: the frontend's Create Listing forms already
+  // allow a farmer-typed custom value for all three (see e.g.
+  // CreateListing.jsx's customAnimalType/customEquipmentType), and the
+  // AgroAI marketplace search tool already assumes itemId can be null
+  // for any category, falling back to a text search (tools.js's
+  // resolveItemId). A supplied itemId is still fully validated below,
+  // regardless of category.
+  if (!itemId) return;
   const item = await cropRepository.findById(itemId);
   if (!item || item.category !== category) {
     throw new ApiError(400, 'VALIDATION_ERROR', `itemId does not reference a valid ${category} catalog item.`);

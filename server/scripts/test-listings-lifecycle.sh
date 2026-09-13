@@ -185,6 +185,63 @@ ALL_ANIMAL=$(echo "$RESP" | python3 -c "import json,sys; d=json.load(sys.stdin);
 check "category filter returns only that category" "True" "$ALL_ANIMAL"
 
 echo ""
+echo "=== Additional: itemId contract (crop/animal/equipment) ==="
+# POST /listings requires at least one photo (saveListingPhotos), so
+# these use multipart form data with a real file attached under the
+# 'photos' field - a plain JSON body would fail on the photo
+# requirement before ever reaching itemId validation.
+echo "fake image bytes" > /tmp/contract-test-photo.jpg
+
+CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$BASE/listings" -H "Authorization: Bearer $TOKEN_A" \
+  -F "category=crop" -F "itemName=Some Local Crop" -F "quantity=10" -F "unit=Kg" -F "price=15" -F "phone=9876543210" \
+  -F "photos=@/tmp/contract-test-photo.jpg;type=image/jpeg")
+check "crop, itemId missing -> 201" "201" "$CODE"
+
+CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$BASE/listings" -H "Authorization: Bearer $TOKEN_A" \
+  -F "category=animal" -F "itemName=Some Local Animal" -F "quantity=1" -F "unit=Head" -F "price=5000" -F "phone=9876543210" \
+  -F "photos=@/tmp/contract-test-photo.jpg;type=image/jpeg")
+check "animal, itemId missing -> 201" "201" "$CODE"
+
+CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$BASE/listings" -H "Authorization: Bearer $TOKEN_A" \
+  -F "category=equipment" -F "itemName=Some Local Tool" -F "quantity=1" -F "unit=Unit" -F "price=2000" -F "phone=9876543210" -F "condition=used-good" \
+  -F "photos=@/tmp/contract-test-photo.jpg;type=image/jpeg")
+check "equipment, itemId missing -> 201" "201" "$CODE"
+
+echo ""
+echo "=== Additional: a supplied itemId is still fully validated ==="
+CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$BASE/listings" -H "Authorization: Bearer $TOKEN_A" \
+  -F "category=animal" -F "itemId=bull" -F "itemName=Bull" -F "quantity=1" -F "unit=Head" -F "price=40000" -F "phone=9876543210" \
+  -F "photos=@/tmp/contract-test-photo.jpg;type=image/jpeg")
+check "animal, valid animal itemId -> 201" "201" "$CODE"
+
+CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$BASE/listings" -H "Authorization: Bearer $TOKEN_A" \
+  -F "category=equipment" -F "itemId=tractor" -F "itemName=Tractor" -F "quantity=1" -F "unit=Unit" -F "price=500000" -F "phone=9876543210" -F "condition=used-good" \
+  -F "photos=@/tmp/contract-test-photo.jpg;type=image/jpeg")
+check "equipment, valid equipment itemId -> 201" "201" "$CODE"
+
+CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$BASE/listings" -H "Authorization: Bearer $TOKEN_A" \
+  -F "category=animal" -F "itemId=not-a-real-catalog-id" -F "itemName=Cow" -F "quantity=1" -F "unit=Head" -F "price=30000" -F "phone=9876543210" \
+  -F "photos=@/tmp/contract-test-photo.jpg;type=image/jpeg")
+check "animal, invalid itemId -> 400" "400" "$CODE"
+
+CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$BASE/listings" -H "Authorization: Bearer $TOKEN_A" \
+  -F "category=equipment" -F "itemId=not-a-real-catalog-id" -F "itemName=Tractor" -F "quantity=1" -F "unit=Unit" -F "price=500000" -F "phone=9876543210" -F "condition=used-good" \
+  -F "photos=@/tmp/contract-test-photo.jpg;type=image/jpeg")
+check "equipment, invalid itemId -> 400" "400" "$CODE"
+
+CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$BASE/listings" -H "Authorization: Bearer $TOKEN_A" \
+  -F "category=animal" -F "itemId=onion" -F "itemName=Cow" -F "quantity=1" -F "unit=Head" -F "price=30000" -F "phone=9876543210" \
+  -F "photos=@/tmp/contract-test-photo.jpg;type=image/jpeg")
+check "animal, crop itemId (category mismatch) -> 400" "400" "$CODE"
+
+CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$BASE/listings" -H "Authorization: Bearer $TOKEN_A" \
+  -F "category=equipment" -F "itemId=cow" -F "itemName=Tractor" -F "quantity=1" -F "unit=Unit" -F "price=500000" -F "phone=9876543210" -F "condition=used-good" \
+  -F "photos=@/tmp/contract-test-photo.jpg;type=image/jpeg")
+check "equipment, animal itemId (category mismatch) -> 400" "400" "$CODE"
+
+rm -f /tmp/contract-test-photo.jpg
+
+echo ""
 echo "================================"
 echo "$PASS passed, $FAIL failed"
 echo "================================"
