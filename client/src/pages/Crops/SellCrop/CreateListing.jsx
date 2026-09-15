@@ -913,8 +913,6 @@ export default function CreateListing() {
           )}
         </StepCard>
 
-        <div style={{ height: 128 }} />
-
         <div className="cl-sticky-bar">
           <StickyActionBar
             secondaryLabel={t(

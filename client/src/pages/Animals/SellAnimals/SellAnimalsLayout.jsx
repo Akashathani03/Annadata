@@ -62,6 +62,7 @@ export default function SellAnimalsLayout() {
       icon: IconAdd,
       label: t('navigation:animals.sellAnimal'),
       route: '/sell-animal/create',
+      primary: true,
     },
     {
       key: 'listings',

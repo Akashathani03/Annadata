@@ -49,6 +49,7 @@ export default function SellCropLayout() {
       icon: IconAdd,
       label: t('navigation:crops.sellCrop'),
       route: '/sell/create',
+      primary: true,
     },
     {
       key: 'listings',

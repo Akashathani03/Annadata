@@ -71,7 +71,10 @@ export default function AppShell({ title, subtitle, onBack, navItems, activeNavK
           {navItems.map((item) => (
             <a
               key={item.key}
-              className={item.key === activeNavKey ? 'active' : ''}
+              className={[
+                item.key === activeNavKey ? 'active' : '',
+                item.primary ? 'primary' : '',
+              ].filter(Boolean).join(' ')}
               onClick={() => navigate(item.route)}
             >
               <span className="ic"><item.icon size={19} strokeWidth={2} /></span>

@@ -866,10 +866,6 @@ export default function CreateListing() {
           />
         </StepCard>
 
-        {/* Space for sticky bar */}
-
-        <div style={{ height: 128 }} />
-
         {/* ==========================================
             STICKY ACTION BAR
         ========================================== */}

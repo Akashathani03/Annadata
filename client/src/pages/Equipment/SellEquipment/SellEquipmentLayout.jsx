@@ -25,7 +25,7 @@ export default function SellEquipmentLayout() {
 
   const navItems = [
     { key: 'dashboard', icon: IconHome, label: t('common:dashboard'), route: '/sell-equipment/dashboard' },
-    { key: 'create', icon: IconAdd, label: t('navigation:equipment.sellEquipment'), route: '/sell-equipment/create' },
+    { key: 'create', icon: IconAdd, label: t('navigation:equipment.sellEquipment'), route: '/sell-equipment/create', primary: true },
     { key: 'listings', icon: IconListings, label: t('equipment:nav.myListings'), route: '/sell-equipment/listings' },
   ];
 

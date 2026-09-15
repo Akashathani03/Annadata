@@ -1,5 +1,30 @@
 .create-listing-page {
-  padding-bottom: 90px;
+  /* Sole bottom-clearance mechanism for the fixed .cl-sticky-bar below.
+     Previously this padding coexisted with a separate inline spacer
+     div in the JSX - both reserved space for the same bar, independently
+     and uncoordinated (confirmed via git history: both existed since
+     this screen's very first version), which is why the two combined
+     to far more clearance than the bar actually needs. That spacer has
+     been removed; this is now the only source of truth, derived
+     directly from .cl-sticky-bar's own box model below:
+       16px bar's own bottom offset
+     + 16px bar's vertical padding (8px top + 8px bottom)
+     +  2px bar's border (1px top + 1px bottom)
+     + 52px button min-height - already tall enough for a wrapped
+       second line of the longer Kannada/Mix labels ("ಪಟ್ಟಿ Publish
+       ಮಾಡಿ", "Draft ಆಗಿ Save ಮಾಡಿ") at this font-size/weight, so no
+       extra allowance is needed for that case
+     + 14px gap before the bar, matching .cl-field's own margin-bottom
+       used throughout this form (not a new/arbitrary value)
+     = 100px, plus env(safe-area-inset-bottom) for devices that report
+     a real home-indicator/gesture-bar inset (see index.html's
+     viewport-fit=cover - genuinely needed for iOS Safari; correctly
+     evaluates to 0 on most Android devices, where there is no such
+     inset to account for).
+     Update this if .cl-sticky-bar's own padding/border/min-height
+     below ever changes - shared by Crop, Animal, and Equipment Create
+     Listing (all three import this file). */
+  padding-bottom: calc(100px + env(safe-area-inset-bottom));
 }
 
 .create-listing-subtitle {

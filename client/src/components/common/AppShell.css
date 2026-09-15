@@ -9,9 +9,30 @@
 /* The bottom-nav bar (below) floats inset from the viewport edge and is
    taller than the default reserve accounts for - pages using it need more
    bottom clearance than the sticky-action-bar reserve. Scoped via :has() so
-   pages using stickyBar, or no fixed bottom UI at all, are unaffected. */
+   pages using stickyBar, or no fixed bottom UI at all, are unaffected.
+   Derived from .app-shell-bottomnav's own real box model, same approach
+   as CreateListing.css's .create-listing-page padding - not a flat guess.
+   Sized for the WORST-CASE item height, not the common case: the bar uses
+   align-items:center (not stretch), so its real height follows whichever
+   item is tallest, and the longer labels here ("Sell Equipment", Kannada's
+   "ಪ್ರಾಣಿ ಮಾರಾಟ ಮಾಡಿ") do wrap to 2 lines in this column width at
+   320-360px viewports - sizing for 1 line here would silently under-
+   reserve exactly when a label wraps:
+     16px bar's own bottom offset
+   + 10px bar's vertical padding (top)
+   + 12px item's vertical padding (top)
+   + 24px icon height
+   +  6px gap between icon and label
+   + 32px label, 2 lines (13px font, ~1.2 line-height, ~16px/line)
+   + 12px item's vertical padding (bottom)
+   + 10px bar's vertical padding (bottom)
+   + 16px breathing room above the bar
+   = 138px, plus env(safe-area-inset-bottom) for devices that report a
+   real home-indicator/gesture-bar inset (see index.html's
+   viewport-fit=cover). Update this if .app-shell-bottomnav's own
+   padding/icon/label sizing below ever changes. */
 .app-shell:has(.app-shell-bottomnav) {
-  padding-bottom: 136px;
+  padding-bottom: calc(138px + env(safe-area-inset-bottom));
 }
 
 .app-shell-bar {
@@ -131,19 +152,19 @@
 
 .app-shell-bottomnav {
   position: fixed;
-  left: 26px;
-  right: 26px;
+  left: 12px;
+  right: 12px;
   bottom: calc(16px + env(safe-area-inset-bottom));
   z-index: 150;
   background: #fff;
   border: 1px solid var(--border);
-  border-radius: 28px;
+  border-radius: 32px;
   display: flex;
   align-items: center;
   justify-content: space-around;
-  padding: 8px;
-  box-shadow: 0 14px 32px rgba(31, 43, 35, 0.16);
-  max-width: 428px;
+  padding: 10px 14px;
+  box-shadow: 0 16px 36px rgba(31, 43, 35, 0.16);
+  max-width: 480px;
   margin: 0 auto;
 }
 
@@ -152,17 +173,17 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  min-height: 56px;
-  font-size: 11.5px;
+  gap: 6px;
+  min-height: 64px;
+  font-size: 13px;
   font-weight: 700;
   color: var(--muted);
   flex: 1;
-  padding: 9px 8px;
-  border-radius: 20px;
+  padding: 12px 10px;
+  border-radius: 22px;
   cursor: pointer;
   text-align: center;
-  line-height: 1.15;
+  line-height: 1.2;
   transition: background-color 0.15s ease, color 0.15s ease;
 }
 
@@ -175,11 +196,39 @@
    bump the rendered SVG box directly here rather than in JS, so this stays
    a CSS-only visual change. */
 .app-shell-bottomnav a .ic svg {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
 }
 
 .app-shell-bottomnav a.active {
   background: var(--green-light);
   color: var(--green-dark);
+}
+
+/* Distinguishes the one nav item that opens this section's primary
+   create action (Sell Crop/Sell Animal/Sell Equipment's "create" item)
+   from an ordinary destination like Manage Shop's middle item ("My
+   Shop") - opted into per item via navItems' `primary: true`, never
+   inferred from position. Purely visual: same click/navigate behavior,
+   same label/active-state logic as any other item - only the icon
+   badge is raised and filled, inspired by a floating center action
+   button without introducing a new nav item or route. */
+.app-shell-bottomnav a.primary .ic {
+  width: 58px;
+  height: 58px;
+  align-items: center;
+  justify-content: center;
+  margin-top: -34px;
+  border-radius: 50%;
+  background: var(--green-dark);
+  color: #fff;
+  box-shadow: 0 12px 24px rgba(30, 91, 50, 0.35);
+}
+
+/* Bumped past the shared 24px .ic svg size (above) - the "+" needs to
+   read clearly at this larger circle's scale, proportionate to it
+   rather than matching the smaller icons either side of it. */
+.app-shell-bottomnav a.primary .ic svg {
+  width: 28px;
+  height: 28px;
 }

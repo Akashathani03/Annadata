@@ -895,14 +895,6 @@ export default function CreateListing() {
         </StepCard>
 
 
-        {/* Bottom spacing */}
-        <div
-          style={{
-            height: 128,
-          }}
-        />
-
-
         {/* Sticky actions */}
         <div className="cl-sticky-bar">
           <StickyActionBar
